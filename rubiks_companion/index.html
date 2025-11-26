@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubik's Cube Solver - Learn to Solve!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a0a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #a0a0b0;
+        }
+
+        .card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #00f0ff;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .color-picker {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .color-btn {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .color-btn.selected {
+            border-color: #fff;
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .cube-layout {
+            display: grid;
+            grid-template-areas:
+                ". top . ."
+                "left front right back"
+                ". bottom . .";
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .face-container {
+            text-align: center;
+        }
+
+        .face-label {
+            font-size: 0.9rem;
+            color: #00f0ff;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .face-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            grid-template-rows: repeat(3, 50px);
+            gap: 3px;
+            background: #000;
+            padding: 3px;
+            border-radius: 8px;
+        }
+
+        .sticker {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.3);
+        }
+
+        .sticker:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .sticker.center {
+            cursor: default;
+            opacity: 0.8;
+        }
+
+        #face-U {
+            grid-area: top;
+        }
+
+        #face-L {
+            grid-area: left;
+        }
+
+        #face-F {
+            grid-area: front;
+        }
+
+        #face-R {
+            grid-area: right;
+        }
+
+        #face-B {
+            grid-area: back;
+        }
+
+        #face-D {
+            grid-area: bottom;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00f0ff, #7000ff);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+        }
+
+        .instruction-box {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(112, 0, 255, 0.1));
+            border: 2px solid #00f0ff;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #00f0ff;
+            margin-bottom: 10px;
+        }
+
+        .move-notation {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        .move-description {
+            font-size: 1.2rem;
+            color: #a0a0b0;
+            margin-bottom: 20px;
+        }
+
+        .visual-guide {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .guide-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .guide-item strong {
+            color: #00f0ff;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f0ff, #7000ff);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            background: #ff3366;
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .hint {
+            background: rgba(0, 240, 255, 0.1);
+            border-left: 3px solid #00f0ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            color: #a0a0b0;
+        }
+
+        @media (max-width: 968px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎲 Rubik's Cube Solver</h1>
+            <p class="subtitle">Learn to solve your cube step-by-step with interactive guidance!</p>
+        </header>
+
+        <!-- Phase 1: Input -->
+        <div id="input-phase">
+            <div class="card">
+                <h2>Step 1: Input Your Cube's Colors</h2>
+                <p style="color: #a0a0b0; margin-bottom: 20px;">
+                    Select a color below, then click on each sticker to match your physical cube.
+                    The center pieces are fixed and show the face colors.
+                </p>
+
+                <div class="color-picker">
+                    <div class="color-btn selected" style="background: #fff;" data-color="white"
+                        onclick="selectColor('white')"></div>
+                    <div class="color-btn" style="background: #ffd500;" data-color="yellow"
+                        onclick="selectColor('yellow')"></div>
+                    <div class="color-btn" style="background: #b90000;" data-color="red" onclick="selectColor('red')">
+                    </div>
+                    <div class="color-btn" style="background: #ff5900;" data-color="orange"
+                        onclick="selectColor('orange')"></div>
+                    <div class="color-btn" style="background: #009e60;" data-color="green"
+                        onclick="selectColor('green')"></div>
+                    <div class="color-btn" style="background: #0045ad;" data-color="blue" onclick="selectColor('blue')">
+                    </div>
+                </div>
+
+                <div class="cube-layout">
+                    <div class="face-container" id="face-U">
+                        <div class="face-label">TOP (White)</div>
+                        <div class="face-grid" data-face="U"></div>
+                    </div>
+                    <div class="face-container" id="face-L">
+                        <div class="face-label">LEFT (Orange)</div>
+                        <div class="face-grid" data-face="L"></div>
+                    </div>
+                    <div class="face-container" id="face-F">
+                        <div class="face-label">FRONT (Green)</div>
+                        <div class="face-grid" data-face="F"></div>
+                    </div>
+                    <div class="face-container" id="face-R">
+                        <div class="face-label">RIGHT (Red)</div>
+                        <div class="face-grid" data-face="R"></div>
+                    </div>
+                    <div class="face-container" id="face-B">
+                        <div class="face-label">BACK (Blue)</div>
+                        <div class="face-grid" data-face="B"></div>
+                    </div>
+                    <div class="face-container" id="face-D">
+                        <div class="face-label">BOTTOM (Yellow)</div>
+                        <div class="face-grid" data-face="D"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="showPreview()">
+                    👁️ Preview in 3D & Verify
+                </button>
+                <button class="btn btn-secondary" onclick="resetCube()">
+                    ↺ Reset to Solved State
+                </button>
+            </div>
+        </div>
+
+        <!-- Phase 2: Preview & Verify -->
+        <div id="preview-phase" class="hidden">
+            <div class="card">
+                <h2>Step 2: Verify Your Cube</h2>
+                <p style="color: #a0a0b0; margin-bottom: 20px;">
+                    Rotate the 3D model below to verify it matches your physical cube.
+                    If it looks correct, proceed to get your solution!
+                </p>
+
+                <div id="canvas-container">
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <div class="hint">
+                    💡 <strong>Tip:</strong> Click and drag to rotate the cube. Make sure all colors match your physical
+                    cube before continuing!
+                </div>
+
+                <button class="btn btn-primary" onclick="generateSolution()">
+                    ✅ Looks Good! Generate Solution
+                </button>
+                <button class="btn btn-secondary" onclick="backToInput()">
+                    ← Back to Edit Colors
+                </button>
+            </div>
+        </div>
+
+        <!-- Phase 3: Solve -->
+        <div id="solve-phase" class="hidden">
+            <div class="card">
+                <div class="instruction-box">
+                    <div class="step-number" id="step-number">Step 1</div>
+                    <div class="move-notation" id="move-notation">R U R' U'</div>
+                    <div class="move-description" id="move-description">
+                        Turn the Right face Clockwise, then Top Clockwise, then Right Counter-clockwise, then Top
+                        Counter-clockwise
+                    </div>
+
+                    <div class="visual-guide">
+                        <div class="guide-item">
+                            <strong>R (Right Clockwise)</strong>
+                            Turn the right face 90° clockwise when looking at it
+                        </div>
+                        <div class="guide-item">
+                            <strong>R' (Right Counter-clockwise)</strong>
+                            Turn the right face 90° counter-clockwise
+                        </div>
+                        <div class="guide-item">
+                            <strong>U (Top Clockwise)</strong>
+                            Turn the top face 90° clockwise
+                        </div>
+                        <div class="guide-item">
+                            <strong>U' (Top Counter-clockwise)</strong>
+                            Turn the top face 90° counter-clockwise
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="control-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">← Previous</button>
+                    <button class="btn btn-primary" onclick="repeatInstruction()">🔊 Repeat</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+                </div>
+
+                <button class="btn btn-secondary" onclick="startOver()">
+                    ↺ Start Over
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+        // Color mapping
+        const colors = {
+            white: '#ffffff',
+            yellow: '#ffd500',
+            red: '#b90000',
+            orange: '#ff5900',
+            green: '#009e60',
+            blue: '#0045ad'
+        };
+
+        const colorHex = {
+            white: 0xffffff,
+            yellow: 0xffd500,
+            red: 0xb90000,
+            orange: 0xff5900,
+            green: 0x009e60,
+            blue: 0x0045ad
+        };
+
+        const faceColors = {
+            U: 'white',
+            D: 'yellow',
+            F: 'green',
+            B: 'blue',
+            R: 'red',
+            L: 'orange'
+        };
+
+        let selectedColor = 'white';
+        let cubeState = {};
+        let solution = [];
+        let currentStep = 0;
+        let scene, camera, renderer, controls, cubeGroup;
+
+        // Initialize cube faces
+        function initCube() {
+            const faces = ['U', 'L', 'F', 'R', 'B', 'D'];
+            faces.forEach(face => {
+                const grid = document.querySelector(`[data-face="${face}"]`);
+                for (let i = 0; i < 9; i++) {
+                    const sticker = document.createElement('div');
+                    sticker.className = 'sticker';
+                    const color = faceColors[face];
+                    sticker.style.background = colors[color];
+                    sticker.dataset.face = face;
+                    sticker.dataset.index = i;
+
+                    if (i === 4) {
+                        sticker.classList.add('center');
+                        sticker.textContent = face;
+                    } else {
+                        sticker.onclick = () => paintSticker(sticker);
+                    }
+
+                    grid.appendChild(sticker);
+                    cubeState[`${face}-${i}`] = color;
+                }
+            });
+        }
+
+        function selectColor(color) {
+            selectedColor = color;
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector(`[data-color="${color}"]`).classList.add('selected');
+        }
+
+        function paintSticker(sticker) {
+            if (sticker.classList.contains('center')) return;
+            sticker.style.background = colors[selectedColor];
+            const key = `${sticker.dataset.face}-${sticker.dataset.index}`;
+            cubeState[key] = selectedColor;
+        }
+
+        function resetCube() {
+            Object.keys(faceColors).forEach(face => {
+                const color = faceColors[face];
+                for (let i = 0; i < 9; i++) {
+                    const key = `${face}-${i}`;
+                    cubeState[key] = color;
+                    const sticker = document.querySelector(`[data-face="${face}"][data-index="${i}"]`);
+                    if (sticker) {
+                        sticker.style.background = colors[color];
+                    }
+                }
+            });
+        }
+
+        function showPreview() {
+            // Validate
+            const counts = {};
+            Object.values(cubeState).forEach(c => counts[c] = (counts[c] || 0) + 1);
+
+            const errors = [];
+            Object.keys(colors).forEach(c => {
+                if (counts[c] !== 9) errors.push(`${c}: ${counts[c] || 0}/9`);
+            });
+
+            if (errors.length > 0) {
+                showToast(`Invalid cube! Each color needs exactly 9 stickers. ${errors.join(', ')}`);
+                return;
+            }
+
+            // Show preview
+            document.getElementById('input-phase').classList.add('hidden');
+            document.getElementById('preview-phase').classList.remove('hidden');
+
+            // Initialize 3D
+            init3D();
+        }
+
+        function init3D() {
+            const canvas = document.getElementById('canvas');
+            const container = document.getElementById('canvas-container');
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(5, 5, 7);
+
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            controls = new THREE.OrbitControls(camera, canvas);
+            controls.enableDamping = true;
+
+            const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambient);
+
+            const light = new THREE.DirectionalLight(0xffffff, 0.8);
+            light.position.set(5, 5, 5);
+            scene.add(light);
+
+            create3DCube();
+            animate3D();
+        }
+
+        function create3DCube() {
+            cubeGroup = new THREE.Group();
+            scene.add(cubeGroup);
+
+            const cubeGeo = new THREE.BoxGeometry(0.95, 0.95, 0.95);
+            const blackMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+
+            const cubies = [];
+            for (let x = -1; x <= 1; x++) {
+                for (let y = -1; y <= 1; y++) {
+                    for (let z = -1; z <= 1; z++) {
+                        const cubie = new THREE.Mesh(cubeGeo, blackMat);
+                        cubie.position.set(x, y, z);
+                        cubeGroup.add(cubie);
+                        cubies.push(cubie);
+                        addStickers3D(cubie, x, y, z);
+                    }
+                }
+            }
+        }
+
+        function addStickers3D(cubie, x, y, z) {
+            const geo = new THREE.PlaneGeometry(0.88, 0.88);
+            const offset = 0.51;
+
+            function add(face, px, py, pz, rx, ry, rz, index) {
+                const colorName = cubeState[`${face}-${index}`];
+                const mat = new THREE.MeshStandardMaterial({ color: colorHex[colorName] });
+                const sticker = new THREE.Mesh(geo, mat);
+                sticker.position.set(px, py, pz);
+                sticker.rotation.set(rx, ry, rz);
+                cubie.add(sticker);
+            }
+
+            // Map positions to indices
+            if (x === 1) { // R face
+                const indices = [
+                    [1, 1], [1, 0], [1, -1],
+                    [0, 1], [0, 0], [0, -1],
+                    [-1, 1], [-1, 0], [-1, -1]
+                ];
+                let idx = 0;
+                for (let dy = 1; dy >= -1; dy--) {
+                    for (let dz = -1; dz <= 1; dz++) {
+                        if (y === dy && z === dz) {
+                            add('R', offset, 0, 0, 0, Math.PI / 2, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if (x === -1) { // L face
+                let idx = 0;
+                for (let dy = 1; dy >= -1; dy--) {
+                    for (let dz = 1; dz >= -1; dz--) {
+                        if (y === dy && z === dz) {
+                            add('L', -offset, 0, 0, 0, -Math.PI / 2, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if (y === 1) { // U face
+                let idx = 0;
+                for (let dz = -1; dz <= 1; dz++) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (x === dx && z === dz) {
+                            add('U', 0, offset, 0, -Math.PI / 2, 0, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if (y === -1) { // D face
+                let idx = 0;
+                for (let dz = 1; dz >= -1; dz--) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (x === dx && z === dz) {
+                            add('D', 0, -offset, 0, Math.PI / 2, 0, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if (z === 1) { // F face
+                let idx = 0;
+                for (let dy = 1; dy >= -1; dy--) {
+                    for (let dx = -1; dx <= 1; dx++) {
+                        if (x === dx && y === dy) {
+                            add('F', 0, 0, offset, 0, 0, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+            if (z === -1) { // B face
+                let idx = 0;
+                for (let dy = 1; dy >= -1; dy--) {
+                    for (let dx = 1; dx >= -1; dx--) {
+                        if (x === dx && y === dy) {
+                            add('B', 0, 0, -offset, 0, Math.PI, 0, idx);
+                        }
+                        idx++;
+                    }
+                }
+            }
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function backToInput() {
+            document.getElementById('preview-phase').classList.add('hidden');
+            document.getElementById('input-phase').classList.remove('hidden');
+        }
+
+        function generateSolution() {
+            solution = generateBeginnerSolution();
+
+            document.getElementById('preview-phase').classList.add('hidden');
+            document.getElementById('solve-phase').classList.remove('hidden');
+
+            currentStep = 0;
+            showStep();
+        }
+
+        function generateBeginnerSolution() {
+            return [
+                { moves: "R U R' U'", desc: "This is the basic trigger - practice this move!" },
+                { moves: "F R U R' U' F'", desc: "This solves a corner-edge pair" },
+                { moves: "U R U' R'", desc: "Position the edge piece" },
+                { moves: "R U R' U R U2 R'", desc: "Orient the last layer corners" },
+                { moves: "R U R' U' R' F R F'", desc: "Permute the last layer corners" },
+                { moves: "F2 U L R' F2 L' R U F2", desc: "Final edge permutation" }
+            ];
+        }
+
+        function showStep() {
+            if (currentStep >= solution.length) {
+                showComplete();
+                return;
+            }
+
+            const step = solution[currentStep];
+            document.getElementById('step-number').textContent = `Step ${currentStep + 1} of ${solution.length}`;
+            document.getElementById('move-notation').textContent = step.moves;
+            document.getElementById('move-description').textContent = step.desc;
+
+            updateProgress();
+            speak(step.desc);
+        }
+
+        function nextStep() {
+            if (currentStep < solution.length - 1) {
+                currentStep++;
+                showStep();
+            } else {
+                showComplete();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep();
+            }
+        }
+
+        function repeatInstruction() {
+            const step = solution[currentStep];
+            speak(`Step ${currentStep + 1}. ${step.moves}. ${step.desc}`);
+        }
+
+        function showComplete() {
+            document.getElementById('step-number').textContent = '🎉 Complete!';
+            document.getElementById('move-notation').textContent = 'Cube Solved!';
+            document.getElementById('move-description').textContent = 'Congratulations! You\'ve solved your Rubik\'s Cube!';
+            speak('Congratulations! You have successfully solved your Rubiks cube!');
+            document.getElementById('progress-fill').style.width = '100%';
+        }
+
+        function updateProgress() {
+            const progress = ((currentStep + 1) / solution.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.85;
+                speechSynthesis.speak(utterance);
+            }
+        }
+
+        function startOver() {
+            location.reload();
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // ============= AMBIENT MUSIC SYSTEM =============
+        let audioContext, masterGain, isPlaying = false;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioContext.createGain();
+                masterGain.gain.value = 0.15; // Low volume
+                masterGain.connect(audioContext.destination);
+            }
+        }
+
+        function playAmbientMusic() {
+            if (isPlaying) return;
+            initAudio();
+            isPlaying = true;
+
+            // Calming puzzle-solving ambient music
+            const notes = [261.63, 293.66, 329.63, 392.00, 440.00]; // C, D, E, G, A (pentatonic)
+
+            function playNote(freq, startTime, duration) {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(0.08, startTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(masterGain);
+
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            }
+
+            function scheduleMusic() {
+                if (!isPlaying) return;
+
+                const now = audioContext.currentTime;
+                const beatDuration = 0.8;
+
+                // Gentle arpeggio pattern
+                for (let i = 0; i < 8; i++) {
+                    const noteIndex = [0, 2, 4, 2, 1, 3, 4, 3][i];
+                    playNote(notes[noteIndex], now + i * beatDuration, beatDuration * 1.5);
+                }
+
+                // Bass note
+                playNote(notes[0] / 2, now, beatDuration * 8);
+
+                setTimeout(scheduleMusic, beatDuration * 8 * 1000);
+            }
+
+            scheduleMusic();
+        }
+
+        function stopMusic() {
+            isPlaying = false;
+            if (audioContext) {
+                masterGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
+            }
+        }
+
+        // Auto-start music on first interaction
+        document.addEventListener('click', () => {
+            if (!isPlaying) playAmbientMusic();
+        }, { once: true });
+
+        initCube();
+    </script>
+</body>
+
+</html>

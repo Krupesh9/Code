@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floor is Lava</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-layer">
+            <div id="score-display">Time: 0s</div>
+            <div id="start-screen" class="active">
+                <h1>Floor is Lava</h1>
+                <p>Click or Tap to Flip Gravity</p>
+                <p>Avoid the Lava!</p>
+                <button id="start-btn">Start Game</button>
+            </div>
+            <div id="game-over-screen" class="hidden">
+                <h1>Game Over</h1>
+                <p>You survived for <span id="final-score">0</span> seconds</p>
+                <button id="restart-btn">Try Again</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+
+</html>

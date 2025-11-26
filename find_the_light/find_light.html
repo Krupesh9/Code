@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find the Light - Neon Speaker Edition</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --speaker-body: #2a2a2a;
+            --speaker-grill: #111;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff66;
+            --light-core: #fff;
+            --light-glow: #ffd700;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* --- UI Overlay --- */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .hud.visible {
+            opacity: 1;
+        }
+
+        /* --- Screens --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 18, 18, 0.95);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+            pointer-events: auto;
+        }
+
+        .screen.hidden {
+            transform: translateY(-100%);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p {
+            color: #aaa;
+            max-width: 80%;
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        button:hover,
+        button:active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+            transform: scale(1.02);
+        }
+
+        button.easy {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        button.easy:hover {
+            background: var(--neon-green);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.6);
+        }
+
+        button.hard {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        button.hard:hover {
+            background: var(--neon-pink);
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+        }
+
+        /* --- Game Area --- */
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 100%;
+            margin-top: 60px;
+            /* Space for HUD */
+        }
+
+        /* --- Speaker Object --- */
+        .speaker-container {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+            cursor: pointer;
+            /* Debug border removed, physics handled by JS */
+        }
+
+        .speaker {
+            width: 80px;
+            height: 90px;
+            background: var(--speaker-body);
+            border-radius: 8px;
+            border-bottom: 4px solid #444;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* The lifting animation class */
+        .speaker.lifted {
+            transform: translateY(-50px);
+        }
+
+        /* The mesh grill */
+        .grill {
+            width: 60px;
+            height: 60px;
+            background:
+                radial-gradient(circle, #333 30%, transparent 31%),
+                radial-gradient(circle, #333 30%, transparent 31%);
+            background-size: 8px 8px;
+            background-color: var(--speaker-grill);
+            border-radius: 50%;
+            border: 2px solid #444;
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        /* Neon rim lights based on difficulty/state */
+        .speaker::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 5px rgba(0, 243, 255, 0.1);
+        }
+
+        /* --- The Hidden Light --- */
+        .light {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, var(--light-core), var(--light-glow));
+            border-radius: 50%;
+            box-shadow: 0 0 20px var(--light-glow), 0 0 40px var(--light-glow);
+            z-index: 5;
+            /* Behind speaker (10) */
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .light.visible {
+            opacity: 1;
+            transform: scale(1);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                box-shadow: 0 0 20px var(--light-glow);
+            }
+
+            to {
+                box-shadow: 0 0 40px var(--light-glow), 0 0 60px var(--light-glow);
+            }
+        }
+
+        /* --- Feedback Text --- */
+        #feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: 900;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 50;
+        }
+
+        .anim-pop {
+            animation: popIn 1s forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HUD -->
+    <div id="ui-layer">
+        <div class="hud" id="hud">
+            <span id="score-display">Level: 1</span>
+            <span id="speaker-count">Speakers: 3</span>
+        </div>
+    </div>
+
+    <!-- Start Menu -->
+    <div id="start-screen" class="screen">
+        <h1>Find the Light</h1>
+        <p>Keep your eye on the speaker hiding the glowing orb.</p>
+
+        <div class="btn-group">
+            <button class="easy" onclick="startGame('easy')">Easy (Toddler)</button>
+            <button class="medium" onclick="startGame('medium')">Medium (Kids)</button>
+            <button class="hard" onclick="startGame('hard')">Hard (Pro)</button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="screen hidden">
+        <h1 style="color: #ff3333; -webkit-text-fill-color: #ff3333;">Game Over</h1>
+        <p>You lost track of the light!</p>
+        <h2 id="final-score">Level Reached: 5</h2>
+        <div class="btn-group">
+            <button onclick="resetToMenu()">Main Menu</button>
+            <button class="easy" onclick="restartGame()">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div id="game-container">
+        <!-- Speakers injected here via JS -->
+    </div>
+
+    <div id="feedback"></div>
+
+    <script>
+        // --- Game State ---
+        const state = {
+            mode: 'medium',
+            level: 1,
+            numSpeakers: 3,
+            swapSpeed: 1000, // ms per swap
+            swapCount: 5,
+            isShuffling: false,
+            correctIndex: 0,
+            speakers: [] // Array of DOM elements
+        };
+
+        const config = {
+            easy: { startSpeakers: 2, startSpeed: 1800, startSwaps: 2, speedInc: 0.95 },
+            medium: { startSpeakers: 3, startSpeed: 1000, startSwaps: 5, speedInc: 0.92 },
+            hard: { startSpeakers: 4, startSpeed: 500, startSwaps: 8, speedInc: 0.90 }
+        };
+
+        const container = document.getElementById('game-container');
+        const hud = document.getElementById('hud');
+
+        // --- Sounds (Synthesized) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'shuffle') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'reveal') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.1);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.setValueAtTime(600, now + 0.1);
+                osc.frequency.setValueAtTime(1000, now + 0.2);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } else if (type === 'lose') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+                gainNode.gain.setValueAtTime(0.3, now);
+                gainNode.gain.linearRampToValueAtTime(0, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        }
+
+        // --- Core Logic ---
+
+        function startGame(mode) {
+            state.mode = mode;
+            state.level = 1;
+            state.numSpeakers = config[mode].startSpeakers;
+            state.swapSpeed = config[mode].startSpeed;
+            state.swapCount = config[mode].startSwaps;
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            hud.classList.add('visible');
+
+            updateHUD();
+            setupRound();
+        }
+
+        function restartGame() {
+            startGame(state.mode);
+        }
+
+        function resetToMenu() {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+            hud.classList.remove('visible');
+        }
+
+        function updateHUD() {
+            document.getElementById('score-display').innerText = `Level: ${state.level}`;
+            document.getElementById('speaker-count').innerText = `Speakers: ${state.numSpeakers}`;
+        }
+
+        // Calculate positions for grid layout (Flex-like behavior with absolute positioning)
+        function getGridPositions(count, width, height) {
+            const positions = [];
+            const itemSize = 100; // 100x100px area for speaker
+            const gap = 20;
+
+            // Calculate columns based on screen width
+            const maxCols = Math.floor(width / (itemSize + gap));
+            // Ensure at least 2 cols, max count cols
+            const cols = Math.min(Math.max(2, maxCols), count);
+
+            // Center the grid
+            const gridWidth = cols * (itemSize + gap) - gap;
+            const startX = (width - gridWidth) / 2;
+            const startY = 100; // Top padding
+
+            for (let i = 0; i < count; i++) {
+                const row = Math.floor(i / cols);
+                const col = i % cols;
+                positions.push({
+                    x: startX + col * (itemSize + gap),
+                    y: startY + row * (itemSize + gap)
+                });
+            }
+            return positions;
+        }
+
+        function setupRound() {
+            state.isShuffling = true;
+            container.innerHTML = '';
+            state.speakers = [];
+
+            // 1. Create Speakers & Light
+            const positions = getGridPositions(state.numSpeakers, container.offsetWidth, container.offsetHeight);
+
+            for (let i = 0; i < state.numSpeakers; i++) {
+                // Wrapper
+                const wrap = document.createElement('div');
+                wrap.className = 'speaker-container';
+                wrap.style.left = positions[i].x + 'px';
+                wrap.style.top = positions[i].y + 'px';
+                wrap.dataset.index = i; // Current visual index
+                wrap.onclick = () => handleGuess(wrap);
+
+                // Speaker Body
+                const speaker = document.createElement('div');
+                speaker.className = 'speaker';
+                speaker.innerHTML = '<div class="grill"></div>';
+
+                // Light (Hidden inside/behind)
+                const light = document.createElement('div');
+                light.className = 'light';
+
+                wrap.appendChild(light);
+                wrap.appendChild(speaker); // Speaker on top
+                container.appendChild(wrap);
+                state.speakers.push(wrap);
+            }
+
+            // 2. Pick winner
+            state.correctIndex = Math.floor(Math.random() * state.numSpeakers);
+            const winningWrap = state.speakers[state.correctIndex];
+            const light = winningWrap.querySelector('.light');
+            const speakerBody = winningWrap.querySelector('.speaker');
+
+            // 3. Reveal phase
+            setTimeout(() => {
+                speakerBody.classList.add('lifted');
+                light.classList.add('visible');
+                playSound('reveal');
+
+                setTimeout(() => {
+                    speakerBody.classList.remove('lifted');
+                    light.classList.remove('visible');
+
+                    setTimeout(() => {
+                        startShuffling();
+                    }, 500);
+                }, 1000 - (state.level * 20)); // Hide faster on higher levels
+            }, 500);
+        }
+
+        async function startShuffling() {
+            const positions = getGridPositions(state.numSpeakers, container.offsetWidth, container.offsetHeight);
+
+            // Logical array of indices [0, 1, 2...]
+            let indices = state.speakers.map((_, i) => i);
+
+            for (let k = 0; k < state.swapCount; k++) {
+                // Pick 2 random indices to swap
+                let a = Math.floor(Math.random() * state.numSpeakers);
+                let b = Math.floor(Math.random() * state.numSpeakers);
+                while (a === b) b = Math.floor(Math.random() * state.numSpeakers);
+
+                // Swap in logical array
+                [indices[a], indices[b]] = [indices[b], indices[a]];
+
+                // Visually move them
+                // Get the DOM elements currently at position 'a' and position 'b'
+                // Actually, we need to track where everyone IS.
+                // Simpler: iterate the logical 'indices' array, and tell the DOM element 'indices[i]' to go to 'positions[i]'
+
+                // We actually want to animate a swap pair.
+                // Let's find the DOM elements currently occupying slot A and slot B.
+                const domA = state.speakers.find(el => parseInt(el.dataset.pos) === a) || state.speakers[a];
+                const domB = state.speakers.find(el => parseInt(el.dataset.pos) === b) || state.speakers[b];
+
+                // For simplicity in this logic: let's just use the main array and swap CSS values
+                // But we need to update the internal tracking.
+
+                playSound('shuffle');
+
+                // Perform the visual swap
+                // We swap the 'left' and 'top' styles of the two chosen elements
+                const elA = state.speakers[a];
+                const elB = state.speakers[b];
+
+                const posA = { left: elA.style.left, top: elA.style.top };
+                const posB = { left: elB.style.left, top: elB.style.top };
+
+                elA.style.transition = `all ${state.swapSpeed / 1000}s ease-in-out`;
+                elB.style.transition = `all ${state.swapSpeed / 1000}s ease-in-out`;
+
+                elA.style.left = posB.left;
+                elA.style.top = posB.top;
+
+                elB.style.left = posA.left;
+                elB.style.top = posA.top;
+
+                // Swap in state array to match visual reality
+                state.speakers[a] = elB;
+                state.speakers[b] = elA;
+
+                // Wait for swap to finish
+                await new Promise(r => setTimeout(r, state.swapSpeed + 50));
+            }
+
+            state.isShuffling = false;
+            showFeedback("Tap the Speaker!");
+        }
+
+        function handleGuess(element) {
+            if (state.isShuffling) return;
+
+            // Find current index of clicked element
+            const clickedIndex = state.speakers.indexOf(element);
+
+            // Determine if this is the original correct one
+            // We need to trace the correctIndex through the swaps? 
+            // Actually, since we swapped the pointers in state.speakers array, 
+            // we just need to know if the clicked element holds the light.
+            // The light is physically inside the DOM element.
+            const hasLight = element.querySelector('.light') !== null;
+            // Wait, all have lights, but only one had .visible added momentarily? 
+            // No, my setup added light to all but logically we tracked one.
+            // Let's check logic:
+            // In setupRound, we only identified the winner to SHOW it. All DOMs have a light div (hidden).
+            // We need to know if 'element' is the one we picked as 'winningWrap'.
+
+            // Better Check:
+            // In setupRound we saved `winningWrap`.
+            // Does element === winningWrap?
+            // BUT `state.correctIndex` was an index. `winningWrap` was a reference.
+            // The reference moves. So we need to compare references.
+
+            // ISSUE: I didn't store the winning reference globally properly. 
+            // Let's fix: Add a data-winner attribute to the DOM element in setup.
+
+            const isWinner = element.dataset.winner === "true";
+
+            // Reveal
+            const speakerBody = element.querySelector('.speaker');
+            const light = element.querySelector('.light');
+            speakerBody.classList.add('lifted');
+
+            if (isWinner) {
+                // WIN
+                light.classList.add('visible');
+                playSound('win');
+                showFeedback("Correct!", "#0f0");
+                state.isShuffling = true; // Block clicks
+
+                setTimeout(() => {
+                    nextLevel();
+                }, 1500);
+            } else {
+                // LOSE
+                playSound('lose');
+                showFeedback("Wrong!", "#f00");
+
+                // Show where the real one was
+                const realWinner = state.speakers.find(el => el.dataset.winner === "true");
+                setTimeout(() => {
+                    realWinner.querySelector('.speaker').classList.add('lifted');
+                    realWinner.querySelector('.light').classList.add('visible');
+                }, 500);
+
+                setTimeout(() => {
+                    gameOver();
+                }, 2000);
+            }
+        }
+
+        // Revised Setup Round for Winning Logic
+        function setupRound() {
+            state.isShuffling = true;
+            container.innerHTML = '';
+            state.speakers = [];
+            showFeedback(""); // Clear text
+
+            const positions = getGridPositions(state.numSpeakers, container.offsetWidth, container.offsetHeight);
+
+            // Determine winner index beforehand
+            const winnerIndex = Math.floor(Math.random() * state.numSpeakers);
+
+            for (let i = 0; i < state.numSpeakers; i++) {
+                const wrap = document.createElement('div');
+                wrap.className = 'speaker-container';
+                wrap.style.left = positions[i].x + 'px';
+                wrap.style.top = positions[i].y + 'px';
+                wrap.onclick = () => handleGuess(wrap);
+
+                // Tag the winner
+                if (i === winnerIndex) {
+                    wrap.dataset.winner = "true";
+                }
+
+                const speaker = document.createElement('div');
+                speaker.className = 'speaker';
+                speaker.innerHTML = '<div class="grill"></div>';
+
+                const light = document.createElement('div');
+                light.className = 'light';
+
+                wrap.appendChild(light);
+                wrap.appendChild(speaker);
+                container.appendChild(wrap);
+                state.speakers.push(wrap);
+            }
+
+            // Reveal Phase
+            const winningWrap = state.speakers[winnerIndex];
+            const light = winningWrap.querySelector('.light');
+            const speakerBody = winningWrap.querySelector('.speaker');
+
+            setTimeout(() => {
+                speakerBody.classList.add('lifted');
+                light.classList.add('visible');
+                playSound('reveal');
+
+                setTimeout(() => {
+                    speakerBody.classList.remove('lifted');
+                    light.classList.remove('visible');
+
+                    setTimeout(() => {
+                        startShuffling();
+                    }, 500);
+                }, 1000); // Wait 1 sec to see light
+            }, 500);
+        }
+
+        function nextLevel() {
+            state.level++;
+            state.numSpeakers++;
+            // Cap speed so it doesn't become instant (min 200ms)
+            state.swapSpeed = Math.max(200, state.swapSpeed * config[state.mode].speedInc);
+            state.swapCount++; // Add one more shuffle
+
+            updateHUD();
+            setupRound();
+        }
+
+        function gameOver() {
+            document.getElementById('final-score').innerText = "Level Reached: " + state.level;
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            hud.classList.remove('visible');
+        }
+
+        function showFeedback(text, color = "#fff") {
+            const fb = document.getElementById('feedback');
+            fb.innerText = text;
+            fb.style.color = color;
+            fb.style.textShadow = `0 0 10px ${color}`;
+
+            // Reset anim
+            fb.classList.remove('anim-pop');
+            void fb.offsetWidth; // trigger reflow
+            fb.classList.add('anim-pop');
+        }
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            // Re-calc positions if resizing mid-game?
+            // Ideally we pause, but for now we just snap to new grid
+            if (state.speakers.length > 0 && !state.isShuffling) {
+                const positions = getGridPositions(state.numSpeakers, container.offsetWidth, container.offsetHeight);
+                state.speakers.forEach((sp, i) => {
+                    sp.style.left = positions[i].x + 'px';
+                    sp.style.top = positions[i].y + 'px';
+                });
+            }
+        });
+
+        // ============= MYSTERIOUS MUSIC =============
+        let musicOscs = [];
+
+        function startMusic() {
+            if (musicOscs.length > 0) return;
+
+            const notes = [329.63, 349.23, 392.00, 440.00, 493.88]; // E4-B4 (mysterious)
+            const pattern = [0, 2, 1, 3, 2, 4, 3, 1];
+            let noteIndex = 0;
+
+            function playNote() {
+                if (musicOscs.length === 0) return;
+
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.value = notes[pattern[noteIndex]];
+
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.025, now + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.8);
+
+                noteIndex = (noteIndex + 1) % pattern.length;
+                setTimeout(playNote, 700);
+            }
+
+            // Ambient pad
+            const pad = audioCtx.createOscillator();
+            const padGain = audioCtx.createGain();
+            pad.type = 'sine';
+            pad.frequency.value = 164.81; // E3
+            padGain.gain.value = 0.015;
+            pad.connect(padGain);
+            padGain.connect(audioCtx.destination);
+            pad.start();
+
+            musicOscs.push(pad);
+            playNote();
+        }
+
+        function stopMusic() {
+            musicOscs.forEach(o => o.stop());
+            musicOscs = [];
+        }
+
+        // Start music on first game start
+        const originalStartGame = startGame;
+        startGame = function (mode) {
+            originalStartGame(mode);
+            startMusic();
+        };
+
+    </script>
+</body>
+
+</html>

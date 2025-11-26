@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Popper | Arcade Verse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #87CEEB;
+            --text-primary: #ffffff;
+            --accent-color: #FFD700;
+            --balloon-colors: #ff5e78, #a78bfa, #4ade80, #fbbf24, #60a5fa;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            user-select: none;
+            touch-action: none;
+            /* Prevent zooming/scrolling on mobile */
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .score-container {
+            font-size: 1.5rem;
+        }
+
+        .streak-container {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+        }
+
+        #back-btn {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-primary);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        #back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 10;
+            pointer-events: auto;
+            transition: opacity 0.3s ease;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #f472b6, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.1rem;
+            max-width: 400px;
+            text-align: center;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 2rem;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, #38bdf8, #818cf8);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+
+        <div id="ui-layer">
+            <div class="hud">
+                <div style="display: flex; flex-direction: column; gap: 20px; align-items: flex-start;">
+                    <a href="../index.html" id="back-btn">← Exit</a>
+
+                    <div id="target-display"
+                        style="font-size: 1.5rem; color: white; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 10px 20px; border-radius: 15px; backdrop-filter: blur(5px);">
+                        Target:
+                        <div id="target-balloon"
+                            style="width: 50px; height: 60px; border-radius: 50%; position: relative; transition: all 0.5s ease;">
+                            <div
+                                style="width: 10px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.3); position: absolute; top: 8px; left: 8px; transform: rotate(45deg);">
+                            </div>
+                            <div
+                                style="width: 3px; height: 15px; background: rgba(255,255,255,0.5); position: absolute; bottom: -15px; left: 23px;">
+                            </div>
+                        </div>
+                        <span id="target-color-name" style="display: none;">ANY</span>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div class="score-container">Score: <span id="score">0</span></div>
+                    <div class="streak-container">Streak: <span id="streak">0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="start-screen">
+            <h1>BALLOON POPPER</h1>
+            <p>Balloons fall UP! Tap ONLY the balloons that match the target color.<br>Let the others fly away into the
+                sky!</p>
+            <button class="play-btn" id="start-btn">START GAME</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const streakEl = document.getElementById('streak');
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+
+        // Game State
+        let isPlaying = false;
+        let score = 0;
+        let streak = 0;
+        let lastTime = 0;
+        let spawnTimer = 0;
+
+        // Entities
+        // Entities
+        let balloons = [];
+        let particles = [];
+        let clouds = [];
+
+        // Configuration
+        const GRAVITY_BALLOON = -0.05; // Very slow upward acceleration
+        const MAX_SPEED = -2; // Cap max speed
+        const GRAVITY_CONFETTI = 0.2; // Falls DOWN
+        const SPAWN_INTERVAL = 1000; // ms
+        const BALLOON_RADIUS_MIN = 25;
+        const BALLOON_RADIUS_MAX = 40;
+        const BALLOON_COLORS = ['#f472b6', '#a78bfa', '#34d399', '#fbbf24', '#60a5fa'];
+        const COLOR_NAMES = { '#f472b6': 'PINK', '#a78bfa': 'PURPLE', '#34d399': 'GREEN', '#fbbf24': 'YELLOW', '#60a5fa': 'BLUE' };
+
+        // Background Themes mapped to Target Colors
+        const THEMES = {
+            '#f472b6': { top: '#2c001e', bottom: '#f472b6' }, // Pink -> Dark Pink Night
+            '#a78bfa': { top: '#1a0b2e', bottom: '#764ba2' }, // Purple -> Deep Purple Night
+            '#34d399': { top: '#002b1d', bottom: '#34d399' }, // Green -> Dark Green Forest
+            '#fbbf24': { top: '#3d2b00', bottom: '#fbbf24' }, // Yellow -> Golden Dusk
+            '#60a5fa': { top: '#0f172a', bottom: '#60a5fa' }  // Blue -> Midnight Blue
+        };
+
+        let currentTargetColor = null;
+        let currentTheme = { top: '#87CEEB', bottom: '#E0F7FA' };
+        let targetTimer = 0;
+        const TARGET_CHANGE_INTERVAL = 10000; // Change target every 10s
+
+        // Resize handling
+        // Resize handling
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initClouds();
+        }
+        window.addEventListener('resize', resize);
+
+        // Classes
+        class Balloon {
+            constructor() {
+                this.radius = Math.random() * (BALLOON_RADIUS_MAX - BALLOON_RADIUS_MIN) + BALLOON_RADIUS_MIN;
+                this.x = Math.random() * (canvas.width - this.radius * 2) + this.radius;
+                this.y = canvas.height + this.radius; // Start below screen
+                this.vy = 0;
+                this.color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+                this.popped = false;
+
+                // Slight horizontal drift
+                this.vx = (Math.random() - 0.5) * 1;
+            }
+
+            update() {
+                this.vy += GRAVITY_BALLOON;
+                // Cap max upward speed
+                if (this.vy < MAX_SPEED) this.vy = MAX_SPEED;
+
+                this.y += this.vy;
+                this.x += this.vx;
+
+                // Bounce off walls
+                if (this.x - this.radius < 0) {
+                    this.x = this.radius;
+                    this.vx *= -1;
+                }
+                if (this.x + this.radius > canvas.width) {
+                    this.x = canvas.width - this.radius;
+                    this.vx *= -1;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                if (this.color === currentTargetColor) {
+                    ctx.shadowBlur = 30;
+                    ctx.shadowColor = this.color;
+                }
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+
+                // Shine effect
+                ctx.beginPath();
+                ctx.arc(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.2, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.fill();
+
+                // String
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.radius);
+                ctx.lineTo(this.x, this.y + this.radius + 20);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 6 + 4;
+                this.color = color;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.01;
+            }
+
+            update() {
+                this.vy += GRAVITY_CONFETTI;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        class Cloud {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * (canvas.height * 0.6); // Top 60%
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.size = Math.random() * 0.5 + 0.5; // Scale
+            }
+
+            update() {
+                this.x += this.speed;
+                if (this.x > canvas.width + 100) {
+                    this.x = -100;
+                    this.y = Math.random() * (canvas.height * 0.6);
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 30 * this.size, 0, Math.PI * 2);
+                ctx.arc(this.x + 25 * this.size, this.y - 10 * this.size, 35 * this.size, 0, Math.PI * 2);
+                ctx.arc(this.x + 50 * this.size, this.y, 30 * this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Game Logic
+        // Game Logic
+        function initClouds() {
+            clouds = [];
+            for (let i = 0; i < 8; i++) {
+                clouds.push(new Cloud());
+            }
+        }
+
+        function spawnBalloon() {
+            balloons.push(new Balloon());
+        }
+
+        function popBalloon(balloon, byPlayer) {
+            balloon.popped = true;
+
+            if (byPlayer) {
+                if (balloon.color !== currentTargetColor) {
+                    // Wrong color!
+                    streak = 0;
+                    streakEl.textContent = streak;
+                    // Shake
+                    canvas.style.transform = 'translate(5px, 5px)';
+                    setTimeout(() => canvas.style.transform = 'translate(0, 0)', 50);
+                    return; // Don't give points
+                }
+
+                // Spawn confetti
+                for (let i = 0; i < 5; i++) {
+                    particles.push(new Particle(balloon.x, balloon.y, balloon.color));
+                }
+                score++;
+                streak++;
+                scoreEl.textContent = score;
+                streakEl.textContent = streak;
+
+                // Visual flair for streak
+                if (streak % 10 === 0) {
+                    streakEl.style.transform = 'scale(1.5)';
+                    setTimeout(() => streakEl.style.transform = 'scale(1)', 200);
+                }
+            } else {
+                // Hit spikes - REMOVED
+                // Now just flies away, no penalty
+            }
+        }
+
+        function checkCollisions() {
+            // Check if balloons fly off screen
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                if (b.y < -b.radius * 2) {
+                    // Flew away
+                    balloons.splice(i, 1);
+                }
+            }
+        }
+
+        function handleInput(e) {
+            if (!isPlaying) return;
+
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (e.type === 'touchstart') {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            // Check if clicked on any balloon
+            // Iterate backwards to click top-most balloons first
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                const dx = x - b.x;
+                const dy = y - b.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < b.radius + 10) { // +10 for generous hit area
+                    popBalloon(b, true);
+                    break; // Only pop one per click
+                }
+            }
+        }
+
+        function update(timestamp) {
+            if (!isPlaying) return;
+
+            const dt = timestamp - lastTime;
+            lastTime = timestamp;
+
+            // Spawn logic
+            spawnTimer += dt;
+            if (spawnTimer > SPAWN_INTERVAL) {
+                spawnBalloon();
+                spawnTimer = 0;
+            }
+
+            // Update Target
+            targetTimer += dt;
+            if (targetTimer > TARGET_CHANGE_INTERVAL) {
+                changeTargetColor();
+                targetTimer = 0;
+            }
+
+            // Update balloons
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                b.update();
+                if (b.popped) {
+                    balloons.splice(i, 1);
+                }
+            }
+
+            // Update clouds
+            clouds.forEach(c => c.update());
+
+            // Update particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            checkCollisions();
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Sky Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, currentTheme.top);
+            gradient.addColorStop(1, currentTheme.bottom);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Rainbow
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            const cx = canvas.width / 2;
+            const cy = canvas.height + 100;
+            const maxR = Math.min(canvas.width, canvas.height) * 0.8;
+            const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet'];
+            for (let i = 0; i < 7; i++) {
+                ctx.beginPath();
+                ctx.arc(cx, cy, maxR - (i * 20), Math.PI, 0);
+                ctx.strokeStyle = colors[i];
+                ctx.lineWidth = 20;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            // Draw Clouds
+            clouds.forEach(c => c.draw());
+
+            // Draw Balloons
+            for (let b of balloons) {
+                b.draw();
+            }
+
+            // Draw Particles
+            for (let p of particles) {
+                p.draw();
+            }
+        }
+
+        function changeTargetColor() {
+            currentTargetColor = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+            const name = COLOR_NAMES[currentTargetColor];
+
+            // Update Theme
+            currentTheme = THEMES[currentTargetColor];
+
+            const balloonEl = document.getElementById('target-balloon');
+            balloonEl.style.backgroundColor = currentTargetColor;
+            balloonEl.style.boxShadow = `0 0 25px ${currentTargetColor}`;
+
+            const textEl = document.getElementById('target-color-name');
+            textEl.textContent = name;
+        }
+
+        function startGame() {
+            isPlaying = true;
+            score = 0;
+            streak = 0;
+            balloons = [];
+            particles = [];
+            scoreEl.textContent = '0';
+            streakEl.textContent = '0';
+            startScreen.classList.add('hidden');
+            lastTime = performance.now();
+            changeTargetColor(); // Set initial target
+            resize(); // Ensure spikes are ready
+            requestAnimationFrame(update);
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        canvas.addEventListener('mousedown', handleInput);
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent default touch actions
+            handleInput(e);
+        }, { passive: false });
+
+        // Initial Setup
+        resize();
+        initClouds();
+        draw(); // Draw initial static frame
+
+        // ============= PLAYFUL MUSIC =============
+        let audioContext, musicOscs = [];
+
+        function startMusic() {
+            if (musicOscs.length > 0) return;
+
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [523.25, 587.33, 659.25, 783.99, 880.00]; // C5-A5
+            const pattern = [0, 2, 4, 2, 1, 3, 4, 0];
+            let noteIndex = 0;
+
+            function playNote() {
+                if (musicOscs.length === 0) return;
+
+                const now = audioContext.currentTime;
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                osc.type = 'square';
+                osc.frequency.value = notes[pattern[noteIndex]];
+
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.03, now + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+
+                noteIndex = (noteIndex + 1) % pattern.length;
+                setTimeout(playNote, 280);
+            }
+
+            // Bass
+            const bass = audioContext.createOscillator();
+            const bassGain = audioContext.createGain();
+            bass.type = 'sine';
+            bass.frequency.value = 130.81; // C3
+            bassGain.gain.value = 0.03;
+            bass.connect(bassGain);
+            bassGain.connect(audioContext.destination);
+            bass.start();
+
+            musicOscs.push(bass);
+            playNote();
+        }
+
+        // Auto-start music when game starts
+        const originalStartGame = startGame;
+        startGame = function () {
+            originalStartGame();
+            startMusic();
+        };
+
+    </script>
+</body>
+
+</html>
