@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Spell Snake - Learn Names</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --panel-bg: #34495e;
+            --accent-color: #f1c40f;
+            --text-color: #ecf0f1;
+            --btn-primary: #e67e22;
+            --btn-secondary: #2ecc71;
+            --snake-head: #2ecc71;
+            --snake-body: #27ae60;
+            --food-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Start Screen UI --- */
+        #startScreen {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: var(--accent-color);
+            text-shadow: 2px 2px 0px #000;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border-radius: 20px;
+            padding: 25px;
+            width: 100%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 12px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            font-family: inherit;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 15px 25px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.1s;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .btn-add {
+            background-color: var(--btn-secondary);
+        }
+
+        .btn-start {
+            background-color: var(--btn-primary);
+            width: 100%;
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
+
+        .btn-start:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .quick-adds {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tag-btn {
+            background-color: #9b59b6;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .names-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 50px;
+            align-content: flex-start;
+        }
+
+        .name-chip {
+            background-color: var(--accent-color);
+            color: #2c3e50;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .delete-chip {
+            background: rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* --- Game Screen UI --- */
+        #gameScreen {
+            display: none;
+            width: 100%;
+            height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .hud {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 20px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .hud-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .hud-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .target-word {
+            font-size: 2rem;
+            letter-spacing: 5px;
+            font-weight: 600;
+            margin: 5px 0;
+            text-align: center;
+            height: 40px;
+        }
+
+        .letter-slot {
+            display: inline-block;
+            color: #7f8c8d;
+            transition: color 0.3s;
+        }
+
+        .letter-slot.collected {
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
+        }
+
+        #gameCanvas {
+            background: #1a252f;
+            border-radius: 10px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            max-width: 100%;
+            max-height: 50vh;
+            /* Leave room for controls */
+        }
+
+        /* --- Controls --- */
+        .controls-area {
+            width: 100%;
+            max-width: 400px;
+            height: 220px;
+            /* Fixed height for controls */
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .dpad-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .dpad-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .dpad-up {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        .dpad-left {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .dpad-down {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .dpad-right {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        /* --- Modals --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: white;
+            color: #2c3e50;
+            padding: 30px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #e67e22;
+        }
+
+        .modal-msg {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Responsive Tweaks --- */
+        @media (min-height: 800px) {
+            #gameCanvas {
+                max-height: 60vh;
+            }
+
+            .controls-area {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <h1>🐍 Spell Snake</h1>
+
+        <div class="card">
+            <h3>Who are we spelling today?</h3>
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="Enter Name (e.g. MOM)" maxlength="12">
+                <button class="btn-add" onclick="addName()">ADD</button>
+            </div>
+
+            <div class="quick-adds">
+                <button class="tag-btn" onclick="quickAdd('MOM')">MOM</button>
+                <button class="tag-btn" onclick="quickAdd('DAD')">DAD</button>
+                <button class="tag-btn" onclick="quickAdd('GRANDMA')">GRANDMA</button>
+                <button class="tag-btn" onclick="quickAdd('GRANDPA')">GRANDPA</button>
+            </div>
+
+            <div class="names-list" id="namesList">
+                <!-- Chips go here -->
+            </div>
+        </div>
+
+        <button class="btn-start" id="startBtn" onclick="startGame()" disabled>START GAME</button>
+
+        <p style="opacity: 0.6; margin-top: 20px; font-size: 0.9rem;">
+            Tip: Use the on-screen arrows to guide the snake!
+        </p>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="gameScreen">
+        <div class="hud">
+            <div class="hud-item">
+                <span class="hud-label">SCORE</span>
+                <span class="hud-value" id="scoreDisplay">0</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">LIVES</span>
+                <span class="hud-value" id="livesDisplay">❤️❤️❤️</span>
+            </div>
+        </div>
+
+        <div class="target-word" id="wordDisplay">
+            <!-- Letters go here -->
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+
+        <div class="controls-area">
+            <div class="dpad-btn dpad-up" ontouchstart="handleInput('UP')" onmousedown="handleInput('UP')">⬆️</div>
+            <div class="dpad-btn dpad-left" ontouchstart="handleInput('LEFT')" onmousedown="handleInput('LEFT')">⬅️
+            </div>
+            <div class="dpad-btn dpad-down" ontouchstart="handleInput('DOWN')" onmousedown="handleInput('DOWN')">⬇️
+            </div>
+            <div class="dpad-btn dpad-right" ontouchstart="handleInput('RIGHT')" onmousedown="handleInput('RIGHT')">➡️
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div id="victoryModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">🎉 Amazing!</div>
+            <div class="modal-msg" id="victoryMsg">You spelled it!</div>
+            <button class="btn-start" onclick="nextLevel()">Next Name ➡️</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-title">💥 Oh no!</div>
+            <div class="modal-msg">Keep practicing!</div>
+            <button class="btn-add" onclick="retryLevel()" style="width:100%; margin-bottom:10px;">Try Again 🔄</button>
+            <button class="btn-add" onclick="showStartScreen()" style="width:100%; background:#e74c3c;">Main Menu
+                🏠</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Game State ---
+        let names = [];
+        let currentNameIndex = 0;
+        let currentName = "";
+        let collectedCount = 0;
+        let score = 0;
+        let lives = 3;
+        let gameLoop = null;
+        let isPaused = false;
+
+        // --- Snake & Grid ---
+        const gridSize = 20; // Size of one grid cell in pixels (logical)
+        let tileCountX = 20;
+        let tileCountY = 20;
+        let snake = [];
+        let velocity = { x: 0, y: 0 };
+        let nextVelocity = { x: 0, y: 0 }; // Buffer for next move
+
+        // --- Items ---
+        let targetLetterItem = null;
+        let decoyItems = [];
+
+        // --- Audio Context ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let musicNode = null;
+
+        // --- DOM Elements ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const nameInput = document.getElementById('nameInput');
+
+        // --- Initialization ---
+        function init() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            document.addEventListener('keydown', handleKeyInput);
+
+            // Prevent double-tap zoom on buttons
+            document.querySelectorAll('button, .dpad-btn').forEach(el => {
+                el.addEventListener('touchend', e => e.preventDefault());
+            });
+        }
+
+        function resizeCanvas() {
+            // Calculate available space
+            const hudHeight = 80;
+            const controlsHeight = 240;
+            const wordHeight = 50;
+            const padding = 40;
+
+            const availableHeight = window.innerHeight - hudHeight - controlsHeight - wordHeight - padding;
+            const availableWidth = window.innerWidth - 20;
+
+            // Determine grid dimensions based on available space
+            // We want roughly square cells, but fit to screen
+            const cellSize = Math.floor(Math.min(availableWidth / 15, availableHeight / 15));
+            const finalCellSize = Math.max(cellSize, 15); // Min size
+
+            const cols = Math.floor(availableWidth / finalCellSize);
+            const rows = Math.floor(availableHeight / finalCellSize);
+
+            tileCountX = cols;
+            tileCountY = rows;
+
+            canvas.width = tileCountX * finalCellSize;
+            canvas.height = tileCountY * finalCellSize;
+
+            // Store the actual render size of a cell
+            canvas.cellSize = finalCellSize;
+        }
+
+        // --- UI Functions ---
+        function addName() {
+            const val = nameInput.value.trim().toUpperCase();
+            if (!val) return;
+            if (names.includes(val)) {
+                alert("Name already added!");
+                return;
+            }
+            names.push(val);
+            nameInput.value = "";
+            renderNamesList();
+        }
+
+        function quickAdd(val) {
+            if (names.includes(val)) return;
+            names.push(val);
+            renderNamesList();
+        }
+
+        function removeName(index) {
+            names.splice(index, 1);
+            renderNamesList();
+        }
+
+        function renderNamesList() {
+            const list = document.getElementById('namesList');
+            list.innerHTML = "";
+            names.forEach((n, i) => {
+                const chip = document.createElement('div');
+                chip.className = 'name-chip';
+                chip.innerHTML = `
+                    ${n}
+                    <div class="delete-chip" onclick="removeName(${i})">✕</div>
+                `;
+                list.appendChild(chip);
+            });
+            document.getElementById('startBtn').disabled = names.length === 0;
+        }
+
+        function showStartScreen() {
+            stopMusic();
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverModal').style.display = 'none';
+            document.getElementById('victoryModal').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'flex';
+        }
+
+        // --- Game Logic ---
+        function startGame() {
+            if (names.length === 0) return;
+
+            // Init Audio
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            playMusic();
+
+            currentNameIndex = 0;
+            score = 0;
+            lives = 3;
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'flex';
+
+            // Force resize once visible
+            resizeCanvas();
+
+            startLevel();
+        }
+
+        function startLevel() {
+            currentName = names[currentNameIndex];
+            collectedCount = 0;
+
+            // Reset Snake
+            const startX = Math.floor(tileCountX / 2);
+            const startY = Math.floor(tileCountY / 2);
+            snake = [
+                { x: startX, y: startY },
+                { x: startX, y: startY + 1 },
+                { x: startX, y: startY + 2 }
+            ];
+            velocity = { x: 0, y: -1 }; // Start moving up
+            nextVelocity = { x: 0, y: -1 };
+
+            decoyItems = [];
+            spawnTarget();
+
+            updateHUD();
+            document.getElementById('victoryModal').style.display = 'none';
+
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 150); // Game speed
+        }
+
+        function spawnTarget() {
+            // Target letter
+            const letter = currentName[collectedCount];
+            targetLetterItem = findEmptySpot();
+            targetLetterItem.char = letter;
+            targetLetterItem.type = 'target';
+
+            // Decoys (increase with progress)
+            const decoyCount = Math.min(3, Math.floor(collectedCount / 2) + 1);
+            decoyItems = [];
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            for (let i = 0; i < decoyCount; i++) {
+                let spot = findEmptySpot();
+                let char = alphabet[Math.floor(Math.random() * alphabet.length)];
+                // Ensure decoy isn't the target letter
+                while (char === letter) {
+                    char = alphabet[Math.floor(Math.random() * alphabet.length)];
+                }
+                spot.char = char;
+                spot.type = 'decoy';
+                decoyItems.push(spot);
+            }
+        }
+
+        function findEmptySpot() {
+            let spot;
+            while (true) {
+                spot = {
+                    x: Math.floor(Math.random() * tileCountX),
+                    y: Math.floor(Math.random() * tileCountY)
+                };
+                // Check collision with snake
+                let onSnake = snake.some(s => s.x === spot.x && s.y === spot.y);
+                // Check collision with other items
+                let onTarget = targetLetterItem && targetLetterItem.x === spot.x && targetLetterItem.y === spot.y;
+                let onDecoy = decoyItems.some(d => d.x === spot.x && d.y === spot.y);
+
+                if (!onSnake && !onTarget && !onDecoy) break;
+            }
+            return spot;
+        }
+
+        function update() {
+            if (isPaused) return;
+
+            // Apply buffered input
+            velocity = nextVelocity;
+
+            // Move Snake
+            const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
+
+            // Wall Collision (Wrap or Die? Let's Die for classic feel, or Wrap for kids? Let's Die but soft reset)
+            if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
+                handleCrash();
+                return;
+            }
+
+            // Self Collision
+            if (snake.some(s => s.x === head.x && s.y === head.y)) {
+                handleCrash();
+                return;
+            }
+
+            snake.unshift(head); // Add new head
+
+            // Check Item Collision
+            let ate = false;
+
+            // Target?
+            if (head.x === targetLetterItem.x && head.y === targetLetterItem.y) {
+                ate = true;
+                handleCollect();
+            }
+            // Decoy?
+            else {
+                const decoyIdx = decoyItems.findIndex(d => d.x === head.x && d.y === head.y);
+                if (decoyIdx !== -1) {
+                    handleBadCollect();
+                    return; // Stop update to process crash
+                }
+            }
+
+            if (!ate) {
+                snake.pop(); // Remove tail
+            }
+
+            draw();
+        }
+
+        function handleCollect() {
+            playSound('collect');
+            score += 10;
+            collectedCount++;
+            updateHUD();
+
+            if (collectedCount >= currentName.length) {
+                handleWin();
+            } else {
+                spawnTarget();
+            }
+        }
+
+        function handleBadCollect() {
+            playSound('crash');
+            handleCrash();
+        }
+
+        function handleCrash() {
+            playSound('crash');
+            lives--;
+            updateHUD();
+            clearInterval(gameLoop);
+
+            if (lives <= 0) {
+                document.getElementById('gameOverModal').style.display = 'flex';
+            } else {
+                // Flash effect then reset position
+                setTimeout(() => {
+                    // Keep progress, reset positions
+                    const startX = Math.floor(tileCountX / 2);
+                    const startY = Math.floor(tileCountY / 2);
+                    snake = [
+                        { x: startX, y: startY },
+                        { x: startX, y: startY + 1 },
+                        { x: startX, y: startY + 2 }
+                    ];
+                    velocity = { x: 0, y: -1 };
+                    nextVelocity = { x: 0, y: -1 };
+                    gameLoop = setInterval(update, 150);
+                }, 1000);
+            }
+        }
+
+        function handleWin() {
+            clearInterval(gameLoop);
+            playSound('win');
+            document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
+            document.getElementById('victoryModal').style.display = 'flex';
+        }
+
+        function nextLevel() {
+            currentNameIndex++;
+            if (currentNameIndex >= names.length) {
+                // Loop back or finish? Let's loop back for endless play
+                currentNameIndex = 0;
+                alert("You finished all names! Starting over with higher speed!");
+                // Could increase speed here
+            }
+            startLevel();
+        }
+
+        function retryLevel() {
+            lives = 3;
+            score = 0; // Optional reset score
+            document.getElementById('gameOverModal').style.display = 'none';
+            startLevel();
+        }
+
+        function updateHUD() {
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('livesDisplay').innerText = "❤️".repeat(lives);
+
+            // Render word
+            const wordContainer = document.getElementById('wordDisplay');
+            wordContainer.innerHTML = '';
+            for (let i = 0; i < currentName.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'letter-slot ' + (i < collectedCount ? 'collected' : '');
+                span.innerText = currentName[i];
+                wordContainer.appendChild(span);
+            }
+        }
+
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#1a252f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const cs = canvas.cellSize;
+
+            // Draw Grid (Subtle)
+            ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x <= tileCountX; x++) {
+                ctx.beginPath(); ctx.moveTo(x * cs, 0); ctx.lineTo(x * cs, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y <= tileCountY; y++) {
+                ctx.beginPath(); ctx.moveTo(0, y * cs); ctx.lineTo(canvas.width, y * cs); ctx.stroke();
+            }
+
+            // Draw Snake
+            snake.forEach((seg, i) => {
+                ctx.fillStyle = i === 0 ? 'var(--snake-head)' : 'var(--snake-body)';
+                // Round rect for nicer look
+                const pad = 1;
+                ctx.fillRect(seg.x * cs + pad, seg.y * cs + pad, cs - pad * 2, cs - pad * 2);
+
+                // Eyes
+                if (i === 0) {
+                    ctx.fillStyle = 'white';
+                    const eyeSize = cs / 5;
+                    // Simple logic to place eyes based on velocity
+                    // Defaulting to top corners for simplicity or direction based
+                    ctx.fillRect(seg.x * cs + cs / 4, seg.y * cs + cs / 4, eyeSize, eyeSize);
+                    ctx.fillRect(seg.x * cs + cs * 3 / 4 - eyeSize, seg.y * cs + cs / 4, eyeSize, eyeSize);
+                }
+            });
+
+            // Draw Target
+            if (targetLetterItem) {
+                drawItem(targetLetterItem, '#f1c40f', true);
+            }
+
+            // Draw Decoys
+            decoyItems.forEach(d => drawItem(d, '#e74c3c', false));
+        }
+
+        function drawItem(item, color, isTarget) {
+            const cs = canvas.cellSize;
+            const x = item.x * cs + cs / 2;
+            const y = item.y * cs + cs / 2;
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, cs / 2 - 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = `bold ${Math.floor(cs * 0.7)}px Fredoka`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(item.char, x, y + 2);
+        }
+
+        // --- Input Handling ---
+        function handleInput(dir) {
+            // Prevent reversing
+            if (dir === 'UP' && velocity.y === 0) nextVelocity = { x: 0, y: -1 };
+            if (dir === 'DOWN' && velocity.y === 0) nextVelocity = { x: 0, y: 1 };
+            if (dir === 'LEFT' && velocity.x === 0) nextVelocity = { x: -1, y: 0 };
+            if (dir === 'RIGHT' && velocity.x === 0) nextVelocity = { x: 1, y: 0 };
+        }
+
+        function handleKeyInput(e) {
+            switch (e.key) {
+                case 'ArrowUp': handleInput('UP'); break;
+                case 'ArrowDown': handleInput('DOWN'); break;
+                case 'ArrowLeft': handleInput('LEFT'); break;
+                case 'ArrowRight': handleInput('RIGHT'); break;
+            }
+        }
+
+        // --- Audio System (Nokia Tune) ---
+        // Simple synth implementation
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'collect') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.1);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'crash') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                // Arpeggio
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.1, now + i * 0.1);
+                    g.gain.linearRampToValueAtTime(0, now + i * 0.1 + 0.2);
+                    o.start(now + i * 0.1);
+                    o.stop(now + i * 0.1 + 0.2);
+                });
+            }
+        }
+
+        // Nokia Tune Melody
+        const melody = [
+            { f: 659, d: 0.125 }, { f: 587, d: 0.125 }, { f: 494, d: 0.125 }, { f: 523, d: 0.125 },
+            { f: 587, d: 0.25 }, { f: 523, d: 0.25 }, { f: 440, d: 0.25 }, { f: 440, d: 0.125 },
+            { f: 523, d: 0.125 }, { f: 659, d: 0.25 }, { f: 587, d: 0.125 }, { f: 523, d: 0.125 },
+            { f: 494, d: 0.375 }, { f: 494, d: 0.125 }, { f: 523, d: 0.125 }, { f: 587, d: 0.25 },
+            { f: 659, d: 0.25 }, { f: 523, d: 0.25 }, { f: 440, d: 0.25 }, { f: 440, d: 0.25 }
+        ];
+
+        let noteIndex = 0;
+        let nextNoteTime = 0;
+
+        function playMusic() {
+            if (musicNode) return; // Already playing
+
+            // We'll use a recursive timeout loop for simplicity in scheduling
+            function schedule() {
+                if (!gameLoop) { // Stop if game stopped
+                    musicNode = null;
+                    return;
+                }
+
+                const note = melody[noteIndex];
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.type = 'square'; // Retro sound
+                osc.frequency.value = note.f;
+
+                const now = audioCtx.currentTime;
+                gain.gain.setValueAtTime(0.05, now); // Low volume background
+                gain.gain.linearRampToValueAtTime(0, now + note.d * 0.9);
+
+                osc.start(now);
+                osc.stop(now + note.d);
+
+                noteIndex = (noteIndex + 1) % melody.length;
+
+                // Schedule next
+                musicNode = setTimeout(schedule, note.d * 1000);
+            }
+            schedule();
+        }
+
+        function stopMusic() {
+            if (musicNode) {
+                clearTimeout(musicNode);
+                musicNode = null;
+            }
+        }
+
+        // Start
+        init();
+
+    </script>
+</body>
+
+</html>

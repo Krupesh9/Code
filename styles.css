@@ -39,7 +39,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 80%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 40% 20%, rgba(0, 245, 255, 0.1) 0%, transparent 50%);
@@ -55,15 +55,22 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 245, 255, 0.03) 2px, rgba(0, 245, 255, 0.03) 4px);
     pointer-events: none;
     z-index: 1;
 }
 
 @keyframes bgShift {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.1) rotate(2deg); }
+
+    0%,
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    50% {
+        transform: scale(1.1) rotate(2deg);
+    }
 }
 
 /* Floating Grid Background */
@@ -73,7 +80,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(rgba(0, 245, 255, 0.05) 1px, transparent 1px),
         linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
     background-size: 50px 50px;
@@ -83,8 +90,13 @@ body::after {
 }
 
 @keyframes gridScroll {
-    0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
-    100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+    0% {
+        transform: perspective(500px) rotateX(60deg) translateY(0);
+    }
+
+    100% {
+        transform: perspective(500px) rotateX(60deg) translateY(50px);
+    }
 }
 
 /* Header */
@@ -96,23 +108,56 @@ header {
 }
 
 .title-container {
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
     position: relative;
+    padding: 1rem;
+}
+
+/* Removed .logo-with-text as it's no longer needed */
+
+.header-logo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.4)) drop-shadow(0 0 30px rgba(255, 0, 255, 0.3));
+    animation: logoFloat 4s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .main-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-size: clamp(2rem, 5vw, 4rem);
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 8px;
+    letter-spacing: 6px;
     background: var(--gradient-neon);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     position: relative;
+    transform: none;
     animation: titleGlow 3s ease-in-out infinite;
-    margin-bottom: 1rem;
+    margin: 0;
+    white-space: normal;
+    text-align: left;
+    width: auto;
+    top: auto;
+    left: auto;
 }
 
 .main-title::before {
@@ -130,9 +175,12 @@ header {
 }
 
 @keyframes titleGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.5));
     }
+
     50% {
         filter: drop-shadow(0 0 30px rgba(255, 0, 128, 0.8)) drop-shadow(0 0 50px rgba(0, 245, 255, 0.6));
     }
@@ -151,6 +199,7 @@ header {
         opacity: 0;
         transform: translateY(30px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -198,10 +247,10 @@ main {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: conic-gradient(from 0deg, 
-        transparent, 
-        rgba(0, 245, 255, 0.1), 
-        transparent 60deg);
+    background: conic-gradient(from 0deg,
+            transparent,
+            rgba(0, 245, 255, 0.1),
+            transparent 60deg);
     animation: rotate 8s linear infinite;
     opacity: 0;
     transition: opacity 0.5s;
@@ -212,18 +261,27 @@ main {
 }
 
 @keyframes rotate {
-    100% { transform: rotate(360deg); }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @keyframes cardFloat {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 .game-card:hover {
     transform: translateY(-20px) scale(1.03);
     border-color: var(--accent-cyan);
-    box-shadow: 
+    box-shadow:
         0 20px 60px rgba(0, 245, 255, 0.3),
         0 0 80px rgba(255, 0, 128, 0.2),
         inset 0 0 30px rgba(255, 255, 255, 0.05);
@@ -237,10 +295,10 @@ main {
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, 
-        transparent,
-        rgba(255, 255, 255, 0.1),
-        transparent);
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent);
     transition: left 0.7s;
 }
 
@@ -270,14 +328,54 @@ main {
     transition: transform 0.3s;
 }
 
+.icon-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.game-icon {
+    margin-bottom: 0;
+    /* Override previous margin */
+}
+
+.idea-credit {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.game-card:hover .idea-credit {
+    background: rgba(0, 245, 255, 0.1);
+    border-color: var(--accent-cyan);
+    color: var(--accent-cyan);
+    box-shadow: 0 0 10px rgba(0, 245, 255, 0.2);
+}
+
 .game-card:hover .game-icon {
     transform: rotateY(360deg) scale(1.1);
     animation: none;
 }
 
 @keyframes iconFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(5deg); }
+
+    0%,
+    100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    50% {
+        transform: translateY(-8px) rotate(5deg);
+    }
 }
 
 .game-title {
@@ -343,7 +441,7 @@ main {
 .play-btn:hover {
     color: white;
     border-color: transparent;
-    box-shadow: 
+    box-shadow:
         0 0 20px var(--accent-cyan),
         0 0 40px rgba(0, 245, 255, 0.5),
         inset 0 0 20px rgba(255, 255, 255, 0.1);
@@ -379,12 +477,15 @@ footer {
         transform: translateY(100vh) translateX(0);
         opacity: 0;
     }
+
     10% {
         opacity: 0.3;
     }
+
     90% {
         opacity: 0.3;
     }
+
     100% {
         transform: translateY(-100px) translateX(100px);
         opacity: 0;

@@ -9,6 +9,7 @@ let inkLevel = 300;
 const MAX_INK = 300;
 const INK_REGEN = 35;
 const INK_COST = 0.25;
+const WIN_TIME = 999;
 
 // Entities
 let protectedObject = null;
@@ -279,6 +280,12 @@ function gameLoop(timestamp) {
     score += dt;
     scoreDisplay.textContent = `Time: ${Math.floor(score)}s`;
 
+    // Check win condition
+    if (score >= WIN_TIME) {
+        gameWin();
+        return;
+    }
+
     // Regenerate ink
     if (inkLevel < MAX_INK) {
         inkLevel = Math.min(MAX_INK, inkLevel + INK_REGEN * dt);
@@ -376,6 +383,12 @@ function startGame() {
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
 
+    // Reset Game Over text in case it was changed by a win
+    const goTitle = gameOverScreen.querySelector('h1');
+    const goText = gameOverScreen.querySelector('p');
+    if (goTitle) goTitle.textContent = "Game Over";
+    if (goText) goText.innerHTML = 'You protected it for <span id="final-score">0</span> seconds';
+
     // Start loop
     lastTime = performance.now();
     rainSpawnTimer = 0;
@@ -387,10 +400,24 @@ function startGame() {
 
 function gameOver() {
     gameRunning = false;
-    finalScoreSpan.textContent = Math.floor(score);
+    const finalScoreSpan = document.getElementById('final-score');
+    if (finalScoreSpan) finalScoreSpan.textContent = Math.floor(score);
     gameOverScreen.classList.remove('hidden');
     stopMusic();
     playSadMusic();
+}
+
+function gameWin() {
+    gameRunning = false;
+    const goTitle = gameOverScreen.querySelector('h1');
+    const goText = gameOverScreen.querySelector('p');
+
+    if (goTitle) goTitle.textContent = "YOU WIN!";
+    if (goText) goText.innerHTML = `You protected it for the full <span id="final-score">${WIN_TIME}</span> seconds!`;
+
+    gameOverScreen.classList.remove('hidden');
+    stopMusic();
+    // Optional: Play a win sound or just silence/happy music
 }
 
 // ============= RAIN AMBIENT MUSIC =============
