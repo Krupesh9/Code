@@ -3,20 +3,66 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moon Rocks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moon Stack | Tower Builder</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div id="game-container"></div>
+
+    <!-- UI Layer -->
     <div id="ui-layer">
-        <h1>Moon Rocks</h1>
-        <div id="score">Current Height: 0m</div>
-        <div id="instructions">Click to spawn rocks. Drag to stack.</div>
-        <a href="../index.html" class="back-link">Back to Portal</a>
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1 class="game-title">MOON STACK</h1>
+            <p class="instruction">Stack shapes high without toppling!</p>
+
+            <div class="mode-select">
+                <p>Select Challenge:</p>
+                <div class="btn-group">
+                    <button class="mode-btn" onclick="startGame(24)">
+                        <span class="btn-icon">🥉</span>
+                        24 Blocks
+                    </button>
+                    <button class="mode-btn" onclick="startGame(40)">
+                        <span class="btn-icon">🥈</span>
+                        40 Blocks
+                    </button>
+                    <button class="mode-btn" onclick="startGame(64)">
+                        <span class="btn-icon">🥇</span>
+                        64 Blocks
+                    </button>
+                </div>
+            </div>
+
+            <a href="../index.html" class="back-link">Back to Portal</a>
+        </div>
+
+        <!-- Game HUD -->
+        <div id="game-hud" class="hidden">
+            <div class="score-card">
+                <div class="label">BLOCKS</div>
+                <div id="block-count">0 / 24</div>
+            </div>
+            <div class="next-piece">
+                <div class="label">NEXT</div>
+                <div id="next-preview"></div>
+            </div>
+            <button id="restart-btn" onclick="resetGame()">↺</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden">
+            <h2 id="result-title">TOWER CRASHED!</h2>
+            <p id="result-msg">You stacked 12 blocks.</p>
+            <button class="action-btn" onclick="showMenu()">Main Menu</button>
+            <button class="action-btn primary" onclick="retryGame()">Try Again</button>
+        </div>
     </div>
+
     <script src="game.js"></script>
 </body>
 

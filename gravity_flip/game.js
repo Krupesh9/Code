@@ -152,9 +152,10 @@ function handleSwipe() {
 }
 
 // Game Loop
+// Game Loop
 function resize() {
-    canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = canvas.parentElement.clientHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     if (!gameRunning) player.reset();
 }
 window.addEventListener('resize', resize);
@@ -192,7 +193,75 @@ function startGame() {
     startMusic();
 }
 
-// ... (gameLoop) ...
+function gameLoop(timestamp) {
+    if (!gameRunning) return;
+
+    const dt = Math.min((timestamp - lastTime) / 1000, 0.1); // Clamp dt to 0.1s
+    lastTime = timestamp;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Update Player
+    player.update(dt);
+
+    // Check Bounds (Lava)
+    if (player.y < LAVA_HEIGHT || player.y + player.height > canvas.height - LAVA_HEIGHT) {
+        gameOver();
+        return;
+    }
+
+    // Update Platforms
+    platforms.forEach(p => p.update(dt));
+
+    // Check Collisions
+    platforms.forEach(p => {
+        if (
+            player.x < p.x + p.width &&
+            player.x + player.width > p.x &&
+            player.y < p.y + p.height &&
+            player.y + player.height > p.y
+        ) {
+            // Collision detected!
+            // Determine side of collision
+            const overlapX = (player.width + p.width) / 2 - Math.abs((player.x + player.width / 2) - (p.x + p.width / 2));
+            const overlapY = (player.height + p.height) / 2 - Math.abs((player.y + player.height / 2) - (p.y + p.height / 2));
+
+            if (overlapY < overlapX) {
+                // Vertical collision
+                if (player.vy > 0 && player.y < p.y) {
+                    // Landing on top
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                } else if (player.vy < 0 && player.y > p.y) {
+                    // Hitting bottom
+                    player.y = p.y + p.height;
+                    player.vy = 0;
+                }
+            }
+        }
+    });
+
+    if (!gameRunning) return;
+
+    // Draw Lava
+    ctx.fillStyle = '#ff3333';
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = '#ff3333';
+    ctx.fillRect(0, 0, canvas.width, LAVA_HEIGHT);
+    ctx.fillRect(0, canvas.height - LAVA_HEIGHT, canvas.width, LAVA_HEIGHT);
+    ctx.shadowBlur = 0;
+
+    player.draw();
+    platforms.forEach(p => p.draw());
+
+    // Score
+    scoreTimer += dt;
+    score = scoreTimer;
+    scoreDisplay.innerText = `Time: ${Math.floor(score)}s`;
+
+    requestAnimationFrame(gameLoop);
+}
 
 // ============= INTENSE MUSIC =============
 let audioContext, musicOscs = [];
@@ -305,19 +374,5 @@ function stopMusic() {
 startBtn.addEventListener('click', startGame);
 restartBtn.addEventListener('click', startGame);
 
-// Resize canvas
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-
-// Flip gravity on click/touch
-canvas.addEventListener('click', () => {
-    if (gameRunning) player.gravityDir *= -1;
-});
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    if (gameRunning) player.gravityDir *= -1;
-});
+// Initial resize
+resize();

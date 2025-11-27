@@ -7,354 +7,323 @@ const Engine = Matter.Engine,
     MouseConstraint = Matter.MouseConstraint,
     Mouse = Matter.Mouse,
     Events = Matter.Events,
-    Vertices = Matter.Vertices,
     Common = Matter.Common;
 
-// Create engine
-const engine = Engine.create();
-// Low gravity for Moon simulation (1/6 of Earth gravity)
-engine.gravity.y = 0.16; // Default is 1
-// Enable sleeping for better stability and performance
-engine.enableSleeping = true;
-
-// Create renderer
-const render = Render.create({
-    element: document.getElementById('game-container'),
-    engine: engine,
-    options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false,
-        background: 'transparent' // Let CSS background show through
-    }
-});
-
-// 3D Effect: Enhanced with better shadows and highlights
-Events.on(render, 'beforeRender', function () {
-    const ctx = render.context;
-    rocks.forEach(rock => {
-        if (rock.render.visible === false) return;
-
-        ctx.beginPath();
-        const vertices = rock.vertices;
-
-        // Draw deeper shadow for more 3D effect
-        const shadowOffset = 8;
-        ctx.moveTo(vertices[0].x + shadowOffset, vertices[0].y + shadowOffset);
-        for (let j = 1; j < vertices.length; j++) {
-            ctx.lineTo(vertices[j].x + shadowOffset, vertices[j].y + shadowOffset);
-        }
-        ctx.closePath();
-
-        // Darker, softer shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.fill();
-
-        // Add highlight on top-left for 3D depth
-        ctx.beginPath();
-        const highlightOffset = -2;
-        ctx.moveTo(vertices[0].x + highlightOffset, vertices[0].y + highlightOffset);
-        for (let j = 1; j < vertices.length; j++) {
-            ctx.lineTo(vertices[j].x + highlightOffset, vertices[j].y + highlightOffset);
-        }
-        ctx.closePath();
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fill();
-    });
-});
-
-// Create ground
-const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 60, {
-    isStatic: true,
-    render: {
-        fillStyle: '#333'
-    },
-    friction: 1.0
-});
-
-Composite.add(engine.world, ground);
-
-// Add mouse control
-const mouse = Mouse.create(render.canvas);
-const mouseConstraint = MouseConstraint.create(engine, {
-    mouse: mouse,
-    constraint: {
-        stiffness: 0.2,
-        render: {
-            visible: false
-        }
-    }
-});
-
-Composite.add(engine.world, mouseConstraint);
-
-// Keep the mouse in sync with rendering
-render.mouse = mouse;
-
-// Run the renderer
-Render.run(render);
-
-// Create runner
-const runner = Runner.create();
-Runner.run(runner, engine);
-
-// Game state
-let rocks = [];
-const scoreElement = document.getElementById('score');
+// Game State
+let engine, render, runner;
+let gameMode = 24; // Default target
+let currentBlocks = 0;
+let gameActive = false;
 let gameWon = false;
-const WIN_HEIGHT = 15; // 15 meters goal
+let blocks = [];
+let ground;
 
-// Function to create a jagged rock
-function createRock(x, y) {
-    const size = Common.random(40, 80);
-    const sides = Math.round(Common.random(5, 8));
+// UI Elements
+const startScreen = document.getElementById('start-screen');
+const gameHud = document.getElementById('game-hud');
+const gameOverScreen = document.getElementById('game-over-screen');
+const blockCountDisplay = document.getElementById('block-count');
+const resultTitle = document.getElementById('result-title');
+const resultMsg = document.getElementById('result-msg');
+const nextPreview = document.getElementById('next-preview');
 
-    // Generate a polygon with more variation
-    const rock = Bodies.polygon(x, y, sides, size, {
-        density: 0.05, // Heavy
-        friction: 0.8, // High friction
-        frictionAir: 0.05, // High air resistance
-        restitution: 0.1, // Low bounciness
-        render: {
-            fillStyle: Common.choose(['#7f8c8d', '#95a5a6', '#bdc3c7', '#636e72']),
-            strokeStyle: '#2c3e50',
-            lineWidth: 3  // Thicker outline for 3D effect
-        },
-        // Custom properties
-        hasLanded: false,
-        stableFrames: 0  // Track how many frames rock has been stable
+// Audio Context
+let audioCtx;
+
+// Initialize Game Engine
+function initEngine() {
+    engine = Engine.create();
+    // Moon gravity (approx 1/6th of Earth)
+    engine.gravity.y = 0.3; // Slightly higher than real moon for better gameplay feel
+    engine.enableSleeping = true;
+
+    render = Render.create({
+        element: document.getElementById('game-container'),
+        engine: engine,
+        options: {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            wireframes: false,
+            background: 'transparent'
+        }
     });
 
-    return rock;
+    // Create Ground
+    ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight + 20, window.innerWidth, 60, {
+        isStatic: true,
+        render: { fillStyle: '#444' },
+        label: 'ground'
+    });
+    Composite.add(engine.world, ground);
+
+    // Mouse/Touch Control
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+            stiffness: 0.2,
+            render: { visible: false }
+        }
+    });
+    Composite.add(engine.world, mouseConstraint);
+    render.mouse = mouse;
+
+    // Run
+    Render.run(render);
+    runner = Runner.create();
+    Runner.run(runner, engine);
+
+    // Collision Event for Loss Condition
+    Events.on(engine, 'afterUpdate', checkGameState);
 }
 
-// Detect collisions to mark rocks as "landed"
-Events.on(engine, 'collisionStart', function (event) {
-    const pairs = event.pairs;
-    pairs.forEach(pair => {
-        if (rocks.includes(pair.bodyA)) pair.bodyA.hasLanded = true;
-        if (rocks.includes(pair.bodyB)) pair.bodyB.hasLanded = true;
+// Start Game with selected mode
+function startGame(mode) {
+    gameMode = mode;
+    currentBlocks = 0;
+    gameActive = true;
+    gameWon = false;
+    blocks = [];
+
+    // Reset World
+    Composite.clear(engine.world);
+    Engine.clear(engine);
+    Composite.add(engine.world, [ground]); // Re-add ground
+
+    // Re-add mouse constraint
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+        mouse: mouse,
+        constraint: {
+            stiffness: 0.2,
+            render: { visible: false }
+        }
     });
-});
+    Composite.add(engine.world, mouseConstraint);
+    render.mouse = mouse;
 
-// Spawn rock on click, but only if not dragging
-function handleSpawn(position) {
-    const bodies = Composite.allBodies(engine.world);
-    const clickedBody = Matter.Query.point(bodies, position)[0];
+    // Update UI
+    startScreen.classList.add('hidden');
+    gameHud.classList.remove('hidden');
+    gameOverScreen.classList.add('hidden');
+    updateHUD();
 
-    if (!clickedBody || clickedBody === ground) {
-        const spawnX = position.x;
-        const spawnY = -50; // Spawn ABOVE the screen to fall in
+    // Init Audio
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
 
-        const newRock = createRock(spawnX, spawnY);
-        rocks.push(newRock);
-        Composite.add(engine.world, newRock);
+function resetGame() {
+    startGame(gameMode);
+}
 
-        // Start music on first interaction
-        if (musicOscs.length === 0) startMusic();
+function retryGame() {
+    startGame(gameMode);
+}
+
+function showMenu() {
+    gameActive = false;
+    startScreen.classList.remove('hidden');
+    gameHud.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+
+    // Clear blocks
+    Composite.clear(engine.world);
+    Composite.add(engine.world, [ground]);
+}
+
+// Spawning Logic
+function spawnShape(x, y) {
+    if (!gameActive || currentBlocks >= gameMode) return;
+
+    // Safety check: Don't spawn if mouse is over UI
+    if (y < 80) return;
+
+    const size = Common.random(40, 60);
+    const color = Common.choose(['#ff0080', '#00f3ff', '#ffd700', '#33ff33', '#ff6b6b']);
+
+    let body;
+    const type = Common.choose(['rectangle', 'circle', 'triangle', 'polygon']);
+
+    switch (type) {
+        case 'rectangle':
+            body = Bodies.rectangle(x, y, size, size, {
+                render: { fillStyle: color, strokeStyle: '#fff', lineWidth: 2 }
+            });
+            break;
+        case 'circle':
+            body = Bodies.circle(x, y, size / 2, {
+                render: { fillStyle: color, strokeStyle: '#fff', lineWidth: 2 }
+            });
+            break;
+        case 'triangle':
+            body = Bodies.polygon(x, y, 3, size / 1.5, {
+                render: { fillStyle: color, strokeStyle: '#fff', lineWidth: 2 }
+            });
+            break;
+        case 'polygon':
+            body = Bodies.polygon(x, y, 5, size / 2, {
+                render: { fillStyle: color, strokeStyle: '#fff', lineWidth: 2 }
+            });
+            break;
+    }
+
+    if (body) {
+        body.restitution = 0.3; // Bounciness
+        body.friction = 0.8;    // Grip
+        Composite.add(engine.world, body);
+        blocks.push(body);
+        currentBlocks++;
+        updateHUD();
+        playPopSound();
+
+        if (currentBlocks === gameMode) {
+            // Check for win after delay
+            setTimeout(() => {
+                if (gameActive && !gameWon) checkWinCondition();
+            }, 3000);
+        }
     }
 }
 
-Events.on(mouseConstraint, 'mousedown', function (event) {
-    handleSpawn(event.mouse.position);
+// Input Handling
+window.addEventListener('mousedown', (e) => {
+    // Only spawn if clicking on canvas and not dragging
+    // For simplicity in this version, click = spawn at mouse pos
+    // But we need to avoid spawning when clicking buttons
+    if (e.target.tagName !== 'BUTTON') {
+        spawnShape(e.clientX, e.clientY);
+    }
 });
 
-// Add touch support for spawning
-render.canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const rect = render.canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    const position = {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top
-    };
-    handleSpawn(position);
+window.addEventListener('touchstart', (e) => {
+    if (e.target.tagName !== 'BUTTON') {
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0];
+        spawnShape(touch.clientX, touch.clientY);
+    }
 }, { passive: false });
 
-// Update score loop with better stability detection
-Events.on(engine, 'afterUpdate', function () {
-    let maxHeight = 0;
+// Game Logic
+function checkGameState() {
+    if (!gameActive) return;
 
-    rocks.forEach(rock => {
-        // Check if rock is moving slowly (stable)
-        const isStable = rock.speed < 0.5;
-
-        // Track stable frames
-        if (isStable && rock.hasLanded) {
-            rock.stableFrames = (rock.stableFrames || 0) + 1;
-        } else {
-            rock.stableFrames = 0;
-        }
-
-        // Only count rocks that have been stable for at least 30 frames (~0.5 seconds)
-        if (rock.hasLanded && rock.stableFrames > 30) {
-            // Calculate height from ground
-            const height = window.innerHeight - rock.bounds.min.y - 30;
-            if (height > maxHeight) {
-                maxHeight = height;
-            }
+    // Check if any block fell off screen
+    blocks.forEach(block => {
+        if (block.position.y > window.innerHeight + 100) {
+            gameOver(false);
         }
     });
+}
 
-    // Convert pixels to "meters" (arbitrary scale: 50px = 1m)
-    const meters = Math.max(0, (maxHeight / 50).toFixed(1));
-    scoreElement.innerText = `Current Height: ${meters}m / ${WIN_HEIGHT}m`;
-
-    // Only declare win if rocks have been stably at height for a moment
-    if (!gameWon && parseFloat(meters) >= WIN_HEIGHT) {
-        // Double-check that we have stable rocks
-        const hasStableRocks = rocks.some(r => r.stableFrames > 30);
-        if (hasStableRocks) {
-            gameWon = true;
-            scoreElement.style.color = '#4ade80';
-            scoreElement.innerText = `GOAL REACHED! ${meters}m`;
-
-            // Confetti effect
-            setTimeout(() => {
-                alert(`Mission Accomplished! You reached ${meters}m!`);
-            }, 500);
-        }
+function checkWinCondition() {
+    // If we haven't lost yet and have all blocks
+    if (gameActive) {
+        gameOver(true);
     }
-});
+}
 
-// Handle window resize
-function resize() {
+function gameOver(win) {
+    gameActive = false;
+    gameWon = win;
+
+    gameHud.classList.add('hidden');
+    gameOverScreen.classList.remove('hidden');
+
+    if (win) {
+        resultTitle.innerText = "MISSION ACCOMPLISHED!";
+        resultTitle.style.color = "#33ff33";
+        resultMsg.innerText = `You successfully stacked ${gameMode} blocks!`;
+        playWinSound();
+        fireConfetti();
+    } else {
+        resultTitle.innerText = "TOWER CRASHED!";
+        resultTitle.style.color = "#ff0080";
+        resultMsg.innerText = `You stacked ${currentBlocks} blocks before the crash.`;
+        playLoseSound();
+    }
+}
+
+function updateHUD() {
+    blockCountDisplay.innerText = `${currentBlocks} / ${gameMode}`;
+    // Random color for next preview
+    nextPreview.style.backgroundColor = Common.choose(['#ff0080', '#00f3ff', '#ffd700', '#33ff33']);
+}
+
+// Audio
+function playPopSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.setValueAtTime(Common.random(200, 600), audioCtx.currentTime);
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+}
+
+function playWinSound() {
+    if (!audioCtx) return;
+    // Simple arpeggio
+    [440, 554, 659, 880].forEach((freq, i) => {
+        setTimeout(() => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.value = freq;
+            osc.type = 'triangle';
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }, i * 100);
+    });
+}
+
+function playLoseSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+    osc.type = 'sawtooth';
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.5);
+}
+
+function fireConfetti() {
+    // Simple particle effect using Matter.js bodies for confetti
+    for (let i = 0; i < 50; i++) {
+        const confetti = Bodies.circle(
+            window.innerWidth / 2,
+            window.innerHeight + 50,
+            5,
+            {
+                render: { fillStyle: Common.choose(['#f00', '#0f0', '#00f', '#ff0']) },
+                force: { x: Common.random(-0.05, 0.05), y: Common.random(-0.05, -0.1) }
+            }
+        );
+        Composite.add(engine.world, confetti);
+    }
+}
+
+// Resize Handler
+window.addEventListener('resize', () => {
     render.canvas.width = window.innerWidth;
     render.canvas.height = window.innerHeight;
-
-    // Reposition ground
     Matter.Body.setPosition(ground, {
         x: window.innerWidth / 2,
-        y: window.innerHeight
+        y: window.innerHeight + 20
     });
+});
 
-    // Resize ground
-    Composite.remove(engine.world, ground);
-
-    const newGround = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 60, {
-        isStatic: true,
-        render: {
-            fillStyle: '#333'
-        },
-        friction: 1.0
-    });
-
-    Composite.add(engine.world, newGround);
-}
-
-window.addEventListener('resize', resize);
-
-// ============= MOON AMBIENT MUSIC =============
-let audioContext, musicOscs = [];
-
-function startMusic() {
-    if (musicOscs.length > 0) return;
-
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const notes = [130.81, 146.83, 164.81, 196.00]; // C3-G3 (low, spacey)
-    const pattern = [0, 2, 1, 3, 2, 0];
-    let noteIndex = 0;
-
-    function playNote() {
-        if (musicOscs.length === 0) return;
-
-        const now = audioContext.currentTime;
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.value = notes[pattern[noteIndex]];
-
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.02, now + 0.2);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        osc.start(now);
-        osc.stop(now + 1.5);
-
-        noteIndex = (noteIndex + 1) % pattern.length;
-        setTimeout(playNote, 1200);
-    }
-
-    // Deep pad
-    const pad = audioContext.createOscillator();
-    const padGain = audioContext.createGain();
-    pad.type = 'sine';
-    pad.frequency.value = 65.41; // C2
-    padGain.gain.value = 0.015;
-    pad.connect(padGain);
-    padGain.connect(audioContext.destination);
-    pad.start();
-
-    musicOscs.push(pad);
-    playNote();
-}
-
-function playSadMusic() {
-    if (!audioContext) {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioContext.state === 'suspended') audioContext.resume();
-
-    // Stop happy music
-    musicOscs.forEach(o => o.stop());
-    musicOscs = [];
-
-    const osc = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    osc.type = 'triangle';
-    // Sad minor chord arpeggio (slow)
-    const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
-    let i = 0;
-
-    function playSadNote() {
-        if (i >= notes.length) {
-            // Drone
-            const drone = audioContext.createOscillator();
-            const dGain = audioContext.createGain();
-            drone.type = 'sine';
-            drone.frequency.value = 65.41; // C2
-            dGain.gain.value = 0.1;
-            drone.connect(dGain);
-            dGain.connect(audioContext.destination);
-            drone.start();
-            dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
-            drone.stop(audioContext.currentTime + 3);
-            return;
-        }
-
-        const now = audioContext.currentTime;
-        const o = audioContext.createOscillator();
-        const g = audioContext.createGain();
-        o.type = 'sine';
-        o.frequency.value = notes[i];
-        g.gain.setValueAtTime(0, now);
-        g.gain.linearRampToValueAtTime(0.1, now + 0.1);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-
-        o.connect(g);
-        g.connect(audioContext.destination);
-        o.start(now);
-        o.stop(now + 1.5);
-
-        i++;
-        setTimeout(playSadNote, 800);
-    }
-    playSadNote();
-}
-
-function stopMusic() {
-    musicOscs.forEach(o => o.stop());
-    musicOscs = [];
-}
-
-// Initialize
-resize();
-
-// Auto-start music on first interaction
-document.addEventListener('click', () => {
-    if (musicOscs.length === 0) startMusic();
-}, { once: true });
+// Init on Load
+window.addEventListener('load', initEngine);

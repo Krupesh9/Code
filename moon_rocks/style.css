@@ -1,16 +1,26 @@
-body {
+:root {
+    --bg-color: #1a1a2e;
+    --text-color: #ffffff;
+    --accent-color: #ff0080;
+    --secondary-color: #00f3ff;
+    --ui-bg: rgba(255, 255, 255, 0.1);
+    --font-main: 'Fredoka', sans-serif;
+}
+
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
     overflow: hidden;
-    background-color: #0b0d17;
-    background-image:
-        radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
-        radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
-        radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
-    background-size: 550px 550px, 350px 350px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    touch-action: none;
 }
 
 #game-container {
@@ -19,58 +29,238 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 1;
+    background: radial-gradient(circle at center, #2a2a4e 0%, #1a1a2e 100%);
 }
 
 #ui-layer {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
     pointer-events: none;
-    /* Let clicks pass through to the canvas */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
-h1 {
-    margin: 0 0 10px 0;
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+/* Start Screen */
+#start-screen {
+    background: rgba(0, 0, 0, 0.85);
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    pointer-events: auto;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    max-width: 90%;
+    width: 400px;
 }
 
-#score {
-    font-size: clamp(1.2rem, 4vw, 1.5rem);
-    font-weight: bold;
-    margin-bottom: 5px;
+.game-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #00f3ff, #ff0080);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
 }
 
-#instructions {
-    font-size: clamp(0.9rem, 3vw, 1rem);
-    opacity: 0.8;
+.instruction {
+    color: #a0a0a0;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+}
+
+.mode-select p {
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.mode-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    font-family: var(--font-main);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.mode-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+    border-color: var(--secondary-color);
+}
+
+.mode-btn:active {
+    transform: scale(0.98);
 }
 
 .back-link {
-    display: inline-block;
-    margin-top: 20px;
-    color: #aaa;
+    color: #666;
     text-decoration: none;
-    pointer-events: auto;
-    /* Re-enable clicks for the link */
-    border: 1px solid #aaa;
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: all 0.2s;
-    font-size: clamp(0.9rem, 3vw, 1rem);
-    touch-action: manipulation;
+    font-size: 0.9rem;
+    transition: color 0.2s;
 }
 
 .back-link:hover {
-    color: white;
-    border-color: white;
-    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
 }
 
-@media (max-width: 600px) {
-    #ui-layer {
-        top: 10px;
-        left: 10px;
-        width: calc(100% - 20px);
+/* HUD */
+#game-hud {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    width: 100%;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+}
+
+.score-card,
+.next-piece {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.label {
+    font-size: 0.8rem;
+    color: #aaa;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+#block-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+}
+
+#next-preview {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+    /* Preview shape will be drawn here via JS or CSS */
+    background: #ff0080;
+    border-radius: 5px;
+}
+
+#restart-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: all 0.2s;
+}
+
+#restart-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(180deg);
+}
+
+/* Game Over Screen */
+#game-over-screen {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 3rem;
+    border-radius: 25px;
+    text-align: center;
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 50px rgba(255, 0, 128, 0.3);
+    pointer-events: auto;
+    animation: dropIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#result-title {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--accent-color);
+}
+
+#result-msg {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #ddd;
+}
+
+.action-btn {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin: 0 10px;
+    transition: all 0.2s;
+}
+
+.action-btn.primary {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.hidden {
+    display: none !important;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes dropIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
