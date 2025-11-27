@@ -285,16 +285,20 @@ function gameLoop(timestamp) {
     }
     inkBar.style.width = `${(inkLevel / MAX_INK) * 100}%`;
 
-    // Spawn rain
+    // Spawn rain (Dynamic Intensity)
     rainSpawnTimer += dt;
-    if (rainSpawnTimer > 0.12) {
+    // Spawn rate increases with score (time), and fluctuates slightly
+    const baseSpawnRate = Math.max(0.04, 0.12 - (score / 300));
+    const currentSpawnRate = baseSpawnRate + (Math.sin(score / 5) * 0.02); // Waves of rain
+
+    if (rainSpawnTimer > currentSpawnRate) {
         raindrops.push(new Raindrop());
         rainSpawnTimer = 0;
     }
 
     // Change wind
     windChangeTimer += dt;
-    if (windChangeTimer > 5) {
+    if (windChangeTimer > 4) { // Change every 4 seconds
         updateWind();
         windChangeTimer = 0;
     }
@@ -386,6 +390,7 @@ function gameOver() {
     finalScoreSpan.textContent = Math.floor(score);
     gameOverScreen.classList.remove('hidden');
     stopMusic();
+    playSadMusic();
 }
 
 // ============= RAIN AMBIENT MUSIC =============
@@ -434,6 +439,60 @@ function startMusic() {
 
     musicOscs.push(pad);
     playNote();
+}
+
+function playSadMusic() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    // Stop happy music
+    musicOscs.forEach(o => o.stop());
+    musicOscs = [];
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = 'triangle';
+    // Sad minor chord arpeggio (slow)
+    const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+    let i = 0;
+
+    function playSadNote() {
+        if (i >= notes.length) {
+            // Drone
+            const drone = audioContext.createOscillator();
+            const dGain = audioContext.createGain();
+            drone.type = 'sine';
+            drone.frequency.value = 65.41; // C2
+            dGain.gain.value = 0.1;
+            drone.connect(dGain);
+            dGain.connect(audioContext.destination);
+            drone.start();
+            dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+            drone.stop(audioContext.currentTime + 3);
+            return;
+        }
+
+        const now = audioContext.currentTime;
+        const o = audioContext.createOscillator();
+        const g = audioContext.createGain();
+        o.type = 'sine';
+        o.frequency.value = notes[i];
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+        o.connect(g);
+        g.connect(audioContext.destination);
+        o.start(now);
+        o.stop(now + 1.5);
+
+        i++;
+        setTimeout(playSadNote, 800);
+    }
+    playSadNote();
 }
 
 function stopMusic() {

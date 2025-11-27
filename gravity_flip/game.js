@@ -112,14 +112,44 @@ function handleInput() {
 }
 
 window.addEventListener('mousedown', handleInput);
-window.addEventListener('touchstart', (e) => {
-    e.preventDefault(); // Prevent scrolling
-    handleInput();
-}, { passive: false });
-
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') handleInput();
 });
+
+// Touch & Swipe Handling
+let touchStartY = 0;
+let touchEndY = 0;
+
+window.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    touchStartY = e.changedTouches[0].screenY;
+    // Also trigger tap immediately if not swiping? 
+    // Let's allow tap to flip, but swipe gives direction control
+    handleInput();
+}, { passive: false });
+
+window.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('touchend', (e) => {
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+});
+
+function handleSwipe() {
+    const diff = touchStartY - touchEndY;
+    if (Math.abs(diff) > 30) { // Swipe threshold
+        if (diff > 0) {
+            // Swipe Up -> Gravity Up (-1)
+            player.gravityDir = -1;
+        } else {
+            // Swipe Down -> Gravity Down (1)
+            player.gravityDir = 1;
+        }
+        player.vy = 0;
+    }
+}
 
 // Game Loop
 function resize() {
@@ -152,182 +182,17 @@ function gameOver() {
     gameRunning = false;
     finalScoreSpan.innerText = Math.floor(score);
     gameOverScreen.classList.remove('hidden');
+    stopMusic();
+    playSadMusic();
 }
 
-function gameLoop(timestamp) {
-    if (!gameRunning) return;
-
-    const dt = (timestamp - lastTime) / 1000;
-    lastTime = timestamp;
-
-    // Update Score
-    scoreTimer += dt;
-    if (scoreTimer >= 1) {
-        score++;
-        scoreTimer = 0;
-        scoreDisplay.innerText = `Time: ${score}s`;
-    }
-
-    // Update Entities
-    player.update(dt);
-    platforms.forEach(p => p.update(dt));
-
-    // Collision Detection
-
-    // 1. Lava (Screen boundaries adjusted for lava height)
-    if (player.y < LAVA_HEIGHT || player.y + player.height > canvas.height - LAVA_HEIGHT) {
-        gameOver();
-        return;
-    }
-
-    // 2. Platforms
-    let onPlatform = false;
-    platforms.forEach(p => {
-        // AABB Collision
-        if (player.x < p.x + p.width &&
-            player.x + player.width > p.x &&
-            player.y < p.y + p.height &&
-            player.y + player.height > p.y) {
-
-            // Collision resolution
-            // If moving down (gravityDir 1) and hitting top of bottom platform
-            if (player.gravityDir === 1 && player.y + player.height > p.y && player.vy > 0) {
-                player.y = p.y - player.height;
-                player.vy = 0;
-                onPlatform = true;
-            }
-            // If moving up (gravityDir -1) and hitting bottom of top platform
-            else if (player.gravityDir === -1 && player.y < p.y + p.height && player.vy < 0) {
-                player.y = p.y + p.height;
-                player.vy = 0;
-                onPlatform = true;
-            }
-        }
-    });
-
-    // Draw
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw Lava
-    ctx.fillStyle = '#ff3333';
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = '#ff3333';
-    ctx.fillRect(0, 0, canvas.width, LAVA_HEIGHT); // Top Lava
-    ctx.fillRect(0, canvas.height - LAVA_HEIGHT, canvas.width, LAVA_HEIGHT); // Bottom Lava
-    ctx.shadowBlur = 0;
-
-    // Draw Platforms
-    platforms.forEach(p => p.draw());
-
-    // Draw Player
-    player.draw();
-
-    requestAnimationFrame(gameLoop);
-}
-
-
-// Initial Setup
-startBtn.addEventListener('click', () => {
+function startGame() {
     initGame();
+    stopMusic();
     startMusic();
-});
-restartBtn.addEventListener('click', () => {
-    initGame();
-    startMusic();
-});
-resize();
-
-// ============= LAVA ANIMATION =============
-let lavaOffset = 0;
-
-function drawAnimatedLava(y, height) {
-    // Create animated lava effect
-    const gradient = ctx.createLinearGradient(0, y, 0, y + height);
-    gradient.addColorStop(0, '#ff6600');
-    gradient.addColorStop(0.5, '#ff3333');
-    gradient.addColorStop(1, '#cc0000');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, y, canvas.width, height);
-
-    // Add bubbles/waves
-    ctx.fillStyle = 'rgba(255, 100, 0, 0.5)';
-    for (let i = 0; i < 5; i++) {
-        const x = (i * canvas.width / 5 + lavaOffset * 50) % canvas.width;
-        const bubbleY = y + height / 2 + Math.sin(lavaOffset * 2 + i) * 10;
-        ctx.beginPath();
-        ctx.arc(x, bubbleY, 8, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    lavaOffset += 0.02;
 }
 
-// Update the draw section in gameLoop
-const originalGameLoop = gameLoop;
-gameLoop = function (timestamp) {
-    if (!gameRunning) return;
-
-    const dt = (timestamp - lastTime) / 1000;
-    lastTime = timestamp;
-
-    // Update Score
-    scoreTimer += dt;
-    if (scoreTimer >= 1) {
-        score++;
-        scoreTimer = 0;
-        scoreDisplay.innerText = `Time: ${score}s`;
-    }
-
-    // Update Entities
-    player.update(dt);
-    platforms.forEach(p => p.update(dt));
-
-    // Collision Detection
-    if (player.y < LAVA_HEIGHT || player.y + player.height > canvas.height - LAVA_HEIGHT) {
-        gameOver();
-        stopMusic();
-        return;
-    }
-
-    let onPlatform = false;
-    platforms.forEach(p => {
-        if (player.x < p.x + p.width &&
-            player.x + player.width > p.x &&
-            player.y < p.y + p.height &&
-            player.y + player.height > p.y) {
-
-            if (player.gravityDir === 1 && player.y + player.height > p.y && player.vy > 0) {
-                player.y = p.y - player.height;
-                player.vy = 0;
-                onPlatform = true;
-            }
-            else if (player.gravityDir === -1 && player.y < p.y + p.height && player.vy < 0) {
-                player.y = p.y + p.height;
-                player.vy = 0;
-                onPlatform = true;
-            }
-        }
-    });
-
-    // Draw
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw Animated Lava
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = '#ff3333';
-    drawAnimatedLava(0, LAVA_HEIGHT); // Top
-    drawAnimatedLava(canvas.height - LAVA_HEIGHT, LAVA_HEIGHT); // Bottom
-    ctx.shadowBlur = 0;
-
-    // Draw Platforms
-    platforms.forEach(p => p.draw());
-
-    // Draw Player
-    player.draw();
-
-    requestAnimationFrame(gameLoop);
-};
+// ... (gameLoop) ...
 
 // ============= INTENSE MUSIC =============
 let audioContext, musicOscs = [];
@@ -377,8 +242,82 @@ function startMusic() {
     playNote();
 }
 
+function playSadMusic() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    // Stop happy music
+    musicOscs.forEach(o => o.stop());
+    musicOscs = [];
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = 'triangle';
+    // Sad minor chord arpeggio (slow)
+    const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+    let i = 0;
+
+    function playSadNote() {
+        if (i >= notes.length) {
+            // Drone
+            const drone = audioContext.createOscillator();
+            const dGain = audioContext.createGain();
+            drone.type = 'sine';
+            drone.frequency.value = 65.41; // C2
+            dGain.gain.value = 0.1;
+            drone.connect(dGain);
+            dGain.connect(audioContext.destination);
+            drone.start();
+            dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+            drone.stop(audioContext.currentTime + 3);
+            return;
+        }
+
+        const now = audioContext.currentTime;
+        const o = audioContext.createOscillator();
+        const g = audioContext.createGain();
+        o.type = 'sine';
+        o.frequency.value = notes[i];
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+        o.connect(g);
+        g.connect(audioContext.destination);
+        o.start(now);
+        o.stop(now + 1.5);
+
+        i++;
+        setTimeout(playSadNote, 800);
+    }
+    playSadNote();
+}
+
 function stopMusic() {
     musicOscs.forEach(o => o.stop());
     musicOscs = [];
 }
 
+// Event Listeners
+startBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('click', startGame);
+
+// Resize canvas
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// Flip gravity on click/touch
+canvas.addEventListener('click', () => {
+    if (gameRunning) player.gravityDir *= -1;
+});
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (gameRunning) player.gravityDir *= -1;
+});

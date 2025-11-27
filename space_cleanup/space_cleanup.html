@@ -21,6 +21,8 @@
             position: relative;
             width: 100vw;
             height: 100vh;
+            touch-action: none;
+            /* Prevent scrolling */
         }
 
         canvas {
@@ -41,7 +43,7 @@
         }
 
         .hud-item {
-            font-size: 2rem;
+            font-size: clamp(1.2rem, 5vw, 2rem);
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
@@ -67,10 +69,12 @@
             z-index: 20;
             pointer-events: auto;
             cursor: default;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         h1 {
-            font-size: 4rem;
+            font-size: clamp(2.5rem, 8vw, 4rem);
             margin-bottom: 1rem;
             text-align: center;
             background: linear-gradient(to right, #00f3ff, #bc13fe);
@@ -81,7 +85,7 @@
         }
 
         p {
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 4vw, 1.5rem);
             margin-bottom: 2rem;
             color: #a0a0a0;
             text-align: center;
@@ -93,12 +97,13 @@
             color: #00f3ff;
             border: 2px solid #00f3ff;
             padding: 15px 40px;
-            font-size: 1.5rem;
+            font-size: clamp(1.2rem, 5vw, 1.5rem);
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 50px;
+            touch-action: manipulation;
         }
 
         .btn:hover {
@@ -140,14 +145,15 @@
         <div id="message-overlay">
             <h1 id="title">SPACE CLEAN UP</h1>
             <p id="description">
-                Use your mouse as a Gravity Well to collect debris.
+                Use your mouse or touch to create a Gravity Well to collect debris.
                 <br><br>
                 <label
-                    style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.2rem; margin-bottom: 1rem;">
+                    style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(1rem, 4vw, 1.2rem); margin-bottom: 1rem;">
                     <input type="checkbox" id="hunterToggle" checked style="width: 20px; height: 20px;">
                     <span>Enable Red Hunters (harder, +30s time)</span>
                 </label>
-                <span style="color: #ff3333; font-size: 1rem;">Red Hunters drain your time if enabled!</span>
+                <span style="color: #ff3333; font-size: clamp(0.8rem, 3vw, 1rem);">Red Hunters drain your time if
+                    enabled!</span>
             </p>
             <button class="btn" onclick="startGame()">Start Mission</button>
         </div>
@@ -174,13 +180,31 @@
         let huntersEnabled = true;
         let timerInterval;
         let enemySpawnInterval;
+        let objects = [];
+        let enemies = [];
+        let particles = [];
 
         // Mouse Position
         const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+
+        function updateInput(x, y) {
+            mouse.x = x;
+            mouse.y = y;
+        }
+
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+            updateInput(e.clientX, e.clientY);
         });
+
+        window.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            updateInput(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        window.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            updateInput(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
 
         // Colors
         const colors = ['#FF0055', '#00FF99', '#00CCFF', '#FFEE00', '#FF33CC'];
@@ -226,13 +250,17 @@
                 this.vx *= 0.99;
                 this.vy *= 0.99;
 
-                // Bounce off walls
-                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                // Bounce off screen edges
+                if (this.x < this.size || this.x > canvas.width - this.size) {
+                    this.vx *= -0.8;
+                }
+                if (this.y < this.size || this.y > canvas.height - this.size) {
+                    this.vy *= -0.8;
+                }
 
-                // Clamp position
-                this.x = Math.max(0, Math.min(canvas.width, this.x));
-                this.y = Math.max(0, Math.min(canvas.height, this.y));
+                // Clamp position within screen
+                this.x = Math.max(this.size, Math.min(canvas.width - this.size, this.x));
+                this.y = Math.max(this.size, Math.min(canvas.height - this.size, this.y));
 
                 // Collection Check
                 if (distance < 30) {
@@ -364,9 +392,7 @@
             }
         }
 
-        let objects = [];
-        let enemies = [];
-        let particles = [];
+        let animationId;
 
         function init() {
             objects = [];
@@ -385,7 +411,7 @@
         function startGame() {
             // Check hunter toggle
             huntersEnabled = document.getElementById('hunterToggle').checked;
-            timeLeft = huntersEnabled ? 90 : 60; // 1.5 min with hunters, 1 min without
+            timeLeft = huntersEnabled ? 60 : 45; // 60s with hunters, 45s without
 
             isPlaying = true;
             score = 0;
@@ -407,8 +433,27 @@
                 enemySpawnInterval = setInterval(spawnEnemy, 4000); // Spawn every 4 seconds
             }
 
+            // Reset overlay UI for next time
+            const title = document.getElementById('title');
+            const desc = document.getElementById('description');
+            const btn = document.querySelector('.btn');
+            title.innerText = "SPACE CLEAN UP";
+            desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.
+                <br><br>
+                <label style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(1rem, 4vw, 1.2rem); margin-bottom: 1rem;">
+                    <input type="checkbox" id="hunterToggle" ${huntersEnabled ? 'checked' : ''} style="width: 20px; height: 20px;">
+                    <span>Enable Red Hunters (harder, +15s time)</span>
+                </label>
+                <span style="color: #ff3333; font-size: clamp(0.8rem, 3vw, 1rem);">Red Hunters drain your time if enabled!</span>`;
+            btn.innerText = "START MISSION";
+
             // Hide overlay
             document.getElementById('message-overlay').classList.add('hidden');
+
+            // Stop any existing loops or music
+            if (animationId) cancelAnimationFrame(animationId);
+            stopMusic();
+
             loop();
             startMusic();
         }
@@ -436,6 +481,7 @@
             isPlaying = false;
             clearInterval(timerInterval);
             clearInterval(enemySpawnInterval);
+            stopMusic();
 
             const overlay = document.getElementById('message-overlay');
             const title = document.getElementById('title');
@@ -452,11 +498,13 @@
                 for (let i = 0; i < 100; i++) {
                     particles.push(new Particle(canvas.width / 2, canvas.height / 2));
                 }
-                loop(); // Continue loop for confetti
+                // Continue loop for confetti if it was stopped (though isPlaying=false handles logic)
+                if (!animationId) loop();
             } else {
                 title.innerText = "TIME'S UP!";
                 desc.innerText = "The Hunters overwhelmed you. Mission Failed.";
                 btn.innerText = "Try Again";
+                playSadMusic();
             }
         }
 
@@ -464,18 +512,48 @@
             ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; // Trails
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Draw Gravity Well (Cursor)
+            // Draw Vacuum Cleaner (Cursor)
             if (isPlaying) {
+                ctx.save();
+                ctx.translate(mouse.x, mouse.y);
+
+                // Vacuum body
+                ctx.fillStyle = '#00f3ff';
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#00f3ff';
                 ctx.beginPath();
-                ctx.arc(mouse.x, mouse.y, 20, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.lineWidth = 2;
+                ctx.ellipse(0, 0, 25, 20, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Vacuum handle
+                ctx.strokeStyle = '#00f3ff';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.moveTo(-15, -15);
+                ctx.lineTo(-25, -30);
                 ctx.stroke();
 
+                // Suction area (glowing)
                 ctx.beginPath();
-                ctx.arc(mouse.x, mouse.y, 5, 0, Math.PI * 2);
-                ctx.fillStyle = 'white';
-                ctx.fill();
+                ctx.arc(0, 0, 35, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                // Animated suction particles
+                const time = Date.now() * 0.005;
+                for (let i = 0; i < 3; i++) {
+                    const angle = (time + i * Math.PI * 2 / 3) % (Math.PI * 2);
+                    const radius = 30 + Math.sin(time * 2 + i) * 5;
+                    const px = Math.cos(angle) * radius;
+                    const py = Math.sin(angle) * radius;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 2, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
+                    ctx.fill();
+                }
+
+                ctx.restore();
             }
 
             // Update Objects
@@ -492,7 +570,9 @@
             particles.forEach(p => p.draw());
 
             if (isPlaying || particles.length > 0) {
-                requestAnimationFrame(loop);
+                animationId = requestAnimationFrame(loop);
+            } else {
+                animationId = null;
             }
         }
 
@@ -503,10 +583,19 @@
         // ============= SPACE MUSIC =============
         let audioContext, musicOscs = [];
 
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
         function startMusic() {
+            initAudio();
             if (musicOscs.length > 0) return;
 
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; // A3-G4
             const pattern = [0, 2, 4, 2, 1, 3, 4, 0];
             let noteIndex = 0;
@@ -546,6 +635,54 @@
 
             musicOscs.push(bass);
             playNote();
+        }
+
+        function playSadMusic() {
+            initAudio();
+            stopMusic(); // Ensure other music is off
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.type = 'triangle';
+            // Sad minor chord arpeggio (slow)
+            const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+            let i = 0;
+
+            function playSadNote() {
+                if (i >= notes.length) {
+                    // Drone
+                    const drone = audioContext.createOscillator();
+                    const dGain = audioContext.createGain();
+                    drone.type = 'sine';
+                    drone.frequency.value = 65.41; // C2
+                    dGain.gain.value = 0.1;
+                    drone.connect(dGain);
+                    dGain.connect(audioContext.destination);
+                    drone.start();
+                    dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+                    drone.stop(audioContext.currentTime + 3);
+                    return;
+                }
+
+                const now = audioContext.currentTime;
+                const o = audioContext.createOscillator();
+                const g = audioContext.createGain();
+                o.type = 'sine';
+                o.frequency.value = notes[i];
+                g.gain.setValueAtTime(0, now);
+                g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+                g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+                o.connect(g);
+                g.connect(audioContext.destination);
+                o.start(now);
+                o.stop(now + 1.5);
+
+                i++;
+                setTimeout(playSadNote, 800);
+            }
+            playSadNote();
         }
 
         function stopMusic() {

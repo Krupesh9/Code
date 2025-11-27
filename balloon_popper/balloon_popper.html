@@ -63,12 +63,38 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
         }
 
-        .score-container {
-            font-size: 1.5rem;
+        .score-container,
+        .timer-container,
+        .streak-container {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+        }
+
+        .timer-container {
+            color: #38bdf8;
+        }
+
+        .timer-container.warning {
+            color: #fbbf24;
+            animation: pulse-timer 0.5s ease-in-out infinite;
+        }
+
+        .timer-container.danger {
+            color: #ff5e78;
+        }
+
+        @keyframes pulse-timer {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         .streak-container {
-            font-size: 1.2rem;
             color: var(--accent-color);
         }
 
@@ -164,24 +190,29 @@
                 <div style="display: flex; flex-direction: column; gap: 20px; align-items: flex-start;">
                     <a href="../index.html" id="back-btn">← Exit</a>
 
-                    <div id="target-display"
-                        style="font-size: 1.5rem; color: white; display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.2); padding: 10px 20px; border-radius: 15px; backdrop-filter: blur(5px);">
-                        Target:
-                        <div id="target-balloon"
-                            style="width: 50px; height: 60px; border-radius: 50%; position: relative; transition: all 0.5s ease;">
-                            <div
-                                style="width: 10px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.3); position: absolute; top: 8px; left: 8px; transform: rotate(45deg);">
-                            </div>
-                            <div
-                                style="width: 3px; height: 15px; background: rgba(255,255,255,0.5); position: absolute; bottom: -15px; left: 23px;">
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <div style="text-align: left;">
+                            <div id="lives"></div>
+                            <div style="margin-top: 10px; font-size: clamp(0.8rem, 3vw, 1rem); color: #cbd5e1;">
+                                Target:
+                                <div id="target-balloon"
+                                    style="width: 50px; height: 60px; border-radius: 50%; position: relative; transition: all 0.5s ease;">
+                                    <div
+                                        style="width: 10px; height: 18px; border-radius: 50%; background: rgba(255,255,255,0.3); position: absolute; top: 8px; left: 8px; transform: rotate(45deg);">
+                                    </div>
+                                    <div
+                                        style="width: 3px; height: 15px; background: rgba(255,255,255,0.5); position: absolute; bottom: -15px; left: 23px;">
+                                    </div>
+                                </div>
+                                <span id="target-color-name" style="display: none;">ANY</span>
                             </div>
                         </div>
-                        <span id="target-color-name" style="display: none;">ANY</span>
+                        <div style="text-align: center; display: flex; flex-direction: column; gap: 8px;">
+                            <div class="timer-container" id="timer">⏱️ 1:00</div>
+                            <div class="score-container">Score: <span id="score">0</span></div>
+                            <div class="streak-container">Streak: <span id="streak">0</span></div>
+                        </div>
                     </div>
-                </div>
-                <div style="text-align: right;">
-                    <div class="score-container">Score: <span id="score">0</span></div>
-                    <div class="streak-container">Streak: <span id="streak">0</span></div>
                 </div>
             </div>
         </div>
@@ -199,6 +230,7 @@
         const ctx = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
         const streakEl = document.getElementById('streak');
+        const timerEl = document.getElementById('timer');
         const startScreen = document.getElementById('start-screen');
         const startBtn = document.getElementById('start-btn');
 
@@ -206,6 +238,8 @@
         let isPlaying = false;
         let score = 0;
         let streak = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
         let lastTime = 0;
         let spawnTimer = 0;
 
@@ -554,19 +588,72 @@
             textEl.textContent = name;
         }
 
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            startScreen.classList.remove('hidden');
+            startScreen.querySelector('h1').textContent = "GAME OVER!";
+            startScreen.querySelector('p').innerHTML = `You scored ${score} points! <br> Try again to beat your high score!`;
+            stopMusic();
+        }
+
+        function updateLives() {
+            // Placeholder for lives display, not implemented in this diff
+            // const livesEl = document.getElementById('lives');
+            // livesEl.textContent = `Lives: ${lives}`;
+        }
+
         function startGame() {
             isPlaying = true;
             score = 0;
             streak = 0;
+            lives = 3;
+            timeLeft = 60;
             balloons = [];
             particles = [];
             scoreEl.textContent = '0';
             streakEl.textContent = '0';
+            updateTimer();
+            updateLives();
+
+            // Clear any existing timer
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Start countdown timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    gameOver();
+                }
+            }, 1000);
+
             startScreen.classList.add('hidden');
+            startScreen.querySelector('h1').textContent = "BALLOON POPPER";
+            startScreen.querySelector('p').innerHTML = "Balloons fall UP! Tap ONLY the balloons that match the target color.<br>Let the others fly away into the sky!";
+
             lastTime = performance.now();
-            changeTargetColor(); // Set initial target
-            resize(); // Ensure spikes are ready
+            changeTargetColor();
+            resize();
             requestAnimationFrame(update);
+
+            stopMusic();
+            startMusic();
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerEl.textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            timerEl.classList.remove('warning', 'danger');
+            if (timeLeft <= 10) {
+                timerEl.classList.add('danger');
+            } else if (timeLeft <= 20) {
+                timerEl.classList.add('warning');
+            }
         }
 
         // Event Listeners

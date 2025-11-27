@@ -40,7 +40,7 @@
             color: #00ffff;
             /* Cyan */
             text-shadow: 0 0 10px #00ffff;
-            font-size: 18px;
+            font-size: clamp(14px, 4vw, 18px);
             pointer-events: none;
         }
 
@@ -50,8 +50,8 @@
         }
 
         .life-pip {
-            width: 20px;
-            height: 20px;
+            width: clamp(15px, 4vw, 20px);
+            height: clamp(15px, 4vw, 20px);
             border: 2px solid #ff00ff;
             /* Magenta */
             background: transparent;
@@ -77,6 +77,8 @@
             align-items: center;
             pointer-events: auto;
             z-index: 10;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .hidden {
@@ -84,7 +86,7 @@
         }
 
         h1 {
-            font-size: 48px;
+            font-size: clamp(2.5rem, 8vw, 48px);
             color: #00ffff;
             text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
             margin-bottom: 20px;
@@ -94,7 +96,7 @@
 
         p {
             color: #fff;
-            font-size: 18px;
+            font-size: clamp(1rem, 4vw, 18px);
             margin-bottom: 40px;
             text-align: center;
             text-shadow: 0 0 5px #fff;
@@ -106,12 +108,13 @@
             /* Lime Green */
             border: 2px solid #39ff14;
             padding: 15px 40px;
-            font-size: 24px;
+            font-size: clamp(1.2rem, 5vw, 24px);
             font-family: 'Orbitron', sans-serif;
             cursor: pointer;
             box-shadow: 0 0 10px #39ff14;
             transition: all 0.2s;
             text-transform: uppercase;
+            touch-action: manipulation;
         }
 
         button:hover {
@@ -121,7 +124,7 @@
         }
 
         #score-display {
-            font-size: 32px;
+            font-size: clamp(1.5rem, 6vw, 32px);
             color: #ff00ff;
             text-shadow: 0 0 15px #ff00ff;
             margin-bottom: 20px;
@@ -327,6 +330,53 @@
 
                 SoundManager.musicOscs.push(bass, harmony);
                 playMelody();
+            },
+            playSadMusic: () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                SoundManager.stopMusic();
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                // Sad minor chord arpeggio (slow)
+                const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+                let i = 0;
+
+                function playSadNote() {
+                    if (i >= notes.length) {
+                        // Drone
+                        const drone = audioCtx.createOscillator();
+                        const dGain = audioCtx.createGain();
+                        drone.type = 'sine';
+                        drone.frequency.value = 65.41; // C2
+                        dGain.gain.value = 0.1;
+                        drone.connect(dGain);
+                        dGain.connect(audioCtx.destination);
+                        drone.start();
+                        dGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+                        drone.stop(audioCtx.currentTime + 3);
+                        return;
+                    }
+
+                    const now = audioCtx.currentTime;
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = notes[i];
+                    g.gain.setValueAtTime(0, now);
+                    g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.start(now);
+                    o.stop(now + 1.5);
+
+                    i++;
+                    setTimeout(playSadNote, 800);
+                }
+                playSadNote();
             },
             stopMusic: () => {
                 SoundManager.musicOscs.forEach(o => o.stop());
@@ -835,8 +885,8 @@
             gameOverScreen.classList.remove('hidden');
             document.getElementById('score-display').innerText = `FINAL SCORE: ${game.score}`;
             SoundManager.stopMusic();
+            SoundManager.playSadMusic();
         }
-
         startBtn.addEventListener('click', startGame);
         restartBtn.addEventListener('click', startGame);
 

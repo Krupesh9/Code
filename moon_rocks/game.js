@@ -12,8 +12,10 @@ const Engine = Matter.Engine,
 
 // Create engine
 const engine = Engine.create();
-// Low gravity for Moon simulation
-engine.gravity.y = 0.16; // Earth is 1.0, Moon is ~0.165
+// Low gravity for Moon simulation (1/6 of Earth gravity)
+engine.gravity.y = 0.16; // Default is 1
+// Enable sleeping for better stability and performance
+engine.enableSleeping = true;
 
 // Create renderer
 const render = Render.create({
@@ -25,6 +27,40 @@ const render = Render.create({
         wireframes: false,
         background: 'transparent' // Let CSS background show through
     }
+});
+
+// 3D Effect: Enhanced with better shadows and highlights
+Events.on(render, 'beforeRender', function () {
+    const ctx = render.context;
+    rocks.forEach(rock => {
+        if (rock.render.visible === false) return;
+
+        ctx.beginPath();
+        const vertices = rock.vertices;
+
+        // Draw deeper shadow for more 3D effect
+        const shadowOffset = 8;
+        ctx.moveTo(vertices[0].x + shadowOffset, vertices[0].y + shadowOffset);
+        for (let j = 1; j < vertices.length; j++) {
+            ctx.lineTo(vertices[j].x + shadowOffset, vertices[j].y + shadowOffset);
+        }
+        ctx.closePath();
+
+        // Darker, softer shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fill();
+
+        // Add highlight on top-left for 3D depth
+        ctx.beginPath();
+        const highlightOffset = -2;
+        ctx.moveTo(vertices[0].x + highlightOffset, vertices[0].y + highlightOffset);
+        for (let j = 1; j < vertices.length; j++) {
+            ctx.lineTo(vertices[j].x + highlightOffset, vertices[j].y + highlightOffset);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.fill();
+    });
 });
 
 // Create ground
@@ -73,80 +109,116 @@ function createRock(x, y) {
     const size = Common.random(40, 80);
     const sides = Math.round(Common.random(5, 8));
 
-    // Generate a polygon
+    // Generate a polygon with more variation
     const rock = Bodies.polygon(x, y, sides, size, {
         density: 0.05, // Heavy
         friction: 0.8, // High friction
         frictionAir: 0.05, // High air resistance
         restitution: 0.1, // Low bounciness
         render: {
-            fillStyle: Common.choose(['#555', '#666', '#777', '#888', '#4a4a4a']),
-            strokeStyle: '#222',
-            lineWidth: 2
-        }
+            fillStyle: Common.choose(['#7f8c8d', '#95a5a6', '#bdc3c7', '#636e72']),
+            strokeStyle: '#2c3e50',
+            lineWidth: 3  // Thicker outline for 3D effect
+        },
+        // Custom properties
+        hasLanded: false,
+        stableFrames: 0  // Track how many frames rock has been stable
     });
-
-    // Make it look a bit more random/jagged by scaling vertices slightly? 
-    // Matter.js polygons are regular. To make them jagged, we'd need custom vertices.
-    // Let's stick to polygons for now as "jagged stones" approximation, 
-    // or we could perturb the vertices if we really wanted to.
-    // For a simple "jagged" look, a random polygon is usually "rock-like" enough compared to a square.
 
     return rock;
 }
 
+// Detect collisions to mark rocks as "landed"
+Events.on(engine, 'collisionStart', function (event) {
+    const pairs = event.pairs;
+    pairs.forEach(pair => {
+        if (rocks.includes(pair.bodyA)) pair.bodyA.hasLanded = true;
+        if (rocks.includes(pair.bodyB)) pair.bodyB.hasLanded = true;
+    });
+});
+
 // Spawn rock on click, but only if not dragging
-Events.on(mouseConstraint, 'mousedown', function (event) {
-    // Check if we clicked on an existing body
-    const mousePosition = event.mouse.position;
+function handleSpawn(position) {
     const bodies = Composite.allBodies(engine.world);
-    const clickedBody = Matter.Query.point(bodies, mousePosition)[0];
+    const clickedBody = Matter.Query.point(bodies, position)[0];
 
     if (!clickedBody || clickedBody === ground) {
-        // Spawn a new rock at the top at the x position of the mouse
-        // But constrain Y to be near top
-        const spawnX = mousePosition.x;
-        const spawnY = 50; // Spawn at top
+        const spawnX = position.x;
+        const spawnY = -50; // Spawn ABOVE the screen to fall in
 
         const newRock = createRock(spawnX, spawnY);
         rocks.push(newRock);
         Composite.add(engine.world, newRock);
+
+        // Start music on first interaction
+        if (musicOscs.length === 0) startMusic();
     }
+}
+
+Events.on(mouseConstraint, 'mousedown', function (event) {
+    handleSpawn(event.mouse.position);
 });
 
-// Update score loop
+// Add touch support for spawning
+render.canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const rect = render.canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    const position = {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
+    handleSpawn(position);
+}, { passive: false });
+
+// Update score loop with better stability detection
 Events.on(engine, 'afterUpdate', function () {
     let maxHeight = 0;
 
     rocks.forEach(rock => {
-        // Calculate height from ground
-        // Ground y is window.innerHeight
-        // Height is distance from ground
-        const height = window.innerHeight - rock.position.y - 30; // approximate
-        if (height > maxHeight) {
-            maxHeight = height;
+        // Check if rock is moving slowly (stable)
+        const isStable = rock.speed < 0.5;
+
+        // Track stable frames
+        if (isStable && rock.hasLanded) {
+            rock.stableFrames = (rock.stableFrames || 0) + 1;
+        } else {
+            rock.stableFrames = 0;
+        }
+
+        // Only count rocks that have been stable for at least 30 frames (~0.5 seconds)
+        if (rock.hasLanded && rock.stableFrames > 30) {
+            // Calculate height from ground
+            const height = window.innerHeight - rock.bounds.min.y - 30;
+            if (height > maxHeight) {
+                maxHeight = height;
+            }
         }
     });
 
-    // Convert pixels to "meters" (arbitrary scale)
-    // Convert pixels to "meters" (arbitrary scale)
+    // Convert pixels to "meters" (arbitrary scale: 50px = 1m)
     const meters = Math.max(0, (maxHeight / 50).toFixed(1));
     scoreElement.innerText = `Current Height: ${meters}m / ${WIN_HEIGHT}m`;
 
+    // Only declare win if rocks have been stably at height for a moment
     if (!gameWon && parseFloat(meters) >= WIN_HEIGHT) {
-        gameWon = true;
-        scoreElement.style.color = '#4ade80';
-        scoreElement.innerText = `GOAL REACHED! ${meters}m`;
+        // Double-check that we have stable rocks
+        const hasStableRocks = rocks.some(r => r.stableFrames > 30);
+        if (hasStableRocks) {
+            gameWon = true;
+            scoreElement.style.color = '#4ade80';
+            scoreElement.innerText = `GOAL REACHED! ${meters}m`;
 
-        // Confetti effect or simple alert
-        setTimeout(() => {
-            alert(`Mission Accomplished! You reached ${meters}m!`);
-        }, 500);
+            // Confetti effect
+            setTimeout(() => {
+                alert(`Mission Accomplished! You reached ${meters}m!`);
+            }, 500);
+        }
     }
 });
 
 // Handle window resize
-window.addEventListener('resize', function () {
+function resize() {
     render.canvas.width = window.innerWidth;
     render.canvas.height = window.innerHeight;
 
@@ -157,9 +229,6 @@ window.addEventListener('resize', function () {
     });
 
     // Resize ground
-    // Matter.js doesn't have a simple resize for bodies, usually better to replace it
-    // But for a static rectangle, we can try scaling or just recreating.
-    // Recreating is safer.
     Composite.remove(engine.world, ground);
 
     const newGround = Bodies.rectangle(window.innerWidth / 2, window.innerHeight, window.innerWidth, 60, {
@@ -171,7 +240,9 @@ window.addEventListener('resize', function () {
     });
 
     Composite.add(engine.world, newGround);
-});
+}
+
+window.addEventListener('resize', resize);
 
 // ============= MOON AMBIENT MUSIC =============
 let audioContext, musicOscs = [];
@@ -220,6 +291,68 @@ function startMusic() {
     musicOscs.push(pad);
     playNote();
 }
+
+function playSadMusic() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    // Stop happy music
+    musicOscs.forEach(o => o.stop());
+    musicOscs = [];
+
+    const osc = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    osc.type = 'triangle';
+    // Sad minor chord arpeggio (slow)
+    const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+    let i = 0;
+
+    function playSadNote() {
+        if (i >= notes.length) {
+            // Drone
+            const drone = audioContext.createOscillator();
+            const dGain = audioContext.createGain();
+            drone.type = 'sine';
+            drone.frequency.value = 65.41; // C2
+            dGain.gain.value = 0.1;
+            drone.connect(dGain);
+            dGain.connect(audioContext.destination);
+            drone.start();
+            dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+            drone.stop(audioContext.currentTime + 3);
+            return;
+        }
+
+        const now = audioContext.currentTime;
+        const o = audioContext.createOscillator();
+        const g = audioContext.createGain();
+        o.type = 'sine';
+        o.frequency.value = notes[i];
+        g.gain.setValueAtTime(0, now);
+        g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+        o.connect(g);
+        g.connect(audioContext.destination);
+        o.start(now);
+        o.stop(now + 1.5);
+
+        i++;
+        setTimeout(playSadNote, 800);
+    }
+    playSadNote();
+}
+
+function stopMusic() {
+    musicOscs.forEach(o => o.stop());
+    musicOscs = [];
+}
+
+// Initialize
+resize();
 
 // Auto-start music on first interaction
 document.addEventListener('click', () => {
