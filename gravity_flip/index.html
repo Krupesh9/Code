@@ -18,12 +18,12 @@
                 <h1>Floor is Lava</h1>
                 <p>Click or Tap to Flip Gravity</p>
                 <p>Avoid the Lava!</p>
-                <button id="start-btn">Start Game</button>
+                <button id="start-btn" ontouchstart="startGame()">Start Game</button>
             </div>
             <div id="game-over-screen" class="hidden">
                 <h1>Game Over</h1>
                 <p>You survived for <span id="final-score">0</span> seconds</p>
-                <button id="restart-btn">Try Again</button>
+                <button id="restart-btn" ontouchstart="startGame()">Try Again</button>
             </div>
         </div>
     </div>

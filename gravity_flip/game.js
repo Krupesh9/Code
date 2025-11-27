@@ -371,8 +371,12 @@ function stopMusic() {
 }
 
 // Event Listeners
+// Event Listeners
 startBtn.addEventListener('click', startGame);
+startBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
+
 restartBtn.addEventListener('click', startGame);
+restartBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startGame(); }, { passive: false });
 
 // Initial resize
 resize();
