@@ -1,0 +1,15 @@
+{
+  "name": "Naksh's Game Arcade",
+  "short_name": "Naksh Arcade",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#0f0f1a",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
