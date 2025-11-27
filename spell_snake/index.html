@@ -398,6 +398,9 @@
 
     <!-- Game Screen -->
     <div id="gameScreen">
+        <div id="debug"
+            style="position:absolute; top:0; left:0; color:red; z-index:999; font-size:10px; pointer-events:none;">
+        </div>
         <div class="hud">
             <div class="hud-item">
                 <span class="hud-label">SCORE</span>
@@ -416,13 +419,10 @@
         <canvas id="gameCanvas"></canvas>
 
         <div class="controls-area">
-            <div class="dpad-btn dpad-up" ontouchstart="handleInput('UP')" onmousedown="handleInput('UP')">⬆️</div>
-            <div class="dpad-btn dpad-left" ontouchstart="handleInput('LEFT')" onmousedown="handleInput('LEFT')">⬅️
-            </div>
-            <div class="dpad-btn dpad-down" ontouchstart="handleInput('DOWN')" onmousedown="handleInput('DOWN')">⬇️
-            </div>
-            <div class="dpad-btn dpad-right" ontouchstart="handleInput('RIGHT')" onmousedown="handleInput('RIGHT')">➡️
-            </div>
+            <div class="dpad-btn dpad-up">⬆️</div>
+            <div class="dpad-btn dpad-left">⬅️</div>
+            <div class="dpad-btn dpad-down">⬇️</div>
+            <div class="dpad-btn dpad-right">➡️</div>
         </div>
     </div>
 
@@ -464,6 +464,7 @@
         let snake = [];
         let velocity = { x: 0, y: 0 };
         let nextVelocity = { x: 0, y: 0 }; // Buffer for next move
+        let gulpTimer = 0; // Animation timer for eating effect
 
         // --- Items ---
         let targetLetterItem = null;
@@ -485,8 +486,26 @@
             window.addEventListener('resize', resizeCanvas);
             document.addEventListener('keydown', handleKeyInput);
 
-            // Prevent double-tap zoom on buttons
-            document.querySelectorAll('button, .dpad-btn').forEach(el => {
+            // Setup controls
+            setupControls();
+        }
+
+        function setupControls() {
+            const directions = ['UP', 'LEFT', 'DOWN', 'RIGHT'];
+            directions.forEach(dir => {
+                const btn = document.querySelector(`.dpad-${dir.toLowerCase()}`);
+                if (btn) {
+                    const handler = (e) => {
+                        e.preventDefault(); // Prevent scrolling/zooming/ghost clicks
+                        handleInput(dir);
+                    };
+                    btn.addEventListener('touchstart', handler, { passive: false });
+                    btn.addEventListener('mousedown', handler);
+                }
+            });
+
+            // Prevent double-tap zoom on all buttons
+            document.querySelectorAll('button').forEach(el => {
                 el.addEventListener('touchend', e => e.preventDefault());
             });
         }
@@ -509,8 +528,8 @@
             const cols = Math.floor(availableWidth / finalCellSize);
             const rows = Math.floor(availableHeight / finalCellSize);
 
-            tileCountX = cols;
-            tileCountY = rows;
+            tileCountX = Math.max(cols, 10);
+            tileCountY = Math.max(rows, 10);
 
             canvas.width = tileCountX * finalCellSize;
             canvas.height = tileCountY * finalCellSize;
@@ -610,7 +629,8 @@
             document.getElementById('victoryModal').style.display = 'none';
 
             if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, 150); // Game speed
+            if (gameLoop) clearInterval(gameLoop);
+            gameLoop = setInterval(update, 250); // Game speed (slower for kids)
         }
 
         function spawnTarget() {
@@ -707,6 +727,7 @@
             playSound('collect');
             score += 10;
             collectedCount++;
+            gulpTimer = 5; // Trigger gulp animation (5 frames)
             updateHUD();
 
             if (collectedCount >= currentName.length) {
@@ -807,18 +828,29 @@
             // Draw Snake
             snake.forEach((seg, i) => {
                 ctx.fillStyle = i === 0 ? 'var(--snake-head)' : 'var(--snake-body)';
+
+                let size = cs;
+                let offset = 0;
+
+                // Gulp animation for head
+                if (i === 0 && gulpTimer > 0) {
+                    size = cs * 1.3; // 30% bigger
+                    offset = (cs - size) / 2;
+                    gulpTimer--;
+                }
+
                 // Round rect for nicer look
                 const pad = 1;
-                ctx.fillRect(seg.x * cs + pad, seg.y * cs + pad, cs - pad * 2, cs - pad * 2);
+                ctx.fillRect(seg.x * cs + pad + offset, seg.y * cs + pad + offset, size - pad * 2, size - pad * 2);
 
                 // Eyes
                 if (i === 0) {
                     ctx.fillStyle = 'white';
-                    const eyeSize = cs / 5;
+                    const eyeSize = size / 5;
                     // Simple logic to place eyes based on velocity
                     // Defaulting to top corners for simplicity or direction based
-                    ctx.fillRect(seg.x * cs + cs / 4, seg.y * cs + cs / 4, eyeSize, eyeSize);
-                    ctx.fillRect(seg.x * cs + cs * 3 / 4 - eyeSize, seg.y * cs + cs / 4, eyeSize, eyeSize);
+                    ctx.fillRect(seg.x * cs + cs / 4 + offset, seg.y * cs + cs / 4 + offset, eyeSize, eyeSize);
+                    ctx.fillRect(seg.x * cs + cs * 3 / 4 - eyeSize + offset, seg.y * cs + cs / 4 + offset, eyeSize, eyeSize);
                 }
             });
 

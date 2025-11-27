@@ -120,8 +120,9 @@ header {
 /* Removed .logo-with-text as it's no longer needed */
 
 .header-logo {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
+    max-width: 100%;
     object-fit: contain;
     filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.4)) drop-shadow(0 0 30px rgba(255, 0, 255, 0.3));
     animation: logoFloat 4s ease-in-out infinite;
@@ -518,6 +519,11 @@ footer {
 
     .main-title {
         letter-spacing: 4px;
+    }
+
+    .header-logo {
+        width: 100px;
+        height: 100px;
     }
 
     .subtitle {
