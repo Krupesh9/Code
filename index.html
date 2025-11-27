@@ -14,9 +14,12 @@
 </head>
 
 <body>
+    <!-- Animated Grid Background -->
+    <div class="grid-bg"></div>
+
     <header>
         <div class="title-container">
-            <h1 class="main-title">NAKSH'S GAME ARCADE</h1>
+            <h1 class="main-title" data-text="NAKSH'S GAME ARCADE">NAKSH'S GAME ARCADE</h1>
             <p class="subtitle">Enter the Digital Dimension</p>
         </div>
     </header>
@@ -24,7 +27,7 @@
     <main>
         <div class="games-grid">
             <!-- Neon Galaxy Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 0">
                 <div class="card-content">
                     <div class="game-icon">🚀</div>
                     <h2 class="game-title">Neon Galaxy</h2>
@@ -38,7 +41,7 @@
             </article>
 
             <!-- Find the Light Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 1">
                 <div class="card-content">
                     <div class="game-icon">💡</div>
                     <h2 class="game-title">Find the Light</h2>
@@ -53,7 +56,7 @@
 
 
             <!-- Space Clean Up Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 2">
                 <div class="card-content">
                     <div class="game-icon">🧲</div>
                     <h2 class="game-title">Space Clean Up</h2>
@@ -67,7 +70,7 @@
             </article>
 
             <!-- Balloon Popper Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 3">
                 <div class="card-content">
                     <div class="game-icon">🎈</div>
                     <h2 class="game-title">Balloon Popper</h2>
@@ -80,7 +83,7 @@
             </article>
 
             <!-- Moon Rocks Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 4">
                 <div class="card-content">
                     <div class="game-icon">🌑</div>
                     <h2 class="game-title">Moon Rocks</h2>
@@ -93,7 +96,7 @@
             </article>
 
             <!-- Floor is Lava Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 5">
                 <div class="card-content">
                     <div class="game-icon">🔥</div>
                     <h2 class="game-title">Floor is Lava</h2>
@@ -106,9 +109,9 @@
             </article>
 
             <!-- Rain Protector Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 6">
                 <div class="card-content">
-                    <div class="game-icon">☔</div>
+                    <div class="game-icon">☂️</div>
                     <h2 class="game-title">Rain Protector</h2>
                     <p class="game-description">
                         Protect the delicate flower from the storm. Draw barriers to
@@ -120,11 +123,11 @@
 
 
 
-            <!-- Visual Math Balancer Tile -->
-            <article class="game-card">
+            <!-- Math Balancer Tile -->
+            <article class="game-card" style="--card-index: 8">
                 <div class="card-content">
-                    <div class="game-icon">🧮</div>
-                    <h2 class="game-title">Visual Math Balancer</h2>
+                    <div class="game-icon">🔢</div>
+                    <h2 class="game-title">Math Balancer</h2>
                     <p class="game-description">
                         Learn math visually! Solve addition and subtraction problems
                         with helpful icons and fun animations. Perfect for young learners.
@@ -134,9 +137,9 @@
             </article>
 
             <!-- Rubik's Companion Tile -->
-            <article class="game-card">
+            <article class="game-card" style="--card-index: 7">
                 <div class="card-content">
-                    <div class="game-icon">🎲</div>
+                    <div class="game-icon">🧩</div>
                     <h2 class="game-title">Rubik's Companion</h2>
                     <p class="game-description">
                         Your personal Rubik's cube solving assistant. Paint your cube's
