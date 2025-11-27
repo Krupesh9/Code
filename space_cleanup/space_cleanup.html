@@ -112,8 +112,42 @@
             box-shadow: 0 0 30px rgba(0, 243, 255, 0.6);
         }
 
-        .hidden {
-            display: none !important;
+        .mode-selection {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .mode-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 200px;
+        }
+
+        .btn-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .btn-sub {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+            font-weight: normal;
+        }
+
+        .mode-btn.pro {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .mode-btn.pro:hover {
+            background: #ff3333;
+            color: white;
+            box-shadow: 0 0 20px #ff3333;
         }
 
         .damage-flash {
@@ -147,15 +181,18 @@
             <p id="description">
                 Use your mouse or touch to create a Gravity Well to collect debris.
                 <br><br>
-                <label
-                    style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(1rem, 4vw, 1.2rem); margin-bottom: 1rem;">
-                    <input type="checkbox" id="hunterToggle" checked style="width: 20px; height: 20px;">
-                    <span>Enable Red Hunters (harder, +30s time)</span>
-                </label>
-                <span style="color: #ff3333; font-size: clamp(0.8rem, 3vw, 1rem);">Red Hunters drain your time if
-                    enabled!</span>
-            </p>
-            <button class="btn" onclick="startGame()" ontouchstart="startGame()">Start Mission</button>
+            <div class="mode-selection">
+                <button class="btn mode-btn" onclick="startGame(false)" ontouchstart="startGame(false)">
+                    <span class="btn-icon">🧹</span>
+                    SPACE CLEAN
+                    <span class="btn-sub">Standard Mission</span>
+                </button>
+                <button class="btn mode-btn pro" onclick="startGame(true)" ontouchstart="startGame(true)">
+                    <span class="btn-icon">👾</span>
+                    SPACE CLEAN PRO
+                    <span class="btn-sub">With Hunters (+30s Time)</span>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -184,12 +221,13 @@
         let enemies = [];
         let particles = [];
 
-        // Mouse Position
+        // Mouse & Touch Handling
         const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 
         function updateInput(x, y) {
-            mouse.x = x;
-            mouse.y = y;
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = x - rect.left;
+            mouse.y = y - rect.top;
         }
 
         window.addEventListener('mousemove', (e) => {
@@ -197,8 +235,9 @@
         });
 
         window.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            updateInput(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault(); // Prevent scrolling
+            const touch = e.touches[0];
+            updateInput(touch.clientX, touch.clientY);
         }, { passive: false });
 
         window.addEventListener('touchstart', (e) => {
@@ -408,9 +447,9 @@
             }
         }
 
-        function startGame() {
+        function startGame(enableHunters) {
             // Check hunter toggle
-            huntersEnabled = document.getElementById('hunterToggle').checked;
+            huntersEnabled = enableHunters;
             timeLeft = huntersEnabled ? 60 : 45; // 60s with hunters, 45s without
 
             isPlaying = true;
@@ -436,16 +475,21 @@
             // Reset overlay UI for next time
             const title = document.getElementById('title');
             const desc = document.getElementById('description');
-            const btn = document.querySelector('.btn');
+            const overlay = document.getElementById('message-overlay');
+
+            // We don't need to reset the innerHTML every time, just show the overlay
+            // But if we want to reset text:
             title.innerText = "SPACE CLEAN UP";
-            desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.
-                <br><br>
-                <label style="display: flex; align-items: center; justify-content: center; gap: 10px; font-size: clamp(1rem, 4vw, 1.2rem); margin-bottom: 1rem;">
-                    <input type="checkbox" id="hunterToggle" ${huntersEnabled ? 'checked' : ''} style="width: 20px; height: 20px;">
-                    <span>Enable Red Hunters (harder, +15s time)</span>
-                </label>
-                <span style="color: #ff3333; font-size: clamp(0.8rem, 3vw, 1rem);">Red Hunters drain your time if enabled!</span>`;
-            btn.innerText = "START MISSION";
+            desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.<br><br>`;
+
+            // Restore buttons if they were replaced by "Play Again"
+            const modeSelection = document.querySelector('.mode-selection');
+            if (modeSelection) {
+                modeSelection.style.display = 'flex';
+                // Remove any "Play Again" button if it exists outside
+                const playAgainBtn = overlay.querySelector('.play-again-btn');
+                if (playAgainBtn) playAgainBtn.remove();
+            }
 
             // Hide overlay
             document.getElementById('message-overlay').classList.add('hidden');
@@ -486,26 +530,55 @@
             const overlay = document.getElementById('message-overlay');
             const title = document.getElementById('title');
             const desc = document.getElementById('description');
-            const btn = document.querySelector('.btn');
+
+            // Hide the original start button if it's still there (it shouldn't be, but just in case)
+            const startBtn = document.querySelector('.btn:not(.mode-btn):not(.play-again-btn)');
+            if (startBtn) startBtn.style.display = 'none';
 
             overlay.classList.remove('hidden');
 
             if (win) {
                 title.innerText = "YOU WIN!";
                 desc.innerText = `Sector cleared with ${timeLeft}s remaining!`;
-                btn.innerText = "Play Again";
                 // Spawn confetti
                 for (let i = 0; i < 100; i++) {
                     particles.push(new Particle(canvas.width / 2, canvas.height / 2));
                 }
-                // Continue loop for confetti if it was stopped (though isPlaying=false handles logic)
                 if (!animationId) loop();
             } else {
                 title.innerText = "TIME'S UP!";
-                desc.innerText = "The Hunters overwhelmed you. Mission Failed.";
-                btn.innerText = "Try Again";
+                desc.innerText = "Mission Failed.";
                 playSadMusic();
             }
+
+            // Hide mode selection
+            const modeSelection = document.querySelector('.mode-selection');
+            if (modeSelection) modeSelection.style.display = 'none';
+
+            // Remove any existing play again button to avoid duplicates
+            const existingBtn = overlay.querySelector('.play-again-btn');
+            if (existingBtn) existingBtn.remove();
+
+            // Create fresh Play Again button
+            const playAgainBtn = document.createElement('button');
+            playAgainBtn.className = 'btn play-again-btn';
+            playAgainBtn.innerText = "Play Again";
+
+            const resetGame = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Reset to main menu
+                title.innerText = "SPACE CLEAN UP";
+                desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.<br><br>`;
+                modeSelection.style.display = 'flex';
+                playAgainBtn.remove();
+            };
+
+            playAgainBtn.addEventListener('click', resetGame);
+            playAgainBtn.addEventListener('touchstart', resetGame, { passive: false });
+
+            overlay.appendChild(playAgainBtn);
         }
 
         function loop() {
