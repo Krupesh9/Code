@@ -990,8 +990,19 @@
         function handleWin() {
             clearInterval(gameLoop);
             playSound('win');
-            document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
-            document.getElementById('victoryModal').style.display = 'flex';
+
+            if (currentNameIndex >= names.length - 1) {
+                // Last name finished - Go to Main Menu
+                setTimeout(() => {
+                    names = []; // Clear names to pick new ones
+                    renderNamesList();
+                    showStartScreen();
+                }, 1500);
+            } else {
+                // Show modal for next name
+                document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
+                document.getElementById('victoryModal').style.display = 'flex';
+            }
         }
 
         function updateHUD() {
