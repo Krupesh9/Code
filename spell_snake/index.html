@@ -17,8 +17,11 @@
             --btn-primary: #e67e22;
             --btn-secondary: #2ecc71;
             --snake-head: #2ecc71;
-            --snake-body: #27ae60;
-            --food-color: #e74c3c;
+            /* Green Head */
+            --snake-correct: #f1c40f;
+            /* Yellow Body */
+            --snake-wrong: #e74c3c;
+            /* Red Body */
         }
 
         * {
@@ -38,6 +41,8 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            overscroll-behavior: none;
+            /* Prevent pull-to-refresh */
         }
 
         /* --- Start Screen UI --- */
@@ -50,6 +55,8 @@
             align-items: center;
             gap: 20px;
             animation: fadeIn 0.5s ease-out;
+            overflow-y: auto;
+            max-height: 100vh;
         }
 
         h1 {
@@ -178,6 +185,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px;
+            position: relative;
         }
 
         .hud {
@@ -234,16 +242,17 @@
             border-radius: 10px;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
             max-width: 100%;
-            max-height: 50vh;
-            /* Leave room for controls */
+            max-height: 55vh;
+            /* Slightly more space */
+            touch-action: none;
+            /* Critical for swipe */
         }
 
         /* --- Controls --- */
         .controls-area {
             width: 100%;
             max-width: 400px;
-            height: 220px;
-            /* Fixed height for controls */
+            height: 200px;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             grid-template-rows: 1fr 1fr;
@@ -350,17 +359,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* --- Responsive Tweaks --- */
-        @media (min-height: 800px) {
-            #gameCanvas {
-                max-height: 60vh;
-            }
-
-            .controls-area {
-                height: 250px;
-            }
-        }
     </style>
 </head>
 
@@ -382,6 +380,8 @@
                 <button class="tag-btn" onclick="quickAdd('DAD')">DAD</button>
                 <button class="tag-btn" onclick="quickAdd('GRANDMA')">GRANDMA</button>
                 <button class="tag-btn" onclick="quickAdd('GRANDPA')">GRANDPA</button>
+                <button class="tag-btn" onclick="quickAdd('KRUPESH')">KRUPESH</button>
+                <button class="tag-btn" onclick="quickAdd('SHIRJA')">SHIRJA</button>
             </div>
 
             <div class="names-list" id="namesList">
@@ -392,15 +392,12 @@
         <button class="btn-start" id="startBtn" onclick="startGame()" disabled>START GAME</button>
 
         <p style="opacity: 0.6; margin-top: 20px; font-size: 0.9rem;">
-            Tip: Use the on-screen arrows to guide the snake!
+            Tip: Eat the correct letters to spell the name! Wrong letters turn RED.
         </p>
     </div>
 
     <!-- Game Screen -->
     <div id="gameScreen">
-        <div id="debug"
-            style="position:absolute; top:0; left:0; color:red; z-index:999; font-size:10px; pointer-events:none;">
-        </div>
         <div class="hud">
             <div class="hud-item">
                 <span class="hud-label">SCORE</span>
@@ -439,7 +436,7 @@
     <div id="gameOverModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-title">💥 Oh no!</div>
-            <div class="modal-msg">Keep practicing!</div>
+            <div class="modal-msg">Watch out for walls!</div>
             <button class="btn-add" onclick="retryLevel()" style="width:100%; margin-bottom:10px;">Try Again 🔄</button>
             <button class="btn-add" onclick="showStartScreen()" style="width:100%; background:#e74c3c;">Main Menu
                 🏠</button>
@@ -458,13 +455,16 @@
         let isPaused = false;
 
         // --- Snake & Grid ---
-        const gridSize = 20; // Size of one grid cell in pixels (logical)
+        const gridSize = 20;
         let tileCountX = 20;
         let tileCountY = 20;
+
+        // Snake segments: {x, y, char, color}
+        // snake[0] is HEAD
         let snake = [];
         let velocity = { x: 0, y: 0 };
-        let nextVelocity = { x: 0, y: 0 }; // Buffer for next move
-        let gulpTimer = 0; // Animation timer for eating effect
+        let nextVelocity = { x: 0, y: 0 };
+        let gulpTimer = 0;
 
         // --- Items ---
         let targetLetterItem = null;
@@ -485,9 +485,8 @@
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             document.addEventListener('keydown', handleKeyInput);
-
-            // Setup controls
             setupControls();
+            setupSwipe();
         }
 
         function setupControls() {
@@ -496,7 +495,7 @@
                 const btn = document.querySelector(`.dpad-${dir.toLowerCase()}`);
                 if (btn) {
                     const handler = (e) => {
-                        e.preventDefault(); // Prevent scrolling/zooming/ghost clicks
+                        e.preventDefault();
                         handleInput(dir);
                     };
                     btn.addEventListener('touchstart', handler, { passive: false });
@@ -504,26 +503,38 @@
                 }
             });
 
-            // Prevent double-tap zoom on all buttons
-            document.querySelectorAll('button').forEach(el => {
-                el.addEventListener('touchend', e => e.preventDefault());
-            });
+            // Removed blanket preventDefault on all buttons to allow clicks on Start/Add buttons
+        }
+
+        function setupSwipe() {
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            canvas.addEventListener('touchstart', function (e) {
+                e.preventDefault(); // Prevent scroll
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', function (e) {
+                e.preventDefault();
+                let touchEndX = e.changedTouches[0].screenX;
+                let touchEndY = e.changedTouches[0].screenY;
+                handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+            }, { passive: false });
         }
 
         function resizeCanvas() {
-            // Calculate available space
             const hudHeight = 80;
-            const controlsHeight = 240;
+            const controlsHeight = 220;
             const wordHeight = 50;
             const padding = 40;
 
             const availableHeight = window.innerHeight - hudHeight - controlsHeight - wordHeight - padding;
             const availableWidth = window.innerWidth - 20;
 
-            // Determine grid dimensions based on available space
-            // We want roughly square cells, but fit to screen
-            const cellSize = Math.floor(Math.min(availableWidth / 15, availableHeight / 15));
-            const finalCellSize = Math.max(cellSize, 15); // Min size
+            const cellSize = Math.floor(Math.min(availableWidth / 12, availableHeight / 12));
+            const finalCellSize = Math.max(cellSize, 15);
 
             const cols = Math.floor(availableWidth / finalCellSize);
             const rows = Math.floor(availableHeight / finalCellSize);
@@ -533,8 +544,6 @@
 
             canvas.width = tileCountX * finalCellSize;
             canvas.height = tileCountY * finalCellSize;
-
-            // Store the actual render size of a cell
             canvas.cellSize = finalCellSize;
         }
 
@@ -568,10 +577,7 @@
             names.forEach((n, i) => {
                 const chip = document.createElement('div');
                 chip.className = 'name-chip';
-                chip.innerHTML = `
-                    ${n}
-                    <div class="delete-chip" onclick="removeName(${i})">✕</div>
-                `;
+                chip.innerHTML = `${n} <div class="delete-chip" onclick="removeName(${i})">✕</div>`;
                 list.appendChild(chip);
             });
             document.getElementById('startBtn').disabled = names.length === 0;
@@ -589,7 +595,6 @@
         function startGame() {
             if (names.length === 0) return;
 
-            // Init Audio
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
             playMusic();
@@ -600,10 +605,7 @@
 
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameScreen').style.display = 'flex';
-
-            // Force resize once visible
             resizeCanvas();
-
             startLevel();
         }
 
@@ -611,26 +613,24 @@
             currentName = names[currentNameIndex];
             collectedCount = 0;
 
-            // Reset Snake
             const startX = Math.floor(tileCountX / 2);
             const startY = Math.floor(tileCountY / 2);
+
+            // Initial snake: Just head
             snake = [
-                { x: startX, y: startY },
-                { x: startX, y: startY + 1 },
-                { x: startX, y: startY + 2 }
+                { x: startX, y: startY, char: '', color: 'head' }
             ];
-            velocity = { x: 0, y: -1 }; // Start moving up
+
+            velocity = { x: 0, y: -1 };
             nextVelocity = { x: 0, y: -1 };
 
             decoyItems = [];
             spawnTarget();
-
             updateHUD();
             document.getElementById('victoryModal').style.display = 'none';
 
             if (gameLoop) clearInterval(gameLoop);
-            if (gameLoop) clearInterval(gameLoop);
-            gameLoop = setInterval(update, 250); // Game speed (slower for kids)
+            gameLoop = setInterval(update, 350); // Slow speed for kids
         }
 
         function spawnTarget() {
@@ -640,15 +640,14 @@
             targetLetterItem.char = letter;
             targetLetterItem.type = 'target';
 
-            // Decoys (increase with progress)
-            const decoyCount = Math.min(3, Math.floor(collectedCount / 2) + 1);
+            // Decoys
+            const decoyCount = 2; // Keep it simple
             decoyItems = [];
             const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             for (let i = 0; i < decoyCount; i++) {
                 let spot = findEmptySpot();
                 let char = alphabet[Math.floor(Math.random() * alphabet.length)];
-                // Ensure decoy isn't the target letter
                 while (char === letter) {
                     char = alphabet[Math.floor(Math.random() * alphabet.length)];
                 }
@@ -665,12 +664,9 @@
                     x: Math.floor(Math.random() * tileCountX),
                     y: Math.floor(Math.random() * tileCountY)
                 };
-                // Check collision with snake
                 let onSnake = snake.some(s => s.x === spot.x && s.y === spot.y);
-                // Check collision with other items
                 let onTarget = targetLetterItem && targetLetterItem.x === spot.x && targetLetterItem.y === spot.y;
                 let onDecoy = decoyItems.some(d => d.x === spot.x && d.y === spot.y);
-
                 if (!onSnake && !onTarget && !onDecoy) break;
             }
             return spot;
@@ -679,13 +675,10 @@
         function update() {
             if (isPaused) return;
 
-            // Apply buffered input
             velocity = nextVelocity;
+            const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y, char: '', color: 'head' };
 
-            // Move Snake
-            const head = { x: snake[0].x + velocity.x, y: snake[0].y + velocity.y };
-
-            // Wall Collision (Wrap or Die? Let's Die for classic feel, or Wrap for kids? Let's Die but soft reset)
+            // Wall Collision
             if (head.x < 0 || head.x >= tileCountX || head.y < 0 || head.y >= tileCountY) {
                 handleCrash();
                 return;
@@ -697,119 +690,74 @@
                 return;
             }
 
-            snake.unshift(head); // Add new head
+            // Add new head
+            snake.unshift(head);
 
-            // Check Item Collision
-            let ate = false;
+            // Check Items
+            let eatenItem = null;
+            let isCorrect = false;
 
-            // Target?
+            // Check Target
             if (head.x === targetLetterItem.x && head.y === targetLetterItem.y) {
-                ate = true;
-                handleCollect();
+                eatenItem = targetLetterItem;
+                isCorrect = true;
             }
-            // Decoy?
+            // Check Decoys
             else {
                 const decoyIdx = decoyItems.findIndex(d => d.x === head.x && d.y === head.y);
                 if (decoyIdx !== -1) {
-                    handleBadCollect();
-                    return; // Stop update to process crash
+                    eatenItem = decoyItems[decoyIdx];
+                    isCorrect = false;
                 }
             }
 
-            if (!ate) {
-                snake.pop(); // Remove tail
-            }
+            if (eatenItem) {
+                // EAT LOGIC
+                // The segment BEHIND the head (snake[1]) takes on the eaten properties
+                // Because snake[0] is the NEW head
+                snake[1].char = eatenItem.char;
+                snake[1].color = isCorrect ? 'correct' : 'wrong';
 
+                gulpTimer = 5;
+
+                if (isCorrect) {
+                    playSound('collect');
+                    score += 10;
+                    collectedCount++;
+                    if (collectedCount >= currentName.length) {
+                        handleWin();
+                        return;
+                    }
+                } else {
+                    playSound('crash'); // Wrong letter sound
+                    // Reset progress on wrong letter!
+                    collectedCount = 0;
+                    // Don't lose life, just add red segment
+                }
+
+                spawnTarget(); // Respawn items
+                updateHUD();
+
+                // Don't pop! Snake grows.
+            } else {
+                // Didn't eat, move tail
+                // Standard snake: pop the last element
+                snake.pop();
+
+                // If we didn't eat, snake[1] (old head) needs to become a body part
+                // We assign default body color to it if it doesn't have one
+                if (snake.length > 1) {
+                    if (!snake[1].char) {
+                        snake[1].color = 'body';
+                    }
+                }
+            }
             draw();
         }
 
-        function handleCollect() {
-            playSound('collect');
-            score += 10;
-            collectedCount++;
-            gulpTimer = 5; // Trigger gulp animation (5 frames)
-            updateHUD();
 
-            if (collectedCount >= currentName.length) {
-                handleWin();
-            } else {
-                spawnTarget();
-            }
-        }
-
-        function handleBadCollect() {
-            playSound('crash');
-            handleCrash();
-        }
-
-        function handleCrash() {
-            playSound('crash');
-            lives--;
-            updateHUD();
-            clearInterval(gameLoop);
-
-            if (lives <= 0) {
-                document.getElementById('gameOverModal').style.display = 'flex';
-            } else {
-                // Flash effect then reset position
-                setTimeout(() => {
-                    // Keep progress, reset positions
-                    const startX = Math.floor(tileCountX / 2);
-                    const startY = Math.floor(tileCountY / 2);
-                    snake = [
-                        { x: startX, y: startY },
-                        { x: startX, y: startY + 1 },
-                        { x: startX, y: startY + 2 }
-                    ];
-                    velocity = { x: 0, y: -1 };
-                    nextVelocity = { x: 0, y: -1 };
-                    gameLoop = setInterval(update, 150);
-                }, 1000);
-            }
-        }
-
-        function handleWin() {
-            clearInterval(gameLoop);
-            playSound('win');
-            document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
-            document.getElementById('victoryModal').style.display = 'flex';
-        }
-
-        function nextLevel() {
-            currentNameIndex++;
-            if (currentNameIndex >= names.length) {
-                // Loop back or finish? Let's loop back for endless play
-                currentNameIndex = 0;
-                alert("You finished all names! Starting over with higher speed!");
-                // Could increase speed here
-            }
-            startLevel();
-        }
-
-        function retryLevel() {
-            lives = 3;
-            score = 0; // Optional reset score
-            document.getElementById('gameOverModal').style.display = 'none';
-            startLevel();
-        }
-
-        function updateHUD() {
-            document.getElementById('scoreDisplay').innerText = score;
-            document.getElementById('livesDisplay').innerText = "❤️".repeat(lives);
-
-            // Render word
-            const wordContainer = document.getElementById('wordDisplay');
-            wordContainer.innerHTML = '';
-            for (let i = 0; i < currentName.length; i++) {
-                const span = document.createElement('span');
-                span.className = 'letter-slot ' + (i < collectedCount ? 'collected' : '');
-                span.innerText = currentName[i];
-                wordContainer.appendChild(span);
-            }
-        }
 
         function draw() {
-            // Clear
             ctx.fillStyle = '#1a252f';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -819,51 +767,63 @@
             ctx.strokeStyle = 'rgba(255,255,255,0.05)';
             ctx.lineWidth = 1;
             for (let x = 0; x <= tileCountX; x++) {
-                ctx.beginPath(); ctx.moveTo(x * cs, 0); ctx.lineTo(x * cs, canvas.height); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x * cs, 0);
+                ctx.lineTo(x * cs, canvas.height);
+                ctx.stroke();
             }
             for (let y = 0; y <= tileCountY; y++) {
-                ctx.beginPath(); ctx.moveTo(0, y * cs); ctx.lineTo(canvas.width, y * cs); ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, y * cs);
+                ctx.lineTo(canvas.width, y * cs);
+                ctx.stroke();
             }
 
-            // Draw Snake
+            // Snake
             snake.forEach((seg, i) => {
-                ctx.fillStyle = i === 0 ? 'var(--snake-head)' : 'var(--snake-body)';
+                let color = '#2ecc71'; // Green Head
+                if (i > 0) {
+                    if (seg.color === 'correct') color = '#f1c40f'; // Yellow
+                    else if (seg.color === 'wrong') color = '#e74c3c'; // Red
+                    else color = '#27ae60'; // Body default
+                }
 
+                ctx.fillStyle = color;
+
+                // Gulp
                 let size = cs;
                 let offset = 0;
-
-                // Gulp animation for head
                 if (i === 0 && gulpTimer > 0) {
-                    size = cs * 1.3; // 30% bigger
+                    size = cs * 1.3;
                     offset = (cs - size) / 2;
                     gulpTimer--;
                 }
 
-                // Round rect for nicer look
-                const pad = 1;
-                ctx.fillRect(seg.x * cs + pad + offset, seg.y * cs + pad + offset, size - pad * 2, size - pad * 2);
+                ctx.fillRect(seg.x * cs + 1 + offset, seg.y * cs + 1 + offset, size - 2, size - 2);
 
-                // Eyes
+                // Eyes for head
                 if (i === 0) {
-                    ctx.fillStyle = 'white';
+                    ctx.fillStyle = '#2c3e50';
                     const eyeSize = size / 5;
-                    // Simple logic to place eyes based on velocity
-                    // Defaulting to top corners for simplicity or direction based
                     ctx.fillRect(seg.x * cs + cs / 4 + offset, seg.y * cs + cs / 4 + offset, eyeSize, eyeSize);
                     ctx.fillRect(seg.x * cs + cs * 3 / 4 - eyeSize + offset, seg.y * cs + cs / 4 + offset, eyeSize, eyeSize);
                 }
+                // Letters for body
+                else if (seg.char) {
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.font = `bold ${Math.floor(cs * 0.7)}px Fredoka`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(seg.char, seg.x * cs + cs / 2, seg.y * cs + cs / 2 + 2);
+                }
             });
 
-            // Draw Target
-            if (targetLetterItem) {
-                drawItem(targetLetterItem, '#f1c40f', true);
-            }
-
-            // Draw Decoys
-            decoyItems.forEach(d => drawItem(d, '#e74c3c', false));
+            // Items
+            if (targetLetterItem) drawItem(targetLetterItem, '#f1c40f');
+            decoyItems.forEach(d => drawItem(d, '#e74c3c'));
         }
 
-        function drawItem(item, color, isTarget) {
+        function drawItem(item, color) {
             const cs = canvas.cellSize;
             const x = item.x * cs + cs / 2;
             const y = item.y * cs + cs / 2;
@@ -880,9 +840,56 @@
             ctx.fillText(item.char, x, y + 2);
         }
 
-        // --- Input Handling ---
+        function handleCrash() {
+            lives--;
+            updateHUD();
+
+            // Shake effect?
+            canvas.style.transform = "translate(5px, 5px)";
+            setTimeout(() => canvas.style.transform = "none", 100);
+
+            if (lives <= 0) {
+                clearInterval(gameLoop);
+                document.getElementById('gameOverModal').style.display = 'flex';
+            } else {
+                // Reset position but keep snake length/segments?
+                // If we reset position, we have to reconstruct the snake body at the new position.
+                // Or we just respawn the head and drag the tail?
+                // Easier to just reset to Head-only but keep the score/progress?
+                // User said "keep that numbers going".
+                // If I crash, do I lose my collected letters?
+                // Usually yes.
+                // But "don't end the live" implies leniency.
+                // Let's keep the collected letters if possible.
+                // But physically moving a long snake to center is hard (where do segments go?).
+                // I'll reset to Head-only and reset collectedCount?
+                // Or maybe just bounce back?
+                // Let's just reset to Head-only but keep the score.
+                // But then the visual history is lost.
+                // Let's try to keep the history:
+                // We can't easily move the whole snake.
+                // I will reset to Head-only and reset collectedCount to 0 for the current name.
+                // It's a penalty.
+
+                clearInterval(gameLoop);
+                setTimeout(() => {
+                    const startX = Math.floor(tileCountX / 2);
+                    const startY = Math.floor(tileCountY / 2);
+                    snake = [{ x: startX, y: startY, char: '', color: 'head' }];
+                    velocity = { x: 0, y: -1 };
+                    nextVelocity = { x: 0, y: -1 };
+
+                    // Reset progress on this name
+                    collectedCount = 0;
+                    spawnTarget();
+                    updateHUD();
+
+                    gameLoop = setInterval(update, 350);
+                }, 1000);
+            }
+        }
+
         function handleInput(dir) {
-            // Prevent reversing
             if (dir === 'UP' && velocity.y === 0) nextVelocity = { x: 0, y: -1 };
             if (dir === 'DOWN' && velocity.y === 0) nextVelocity = { x: 0, y: 1 };
             if (dir === 'LEFT' && velocity.x === 0) nextVelocity = { x: -1, y: 0 };
@@ -898,20 +905,17 @@
             }
         }
 
-        // --- Audio System (Nokia Tune) ---
-        // Simple synth implementation
         function playSound(type) {
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             const now = audioCtx.currentTime;
 
             if (type === 'collect') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.setValueAtTime(523.25, now);
                 osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.1);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
@@ -926,7 +930,6 @@
                 osc.start(now);
                 osc.stop(now + 0.3);
             } else if (type === 'win') {
-                // Arpeggio
                 [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
                     const o = audioCtx.createOscillator();
                     const g = audioCtx.createGain();
@@ -941,7 +944,6 @@
             }
         }
 
-        // Nokia Tune Melody
         const melody = [
             { f: 659, d: 0.125 }, { f: 587, d: 0.125 }, { f: 494, d: 0.125 }, { f: 523, d: 0.125 },
             { f: 587, d: 0.25 }, { f: 523, d: 0.25 }, { f: 440, d: 0.25 }, { f: 440, d: 0.125 },
@@ -949,40 +951,28 @@
             { f: 494, d: 0.375 }, { f: 494, d: 0.125 }, { f: 523, d: 0.125 }, { f: 587, d: 0.25 },
             { f: 659, d: 0.25 }, { f: 523, d: 0.25 }, { f: 440, d: 0.25 }, { f: 440, d: 0.25 }
         ];
-
         let noteIndex = 0;
-        let nextNoteTime = 0;
 
         function playMusic() {
-            if (musicNode) return; // Already playing
-
-            // We'll use a recursive timeout loop for simplicity in scheduling
+            if (musicNode) return;
             function schedule() {
-                if (!gameLoop) { // Stop if game stopped
+                if (!gameLoop && document.getElementById('gameScreen').style.display === 'none') {
                     musicNode = null;
                     return;
                 }
-
                 const note = melody[noteIndex];
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-
-                osc.type = 'square'; // Retro sound
+                osc.type = 'square';
                 osc.frequency.value = note.f;
-
                 const now = audioCtx.currentTime;
-                gain.gain.setValueAtTime(0.05, now); // Low volume background
+                gain.gain.setValueAtTime(0.05, now);
                 gain.gain.linearRampToValueAtTime(0, now + note.d * 0.9);
-
                 osc.start(now);
                 osc.stop(now + note.d);
-
                 noteIndex = (noteIndex + 1) % melody.length;
-
-                // Schedule next
                 musicNode = setTimeout(schedule, note.d * 1000);
             }
             schedule();
@@ -995,9 +985,46 @@
             }
         }
 
-        // Start
-        init();
 
+
+        function handleWin() {
+            clearInterval(gameLoop);
+            playSound('win');
+            document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
+            document.getElementById('victoryModal').style.display = 'flex';
+        }
+
+        function updateHUD() {
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('livesDisplay').innerText = "❤️".repeat(lives);
+
+            const wordContainer = document.getElementById('wordDisplay');
+            wordContainer.innerHTML = '';
+            for (let i = 0; i < currentName.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'letter-slot ' + (i < collectedCount ? 'collected' : '');
+                span.innerText = currentName[i];
+                wordContainer.appendChild(span);
+            }
+        }
+
+        function nextLevel() {
+            currentNameIndex++;
+            if (currentNameIndex >= names.length) {
+                currentNameIndex = 0;
+                alert("You finished all names! Starting over!");
+            }
+            startLevel();
+        }
+
+        function retryLevel() {
+            lives = 3;
+            score = 0;
+            document.getElementById('gameOverModal').style.display = 'none';
+            startLevel();
+        }
+
+        init();
     </script>
 </body>
 
