@@ -157,6 +157,11 @@ class GameMusic {
     play() {
         if (this.isPlaying) return;
         this.init();
+
+        if (this.audioContext.state === 'suspended') {
+            this.audioContext.resume();
+        }
+
         this.isPlaying = true;
         this.scheduleMusic();
     }

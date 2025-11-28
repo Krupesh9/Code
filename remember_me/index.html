@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remember Me - Naksh's Game Arcade</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link rel="stylesheet" href="../styles.css"> <!-- Global styles -->
+    <link rel="stylesheet" href="styles.css"> <!-- Game specific styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen active">
+            <h1 class="game-title">Remember Me 🧠</h1>
+            <p class="game-subtitle">Find the matching pairs!</p>
+
+            <div class="player-selection">
+                <button class="player-btn selected" data-players="1">
+                    <span class="icon">👤</span>
+                    1 Player
+                </button>
+                <button class="player-btn" data-players="2">
+                    <span class="icon">👥</span>
+                    2 Players
+                </button>
+            </div>
+
+            <div class="difficulty-selection">
+                <button class="difficulty-btn selected" data-difficulty="basic">
+                    <span class="icon">🌟</span>
+                    Basic
+                </button>
+                <button class="difficulty-btn" data-difficulty="advance">
+                    <span class="icon">🚀</span>
+                    Advance
+                </button>
+            </div>
+
+            <button id="start-btn" class="action-btn">Play Game! 🎮</button>
+            <a href="../index.html" class="back-link">Back to Arcade</a>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen">
+            <div class="game-header">
+                <div class="score-board">
+                    <div class="score-box p1 active-turn">
+                        <span class="label">Player 1</span>
+                        <span class="score" id="score-p1">0</span>
+                    </div>
+                    <div class="score-box p2 hidden">
+                        <span class="label">Player 2</span>
+                        <span class="score" id="score-p2">0</span>
+                    </div>
+                </div>
+                <div class="level-info">
+                    Level <span id="level-display">1</span>
+                </div>
+                <button id="music-toggle" class="icon-btn">🎵</button>
+            </div>
+
+            <div class="game-board">
+                <div class="cards-grid" id="cards-grid">
+                    <!-- Cards will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="modal">
+            <div class="modal-content">
+                <h2>Game Over! 🎉</h2>
+                <p id="winner-text"></p>
+                <div class="modal-actions">
+                    <button id="play-again-btn" class="action-btn">Play Again 🔄</button>
+                    <a href="../index.html" class="secondary-btn">Exit 🏠</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../game-music.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
