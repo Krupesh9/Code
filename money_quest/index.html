@@ -157,67 +157,42 @@
 
 
         // --- Game Music System ---
+        // --- Game Music System ---
         class GameMusic {
-            constructor(theme = 'playful') {
+            constructor() {
                 this.audioContext = null;
                 this.masterGain = null;
                 this.isPlaying = false;
-                this.theme = theme;
-                this.scheduledTimeout = null;
+                this.noteIndex = 0;
+                this.timeoutId = null;
             }
 
             init() {
                 if (!this.audioContext) {
                     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     this.masterGain = this.audioContext.createGain();
-                    this.masterGain.gain.value = 0.12;
+                    this.masterGain.gain.value = 0.15; // Comfortable volume
                     this.masterGain.connect(this.audioContext.destination);
                 }
             }
 
-            playNote(freq, startTime, duration, waveType = 'sine', volume = 0.08) {
+            playMarimba(freq, time) {
                 const osc = this.audioContext.createOscillator();
                 const gain = this.audioContext.createGain();
-                osc.type = waveType;
+
+                osc.type = 'sine'; // Sine wave is best for Marimba/Kalimba
                 osc.frequency.value = freq;
 
-                // Smoother Jazz Envelope
-                gain.gain.setValueAtTime(0, startTime);
-                gain.gain.linearRampToValueAtTime(volume, startTime + 0.1); // Slower attack
-                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration + 0.5); // Longer release
+                // Marimba Envelope (Fast attack, smooth decay)
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(0.4, time + 0.01); // Percussive attack
+                gain.gain.exponentialRampToValueAtTime(0.001, time + 0.8); // Ringing decay
 
                 osc.connect(gain);
                 gain.connect(this.masterGain);
-                osc.start(startTime);
-                osc.stop(startTime + duration + 0.5);
-            }
 
-            getThemeConfig() {
-                // Smooth Jazz Theme (C Major 7 / Lo-Fi feel)
-                return {
-                    notes: [261.63, 329.63, 392.00, 493.88, 523.25], // C4, E4, G4, B4, C5
-                    pattern: [0, 2, 1, 3, 2, 4, 3, 1],
-                    tempo: 0.6, // Slower tempo
-                    waveType: 'triangle', // Softer than square
-                    bassOctave: 2 // Deeper bass
-                };
-            }
-
-            scheduleMusic() {
-                if (!this.isPlaying) return;
-                const config = this.getThemeConfig();
-                const now = this.audioContext.currentTime;
-                const beatDuration = config.tempo;
-
-                for (let i = 0; i < config.pattern.length; i++) {
-                    const noteIndex = config.pattern[i];
-                    this.playNote(config.notes[noteIndex], now + i * beatDuration, beatDuration * 1.5, config.waveType, 0.06);
-                }
-
-                // Bass
-                this.playNote(config.notes[0] / config.bassOctave, now, beatDuration * config.pattern.length, 'sine', 0.04);
-
-                this.scheduledTimeout = setTimeout(() => this.scheduleMusic(), beatDuration * config.pattern.length * 1000);
+                osc.start(time);
+                osc.stop(time + 1.0);
             }
 
             play() {
@@ -225,15 +200,37 @@
                 this.init();
                 if (this.audioContext.state === 'suspended') this.audioContext.resume();
                 this.isPlaying = true;
-                this.scheduleMusic();
+                this.noteIndex = 0;
+                this.scheduleNextNote();
             }
 
             stop() {
                 this.isPlaying = false;
-                if (this.scheduledTimeout) clearTimeout(this.scheduledTimeout);
-                if (this.audioContext && this.masterGain) {
-                    this.masterGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1);
+                if (this.timeoutId) clearTimeout(this.timeoutId);
+            }
+
+            scheduleNextNote() {
+                if (!this.isPlaying) return;
+
+                const tempo = 0.3; // Speed
+                const now = this.audioContext.currentTime;
+
+                // Happy C Major Pentatonic Melody (Kid-friendly & Educational)
+                const melody = [
+                    523.25, 659.25, 783.99, 659.25, // C5 E5 G5 E5
+                    587.33, 523.25, 440.00, 523.25, // D5 C5 A4 C5
+                    523.25, 659.25, 783.99, 880.00, // C5 E5 G5 A5
+                    783.99, 659.25, 587.33, 0       // G5 E5 D5 (Rest)
+                ];
+
+                const freq = melody[this.noteIndex % melody.length];
+
+                if (freq > 0) {
+                    this.playMarimba(freq, now);
                 }
+
+                this.noteIndex++;
+                this.timeoutId = setTimeout(() => this.scheduleNextNote(), tempo * 1000);
             }
         }
 
