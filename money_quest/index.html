@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneyQuest: Future Tycoon</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0f172a',
+                            primary: '#4f46e5',
+                            secondary: '#ec4899',
+                            accent: '#8b5cf6',
+                            success: '#10b981',
+                            warning: '#f59e0b',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- React & ReactDOM (Pinned Versions) -->
+    <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+
+    <!-- Prop Types (Required for some UMD builds) -->
+    <script src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Recharts (Pinned Version) -->
+    <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+
+    <!-- Lucide Icons (Vanilla) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .slider-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: currentColor;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            margin-top: -10px;
+            /* Center thumb on track */
+        }
+
+        /* Firefox Thumb */
+        .slider-thumb::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: currentColor;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Track Styles */
+        .slider-thumb::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        .slider-thumb::-moz-range-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 4px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+        const {
+            PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+            LineChart, Line, BarChart, Bar, Legend
+        } = Recharts;
+
+
+        // --- Game Music System ---
+        class GameMusic {
+            constructor(theme = 'playful') {
+                this.audioContext = null;
+                this.masterGain = null;
+                this.isPlaying = false;
+                this.theme = theme;
+                this.scheduledTimeout = null;
+            }
+
+            init() {
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.audioContext.createGain();
+                    this.masterGain.gain.value = 0.12;
+                    this.masterGain.connect(this.audioContext.destination);
+                }
+            }
+
+            playNote(freq, startTime, duration, waveType = 'sine', volume = 0.08) {
+                const osc = this.audioContext.createOscillator();
+                const gain = this.audioContext.createGain();
+                osc.type = waveType;
+                osc.frequency.value = freq;
+
+                // Smoother Jazz Envelope
+                gain.gain.setValueAtTime(0, startTime);
+                gain.gain.linearRampToValueAtTime(volume, startTime + 0.1); // Slower attack
+                gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration + 0.5); // Longer release
+
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                osc.start(startTime);
+                osc.stop(startTime + duration + 0.5);
+            }
+
+            getThemeConfig() {
+                // Smooth Jazz Theme (C Major 7 / Lo-Fi feel)
+                return {
+                    notes: [261.63, 329.63, 392.00, 493.88, 523.25], // C4, E4, G4, B4, C5
+                    pattern: [0, 2, 1, 3, 2, 4, 3, 1],
+                    tempo: 0.6, // Slower tempo
+                    waveType: 'triangle', // Softer than square
+                    bassOctave: 2 // Deeper bass
+                };
+            }
+
+            scheduleMusic() {
+                if (!this.isPlaying) return;
+                const config = this.getThemeConfig();
+                const now = this.audioContext.currentTime;
+                const beatDuration = config.tempo;
+
+                for (let i = 0; i < config.pattern.length; i++) {
+                    const noteIndex = config.pattern[i];
+                    this.playNote(config.notes[noteIndex], now + i * beatDuration, beatDuration * 1.5, config.waveType, 0.06);
+                }
+
+                // Bass
+                this.playNote(config.notes[0] / config.bassOctave, now, beatDuration * config.pattern.length, 'sine', 0.04);
+
+                this.scheduledTimeout = setTimeout(() => this.scheduleMusic(), beatDuration * config.pattern.length * 1000);
+            }
+
+            play() {
+                if (this.isPlaying) return;
+                this.init();
+                if (this.audioContext.state === 'suspended') this.audioContext.resume();
+                this.isPlaying = true;
+                this.scheduleMusic();
+            }
+
+            stop() {
+                this.isPlaying = false;
+                if (this.scheduledTimeout) clearTimeout(this.scheduledTimeout);
+                if (this.audioContext && this.masterGain) {
+                    this.masterGain.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 1);
+                }
+            }
+        }
+
+        // --- Icon System ---
+
+        // Helper to render Lucide icons from the global 'lucide' object
+        const Icon = ({ name, size = 24, className, ...props }) => {
+            const iconData = lucide.icons[name];
+            if (!iconData) return null;
+
+            return (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={size}
+                    height={size}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className={className}
+                    {...props}
+                >
+                    {iconData.map((child, index) => {
+                        const [tag, attrs] = child;
+                        return React.createElement(tag, { ...attrs, key: index });
+                    })}
+                </svg>
+            );
+        };
+
+        // Create React components for the icons we need
+        const iconList = [
+            'Home', 'Zap', 'Sprout', 'DollarSign', 'TrendingUp', 'Calendar', 'Percent',
+            'PiggyBank', 'ArrowRight', 'Trophy', 'Sparkles', 'Coins', 'Music', 'Volume2', 'VolumeX'
+        ];
+
+        const Icons = iconList.reduce((acc, name) => {
+            acc[name] = (props) => <Icon name={name} {...props} />;
+            return acc;
+        }, {});
+
+        const {
+            Home, Zap, Sprout, DollarSign, TrendingUp, Calendar, Percent,
+            PiggyBank, ArrowRight, Trophy, Sparkles, Coins, Music, Volume2, VolumeX
+        } = Icons;
+
+        // --- Shared Components ---
+
+        const Card = ({ children, className = "", title, icon: Icon, color = "text-slate-800" }) => (
+            <div className={`glass-panel rounded-3xl p-6 shadow-xl shadow-slate-200/50 ${className}`}>
+                {(title || Icon) && (
+                    <div className="flex items-center gap-3 mb-4">
+                        {Icon && <div className={`p-2 rounded-xl bg-white shadow-sm ${color}`}><Icon size={24} /></div>}
+                        {title && <h3 className="text-xl font-bold text-slate-800">{title}</h3>}
+                    </div>
+                )}
+                {children}
+            </div>
+        );
+
+        const SliderInput = ({ label, value, onChange, min, max, step = 1, unit = "", color = "text-brand-primary" }) => (
+            <div className="mb-6">
+                <div className="flex justify-between items-end mb-2">
+                    <label className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{label}</label>
+                    <span className={`text-lg font-bold ${color}`}>
+                        {unit === "$" ? "$" + value.toLocaleString() : value + unit}
+                    </span>
+                </div>
+                <input
+                    type="range"
+                    min={min}
+                    max={max}
+                    step={step}
+                    value={value}
+                    onChange={(e) => onChange(Number(e.target.value))}
+                    className={`slider-thumb w-full h-2 bg-transparent rounded-lg appearance-none cursor-pointer accent-${color.split('-')[1]}-500 touch-pan-y`}
+                    style={{ accentColor: 'currentColor', touchAction: 'pan-y' }}
+                />
+            </div>
+        );
+
+        const StatBox = ({ label, value, subtext, color = "bg-blue-500" }) => (
+            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                <p className="text-xs text-slate-400 font-semibold uppercase mb-1">{label}</p>
+                <p className={`text-2xl font-bold ${color.replace('bg-', 'text-')}`}>{value}</p>
+                {subtext && <p className="text-xs text-slate-400 mt-1">{subtext}</p>}
+            </div>
+        );
+
+        // --- Feature: The House (Mortgage) ---
+
+        const HouseTab = () => {
+            const [price, setPrice] = useState(300000);
+            const [downPaymentPercent, setDownPaymentPercent] = useState(20);
+            const [interestRate, setInterestRate] = useState(6.5);
+            const [termYears, setTermYears] = useState(30);
+
+            const { monthlyPayment, totalInterest, totalPayment, chartData, balanceData } = useMemo(() => {
+                const downPayment = price * (downPaymentPercent / 100);
+                const loanAmount = price - downPayment;
+                const monthlyRate = interestRate / 100 / 12;
+                const numberOfPayments = termYears * 12;
+
+                let monthlyPayment = 0;
+                if (interestRate === 0) {
+                    monthlyPayment = loanAmount / numberOfPayments;
+                } else {
+                    monthlyPayment = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+                }
+
+                const totalPayment = monthlyPayment * numberOfPayments;
+                const totalInterest = totalPayment - loanAmount;
+
+                // Generate Balance Data for Area Chart
+                const balanceData = [];
+                let currentBalance = loanAmount;
+                for (let i = 0; i <= termYears; i++) {
+                    balanceData.push({
+                        year: i,
+                        balance: Math.max(0, currentBalance),
+                    });
+                    // Approximate balance reduction for next year (simplified)
+                    // Exact calculation would loop months
+                    let yearlyPrincipal = 0;
+                    for (let m = 0; m < 12; m++) {
+                        const interest = currentBalance * monthlyRate;
+                        const principal = monthlyPayment - interest;
+                        currentBalance -= principal;
+                    }
+                }
+
+                return {
+                    monthlyPayment,
+                    totalInterest,
+                    totalPayment,
+                    chartData: [
+                        { name: 'Principal', value: loanAmount, color: '#818cf8' }, // Indigo-400
+                        { name: 'Interest', value: totalInterest, color: '#c7d2fe' }, // Indigo-200
+                    ],
+                    balanceData
+                };
+            }, [price, downPaymentPercent, interestRate, termYears]);
+
+            return (
+                <div className="space-y-6 pb-24 md:pb-0 animate-fade-in">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <Card title="Design Your Loan" icon={Home} color="text-indigo-500">
+                            <SliderInput label="House Price" value={price} onChange={setPrice} min={50000} max={1000000} step={5000} unit="$" color="text-indigo-600" />
+                            <SliderInput label="Down Payment" value={downPaymentPercent} onChange={setDownPaymentPercent} min={0} max={50} unit="%" color="text-indigo-600" />
+                            <SliderInput label="Interest Rate" value={interestRate} onChange={setInterestRate} min={1} max={15} step={0.1} unit="%" color="text-indigo-600" />
+                            <SliderInput label="Loan Term" value={termYears} onChange={setTermYears} min={10} max={40} step={5} unit=" Years" color="text-indigo-600" />
+                        </Card>
+
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <StatBox label="Monthly Payment" value={`$${Math.round(monthlyPayment).toLocaleString()}`} color="bg-indigo-600" />
+                                <StatBox label="Total Interest" value={`$${Math.round(totalInterest).toLocaleString()}`} color="bg-indigo-400" />
+                            </div>
+
+                            <Card className="h-64 flex flex-col justify-center items-center">
+                                <h4 className="text-sm font-bold text-slate-400 uppercase mb-4">Where your money goes</h4>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={chartData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} />
+                                        <Legend verticalAlign="bottom" height={36} />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </Card>
+                        </div>
+                    </div>
+
+                    <Card title="Loan Balance Over Time" className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={balanceData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                                <defs>
+                                    <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(value) => `$${value / 1000}k`} />
+                                <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }} />
+                                <Area type="monotone" dataKey="balance" stroke="#6366f1" strokeWidth={3} fillOpacity={1} fill="url(#colorBalance)" />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </Card>
+                </div>
+            );
+        };
+
+        // --- Feature: Turbo Pay (Debt) ---
+
+        const TurboPayTab = () => {
+            const [loanAmount, setLoanAmount] = useState(50000);
+            const [interestRate, setInterestRate] = useState(18); // Credit card style default
+            const [minPayment, setMinPayment] = useState(1500); // Base payment
+            const [extraMonthly, setExtraMonthly] = useState(200);
+            const [yearlyLumpSum, setYearlyLumpSum] = useState(500);
+            const [stepUpPercent, setStepUpPercent] = useState(5);
+
+            const { comparisonData, stats } = useMemo(() => {
+                // Simulate Normal Path
+                let normalBalance = loanAmount;
+                let normalInterest = 0;
+                let normalMonths = 0;
+                const normalHistory = [{ month: 0, normal: loanAmount, turbo: loanAmount }];
+
+                // Simulate Turbo Path
+                let turboBalance = loanAmount;
+                let turboInterest = 0;
+                let turboMonths = 0;
+                let currentMonthlyTurbo = minPayment + extraMonthly;
+
+                // Run simulation for max 360 months (30 years)
+                for (let m = 1; m <= 360; m++) {
+                    // Normal
+                    if (normalBalance > 0) {
+                        const interest = normalBalance * (interestRate / 100 / 12);
+                        normalInterest += interest;
+                        let principal = minPayment - interest;
+                        if (principal > normalBalance) principal = normalBalance;
+                        normalBalance -= principal;
+                        normalMonths++;
+                    }
+
+                    // Turbo
+                    if (turboBalance > 0) {
+                        // Check for yearly lump sum
+                        let paymentThisMonth = currentMonthlyTurbo;
+                        if (m % 12 === 0) {
+                            paymentThisMonth += yearlyLumpSum;
+                            // Step up
+                            currentMonthlyTurbo = currentMonthlyTurbo * (1 + stepUpPercent / 100);
+                        }
+
+                        const interest = turboBalance * (interestRate / 100 / 12);
+                        turboInterest += interest;
+                        let principal = paymentThisMonth - interest;
+                        // Ensure we don't overpay
+                        if (principal + interest > turboBalance + interest) {
+                            principal = turboBalance;
+                        }
+
+                        turboBalance -= principal;
+                        if (turboBalance < 0) turboBalance = 0;
+                        turboMonths++;
+                    }
+
+                    if (m % 6 === 0 || normalBalance <= 0 && turboBalance <= 0) { // Sample every 6 months for chart smoothness
+                        normalHistory.push({
+                            month: m,
+                            normal: Math.max(0, normalBalance),
+                            turbo: Math.max(0, turboBalance)
+                        });
+                    }
+
+                    if (normalBalance <= 0 && turboBalance <= 0) break;
+                }
+
+                return {
+                    comparisonData: normalHistory,
+                    stats: {
+                        interestSaved: Math.max(0, normalInterest - turboInterest),
+                        timeSavedMonths: Math.max(0, normalMonths - turboMonths),
+                        turboMonths
+                    }
+                };
+            }, [loanAmount, interestRate, minPayment, extraMonthly, yearlyLumpSum, stepUpPercent]);
+
+            const yearsSaved = (stats.timeSavedMonths / 12).toFixed(1);
+
+            return (
+                <div className="space-y-6 pb-24 md:pb-0 animate-fade-in">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <Card title="Turbo Strategy" icon={Zap} color="text-orange-500">
+                            <SliderInput label="Loan Balance" value={loanAmount} onChange={setLoanAmount} min={1000} max={1000000} step={1000} unit="$" color="text-orange-500" />
+                            <SliderInput label="Base Monthly Payment" value={minPayment} onChange={setMinPayment} min={100} max={5000} step={50} unit="$" color="text-slate-500" />
+
+                            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 mt-6">
+                                <h4 className="text-orange-800 font-bold mb-4 flex items-center gap-2"><Sparkles size={16} /> Power Ups</h4>
+                                <SliderInput label="Extra Monthly" value={extraMonthly} onChange={setExtraMonthly} min={0} max={2000} step={50} unit="$" color="text-orange-500" />
+                                <SliderInput label="Yearly Bonus (Birthday!)" value={yearlyLumpSum} onChange={setYearlyLumpSum} min={0} max={5000} step={100} unit="$" color="text-orange-500" />
+                                <SliderInput label="Annual Step-Up" value={stepUpPercent} onChange={setStepUpPercent} min={0} max={20} unit="%" color="text-orange-500" />
+                            </div>
+                        </Card>
+
+                        <div className="space-y-6">
+                            <div className="bg-gradient-to-br from-orange-500 to-pink-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <h3 className="text-lg font-medium opacity-90 mb-1">Total Interest Saved</h3>
+                                    <p className="text-4xl font-bold mb-4">${Math.round(stats.interestSaved).toLocaleString()}</p>
+
+                                    <div className="flex items-center gap-4 mt-6">
+                                        <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1">
+                                            <p className="text-xs uppercase opacity-75 font-bold">Time Saved</p>
+                                            <p className="text-2xl font-bold">{yearsSaved} Years</p>
+                                        </div>
+                                        <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1">
+                                            <p className="text-xs uppercase opacity-75 font-bold">Debt Free In</p>
+                                            <p className="text-2xl font-bold">{(stats.turboMonths / 12).toFixed(1)} Years</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Trophy className="absolute -bottom-4 -right-4 text-white opacity-20" size={120} />
+                            </div>
+
+                            <Card title="Race to Zero" className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart data={comparisonData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                        <XAxis dataKey="month" tickFormatter={(m) => Math.round(m / 12) + 'y'} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `$${v / 1000}k`} />
+                                        <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} contentStyle={{ borderRadius: '12px' }} />
+                                        <Legend />
+                                        <Line type="monotone" dataKey="normal" name="Normal Plan" stroke="#94a3b8" strokeWidth={2} dot={false} />
+                                        <Line type="monotone" dataKey="turbo" name="Turbo Plan" stroke="#f97316" strokeWidth={3} dot={false} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Feature: Money Tree (Investment) ---
+
+        const MoneyTreeTab = () => {
+            const [monthlyContrib, setMonthlyContrib] = useState(500);
+            const [years, setYears] = useState(20);
+            const [returnRate, setReturnRate] = useState(10);
+            const [initialLump, setInitialLump] = useState(1000);
+
+            const { growthData, summary } = useMemo(() => {
+                const data = [];
+                let totalContributed = initialLump;
+                let totalValue = initialLump;
+
+                for (let y = 0; y <= years; y++) {
+                    data.push({
+                        year: y,
+                        contributed: totalContributed,
+                        growth: totalValue - totalContributed,
+                        total: totalValue
+                    });
+
+                    // Calculate next year
+                    const yearlyContrib = monthlyContrib * 12;
+                    totalContributed += yearlyContrib;
+                    totalValue = (totalValue + yearlyContrib) * (1 + returnRate / 100);
+                }
+
+                return {
+                    growthData: data,
+                    summary: {
+                        finalValue: data[data.length - 1].total,
+                        totalInvested: data[data.length - 1].contributed,
+                        freeMoney: data[data.length - 1].growth
+                    }
+                };
+            }, [monthlyContrib, years, returnRate, initialLump]);
+
+            return (
+                <div className="space-y-6 pb-24 md:pb-0 animate-fade-in">
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <Card title="Plant Your Seeds" icon={Sprout} color="text-emerald-500">
+                            <SliderInput label="Starting Cash" value={initialLump} onChange={setInitialLump} min={0} max={10000} step={100} unit="$" color="text-emerald-500" />
+                            <SliderInput label="Monthly Contribution" value={monthlyContrib} onChange={setMonthlyContrib} min={50} max={5000} step={50} unit="$" color="text-emerald-500" />
+                            <SliderInput label="Time to Grow" value={years} onChange={setYears} min={5} max={50} unit=" Years" color="text-emerald-500" />
+                            <SliderInput label="Expected Return" value={returnRate} onChange={setReturnRate} min={1} max={15} step={0.5} unit="%" color="text-emerald-500" />
+                        </Card>
+
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="col-span-2 bg-emerald-500 rounded-3xl p-6 text-white shadow-lg flex items-center justify-between">
+                                    <div>
+                                        <p className="text-emerald-100 font-medium mb-1">Total Value</p>
+                                        <p className="text-4xl font-bold">${Math.round(summary.finalValue).toLocaleString()}</p>
+                                    </div>
+                                    <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center">
+                                        <DollarSign size={24} className="text-white" />
+                                    </div>
+                                </div>
+                                <StatBox label="Your Cash" value={`$${Math.round(summary.totalInvested).toLocaleString()}`} color="bg-slate-600" />
+                                <StatBox label="Free Money (Growth)" value={`$${Math.round(summary.freeMoney).toLocaleString()}`} color="bg-emerald-500" />
+                            </div>
+
+                            <Card title="Growth Over Time" className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={growthData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                                        <defs>
+                                            <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                                                <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
+                                            </linearGradient>
+                                            <linearGradient id="colorContrib" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#94a3b8" stopOpacity={0.8} />
+                                                <stop offset="95%" stopColor="#94a3b8" stopOpacity={0.1} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                        <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `$${v / 1000}k`} />
+                                        <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} contentStyle={{ borderRadius: '12px' }} />
+                                        <Area type="monotone" dataKey="contributed" stackId="1" stroke="#64748b" fill="url(#colorContrib)" name="Your Cash" />
+                                        <Area type="monotone" dataKey="growth" stackId="1" stroke="#10b981" fill="url(#colorGrowth)" name="Growth" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('house');
+            const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+            const musicSystem = useMemo(() => new GameMusic(), []);
+
+            const toggleMusic = () => {
+                if (isMusicPlaying) {
+                    musicSystem.stop();
+                } else {
+                    musicSystem.play();
+                }
+                setIsMusicPlaying(!isMusicPlaying);
+            };
+
+            const renderContent = () => {
+                switch (activeTab) {
+                    case 'house': return <HouseTab />;
+                    case 'turbo': return <TurboPayTab />;
+                    case 'tree': return <MoneyTreeTab />;
+                    default: return <HouseTab />;
+                }
+            };
+
+            const NavButton = ({ id, icon: Icon, label }) => (
+                <button
+                    onClick={() => setActiveTab(id)}
+                    className={`flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:px-6 md:py-3 rounded-xl transition-all duration-300 ${activeTab === id
+                        ? 'text-brand-primary bg-indigo-50 font-bold scale-105'
+                        : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
+                        }`}
+                >
+                    <Icon size={24} className={activeTab === id ? 'stroke-[2.5px]' : 'stroke-2'} />
+                    <span className="text-xs md:text-sm">{label}</span>
+                </button>
+            );
+
+            return (
+                <div className="min-h-screen flex flex-col max-w-5xl mx-auto">
+                    {/* Header */}
+                    <header className="p-6 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-gradient-to-tr from-indigo-600 to-purple-500 p-3 rounded-2xl shadow-lg shadow-indigo-200">
+                                <Coins className="text-white" size={28} />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                                    Money<span className="text-indigo-600">Quest</span>
+                                </h1>
+                                <p className="text-xs md:text-sm text-slate-500 font-medium">Future Tycoon Simulator</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={toggleMusic}
+                                className={`p-3 rounded-full transition-all ${isMusicPlaying ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400'}`}
+                                title={isMusicPlaying ? "Stop Music" : "Play Music"}
+                            >
+                                {isMusicPlaying ? <Volume2 size={20} /> : <VolumeX size={20} />}
+                            </button>
+
+                            {/* Desktop Nav */}
+                            <nav className="hidden md:flex bg-white p-1.5 rounded-2xl shadow-sm border border-slate-100 gap-2">
+                                <NavButton id="house" icon={Home} label="The House" />
+                                <NavButton id="turbo" icon={Zap} label="Turbo Pay" />
+                                <NavButton id="tree" icon={Sprout} label="Money Tree" />
+                            </nav>
+                        </div>
+                    </header>
+
+                    {/* Main Content */}
+                    <main className="flex-1 p-4 md:p-6">
+                        {renderContent()}
+                    </main>
+
+                    {/* Mobile Nav */}
+                    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-2 flex justify-around items-center z-50 pb-safe">
+                        <NavButton id="house" icon={Home} label="The House" />
+                        <NavButton id="turbo" icon={Zap} label="Turbo Pay" />
+                        <NavButton id="tree" icon={Sprout} label="Money Tree" />
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
