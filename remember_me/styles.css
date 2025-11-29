@@ -307,11 +307,18 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: clamp(2rem, 10vmin, 6rem);
+    font-size: 10vmin;
     /* Responsive font size based on viewport */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border: 3px solid white;
     overflow: hidden;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.card.advance .card-face {
+    font-size: 6vmin;
+    /* Smaller font for multiple items */
 }
 
 .card-front {
