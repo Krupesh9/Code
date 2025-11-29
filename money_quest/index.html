@@ -372,8 +372,8 @@
                     totalInterest,
                     totalPayment,
                     chartData: [
-                        { name: 'Principal', value: loanAmount, color: '#818cf8' }, // Indigo-400
-                        { name: 'Interest', value: totalInterest, color: '#c7d2fe' }, // Indigo-200
+                        { name: 'Principal', value: loanAmount, color: '#6366f1' }, // Indigo-500
+                        { name: 'Interest', value: totalInterest, color: '#a5b4fc' }, // Indigo-300
                     ],
                     balanceData
                 };
@@ -381,30 +381,36 @@
 
             return (
                 <div className="space-y-6 pb-24 md:pb-0 animate-fade-in">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <Card title="Design Your Loan" icon={Home} color="text-indigo-500">
+                    <div className="grid md:grid-cols-2 gap-6 items-stretch">
+                        <Card title="Design Your Loan" icon={Home} color="text-indigo-500" className="h-full">
                             <SliderInput label="House Price" value={price} onChange={setPrice} min={50000} max={1000000} step={5000} unit="$" color="text-indigo-600" />
                             <SliderInput label="Down Payment" value={downPaymentPercent} onChange={setDownPaymentPercent} min={0} max={50} unit="%" color="text-indigo-600" />
                             <SliderInput label="Interest Rate" value={interestRate} onChange={setInterestRate} min={1} max={15} step={0.1} unit="%" color="text-indigo-600" />
                             <SliderInput label="Loan Term" value={termYears} onChange={setTermYears} min={10} max={40} step={5} unit=" Years" color="text-indigo-600" />
                         </Card>
 
-                        <div className="space-y-6">
+                        <div className="flex flex-col gap-6 h-full">
                             <div className="grid grid-cols-2 gap-4">
-                                <StatBox label="Monthly Payment" value={`$${Math.round(monthlyPayment).toLocaleString()}`} color="bg-indigo-600" />
-                                <StatBox label="Total Interest" value={`$${Math.round(totalInterest).toLocaleString()}`} color="bg-indigo-400" />
+                                <div className="bg-indigo-600 rounded-2xl p-4 shadow-lg shadow-indigo-200 text-white">
+                                    <p className="text-xs text-indigo-200 font-bold uppercase mb-1">Monthly Payment</p>
+                                    <p className="text-2xl font-bold">${Math.round(monthlyPayment).toLocaleString()}</p>
+                                </div>
+                                <div className="bg-indigo-400 rounded-2xl p-4 shadow-lg shadow-indigo-100 text-white">
+                                    <p className="text-xs text-indigo-100 font-bold uppercase mb-1">Total Interest</p>
+                                    <p className="text-2xl font-bold">${Math.round(totalInterest).toLocaleString()}</p>
+                                </div>
                             </div>
 
-                            <Card className="h-64 flex flex-col justify-center items-center">
+                            <Card className="flex-1 min-h-[320px] flex flex-col justify-center items-center">
                                 <h4 className="text-sm font-bold text-slate-400 uppercase mb-4">Where your money goes</h4>
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
+                                    <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 20 }}>
                                         <Pie
                                             data={chartData}
                                             cx="50%"
                                             cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={80}
+                                            innerRadius="55%"
+                                            outerRadius="85%"
                                             paddingAngle={5}
                                             dataKey="value"
                                         >
@@ -422,7 +428,7 @@
 
                     <Card title="Loan Balance Over Time" className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={balanceData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                            <AreaChart data={balanceData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
                                 <defs>
                                     <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
@@ -444,14 +450,25 @@
         // --- Feature: Turbo Pay (Debt) ---
 
         const TurboPayTab = () => {
-            const [loanAmount, setLoanAmount] = useState(50000);
-            const [interestRate, setInterestRate] = useState(18); // Credit card style default
-            const [minPayment, setMinPayment] = useState(1500); // Base payment
-            const [extraMonthly, setExtraMonthly] = useState(200);
-            const [yearlyLumpSum, setYearlyLumpSum] = useState(500);
-            const [stepUpPercent, setStepUpPercent] = useState(5);
+            const [loanAmount, setLoanAmount] = useState(400000);
+            const [interestRate, setInterestRate] = useState(6.0);
+            const [remainingYears, setRemainingYears] = useState(28);
 
-            const { comparisonData, stats } = useMemo(() => {
+            const [extraMonthly, setExtraMonthly] = useState(500);
+            const [yearlyLumpSum, setYearlyLumpSum] = useState(1000);
+            const [stepUpPercent, setStepUpPercent] = useState(0);
+
+            const { comparisonData, stats, requiredPayment } = useMemo(() => {
+                // Calculate Required Monthly Payment for the remaining term
+                const r = interestRate / 100 / 12;
+                const n = remainingYears * 12;
+                let requiredPayment = 0;
+                if (interestRate === 0) {
+                    requiredPayment = loanAmount / n;
+                } else {
+                    requiredPayment = (loanAmount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                }
+
                 // Simulate Normal Path
                 let normalBalance = loanAmount;
                 let normalInterest = 0;
@@ -462,15 +479,15 @@
                 let turboBalance = loanAmount;
                 let turboInterest = 0;
                 let turboMonths = 0;
-                let currentMonthlyTurbo = minPayment + extraMonthly;
+                let currentMonthlyTurbo = requiredPayment + extraMonthly;
 
-                // Run simulation for max 360 months (30 years)
-                for (let m = 1; m <= 360; m++) {
+                // Run simulation for max 480 months (40 years) to be safe
+                for (let m = 1; m <= 480; m++) {
                     // Normal
                     if (normalBalance > 0) {
                         const interest = normalBalance * (interestRate / 100 / 12);
                         normalInterest += interest;
-                        let principal = minPayment - interest;
+                        let principal = requiredPayment - interest;
                         if (principal > normalBalance) principal = normalBalance;
                         normalBalance -= principal;
                         normalMonths++;
@@ -499,7 +516,7 @@
                         turboMonths++;
                     }
 
-                    if (m % 6 === 0 || normalBalance <= 0 && turboBalance <= 0) { // Sample every 6 months for chart smoothness
+                    if (m % 6 === 0 || (normalBalance <= 0 && turboBalance <= 0)) {
                         normalHistory.push({
                             month: m,
                             normal: Math.max(0, normalBalance),
@@ -516,62 +533,67 @@
                         interestSaved: Math.max(0, normalInterest - turboInterest),
                         timeSavedMonths: Math.max(0, normalMonths - turboMonths),
                         turboMonths
-                    }
+                    },
+                    requiredPayment
                 };
-            }, [loanAmount, interestRate, minPayment, extraMonthly, yearlyLumpSum, stepUpPercent]);
+            }, [loanAmount, interestRate, remainingYears, extraMonthly, yearlyLumpSum, stepUpPercent]);
 
             const yearsSaved = (stats.timeSavedMonths / 12).toFixed(1);
 
             return (
                 <div className="space-y-6 pb-24 md:pb-0 animate-fade-in">
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <Card title="Turbo Strategy" icon={Zap} color="text-orange-500">
-                            <SliderInput label="Loan Balance" value={loanAmount} onChange={setLoanAmount} min={1000} max={1000000} step={1000} unit="$" color="text-orange-500" />
-                            <SliderInput label="Base Monthly Payment" value={minPayment} onChange={setMinPayment} min={100} max={5000} step={50} unit="$" color="text-slate-500" />
-
-                            <div className="p-4 bg-orange-50 rounded-2xl border border-orange-100 mt-6">
-                                <h4 className="text-orange-800 font-bold mb-4 flex items-center gap-2"><Sparkles size={16} /> Power Ups</h4>
-                                <SliderInput label="Extra Monthly" value={extraMonthly} onChange={setExtraMonthly} min={0} max={2000} step={50} unit="$" color="text-orange-500" />
-                                <SliderInput label="Yearly Bonus (Birthday!)" value={yearlyLumpSum} onChange={setYearlyLumpSum} min={0} max={5000} step={100} unit="$" color="text-orange-500" />
-                                <SliderInput label="Annual Step-Up" value={stepUpPercent} onChange={setStepUpPercent} min={0} max={20} unit="%" color="text-orange-500" />
+                    <div className="grid md:grid-cols-2 gap-6 items-stretch">
+                        <Card title="Your Current Loan" icon={Home} color="text-orange-500" className="h-full relative">
+                            <div className="absolute top-6 right-6 bg-slate-100 rounded-full px-3 py-1">
+                                <p className="text-[11px] font-medium text-slate-500">
+                                    Monthly: <span className="font-bold text-slate-600">${Math.round(requiredPayment).toLocaleString()}</span>
+                                </p>
                             </div>
+                            <SliderInput label="Current Balance" value={loanAmount} onChange={setLoanAmount} min={10000} max={1000000} step={5000} unit="$" color="text-orange-500" />
+                            <SliderInput label="Interest Rate" value={interestRate} onChange={setInterestRate} min={1} max={15} step={0.1} unit="%" color="text-orange-500" />
+                            <SliderInput label="Remaining Years" value={remainingYears} onChange={setRemainingYears} min={1} max={40} unit=" Years" color="text-orange-500" />
                         </Card>
 
-                        <div className="space-y-6">
-                            <div className="bg-gradient-to-br from-orange-500 to-pink-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden">
-                                <div className="relative z-10">
-                                    <h3 className="text-lg font-medium opacity-90 mb-1">Total Interest Saved</h3>
-                                    <p className="text-4xl font-bold mb-4">${Math.round(stats.interestSaved).toLocaleString()}</p>
+                        <Card title="Turbo Strategy" icon={Zap} color="text-yellow-500" className="h-full">
+                            <SliderInput label="Extra Monthly Payment" value={extraMonthly} onChange={setExtraMonthly} min={0} max={10000} step={50} unit="$" color="text-yellow-500" />
+                            <SliderInput label="Yearly Bonus (Lump Sum)" value={yearlyLumpSum} onChange={setYearlyLumpSum} min={0} max={20000} step={500} unit="$" color="text-yellow-500" />
+                            <SliderInput label="Annual Step-Up" value={stepUpPercent} onChange={setStepUpPercent} min={0} max={20} unit="%" color="text-yellow-500" />
+                        </Card>
+                    </div>
 
-                                    <div className="flex items-center gap-4 mt-6">
-                                        <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1">
-                                            <p className="text-xs uppercase opacity-75 font-bold">Time Saved</p>
-                                            <p className="text-2xl font-bold">{yearsSaved} Years</p>
-                                        </div>
-                                        <div className="bg-white/20 backdrop-blur-md rounded-xl p-3 flex-1">
-                                            <p className="text-xs uppercase opacity-75 font-bold">Debt Free In</p>
-                                            <p className="text-2xl font-bold">{(stats.turboMonths / 12).toFixed(1)} Years</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Trophy className="absolute -bottom-4 -right-4 text-white opacity-20" size={120} />
+                    <div className="grid md:grid-cols-3 gap-6">
+                        <div className="bg-gradient-to-br from-orange-500 to-pink-500 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden flex flex-col justify-center min-h-[140px]">
+                            <div className="relative z-10">
+                                <h3 className="text-sm font-bold opacity-90 mb-1 uppercase">Total Interest Saved</h3>
+                                <p className="text-3xl font-bold">${Math.round(stats.interestSaved).toLocaleString()}</p>
                             </div>
+                            <Trophy className="absolute -bottom-4 -right-4 text-white opacity-20" size={100} />
+                        </div>
 
-                            <Card title="Race to Zero" className="h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart data={comparisonData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                                        <XAxis dataKey="month" tickFormatter={(m) => Math.round(m / 12) + 'y'} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
-                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `$${v / 1000}k`} />
-                                        <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} contentStyle={{ borderRadius: '12px' }} />
-                                        <Legend />
-                                        <Line type="monotone" dataKey="normal" name="Normal Plan" stroke="#94a3b8" strokeWidth={2} dot={false} />
-                                        <Line type="monotone" dataKey="turbo" name="Turbo Plan" stroke="#f97316" strokeWidth={3} dot={false} />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </Card>
+                        <div className="bg-orange-500 rounded-3xl p-6 text-white shadow-lg shadow-orange-200 flex flex-col justify-center min-h-[140px]">
+                            <p className="text-sm font-bold opacity-90 mb-1 uppercase">Time Saved</p>
+                            <p className="text-3xl font-bold">{yearsSaved} Years</p>
+                        </div>
+
+                        <div className="bg-pink-500 rounded-3xl p-6 text-white shadow-lg shadow-pink-200 flex flex-col justify-center min-h-[140px]">
+                            <p className="text-sm font-bold opacity-90 mb-1 uppercase">Debt Free In</p>
+                            <p className="text-3xl font-bold">{(stats.turboMonths / 12).toFixed(1)} Years</p>
                         </div>
                     </div>
+
+                    <Card title="Race to Zero" className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={comparisonData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="month" tickFormatter={(m) => Math.round(m / 12) + 'y'} axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} />
+                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(v) => `$${v / 1000}k`} />
+                                <Tooltip formatter={(value) => `$${Math.round(value).toLocaleString()}`} contentStyle={{ borderRadius: '12px' }} />
+                                <Legend />
+                                <Line type="monotone" dataKey="normal" name="Normal Plan" stroke="#94a3b8" strokeWidth={2} dot={false} />
+                                <Line type="monotone" dataKey="turbo" name="Turbo Plan" stroke="#f97316" strokeWidth={3} dot={false} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </Card>
                 </div>
             );
         };
@@ -640,7 +662,7 @@
 
                             <Card title="Growth Over Time" className="h-64">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <AreaChart data={growthData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                                    <AreaChart data={growthData} margin={{ top: 10, right: 10, left: 10, bottom: 20 }}>
                                         <defs>
                                             <linearGradient id="colorGrowth" x1="0" y1="0" x2="0" y2="1">
                                                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
@@ -742,6 +764,14 @@
                     <main className="flex-1 p-4 md:p-6">
                         {renderContent()}
                     </main>
+
+                    {/* Disclaimer Footer */}
+                    <footer className="p-4 text-center pb-24 md:pb-8 opacity-70">
+                        <p className="text-xs text-slate-500 max-w-2xl mx-auto leading-relaxed">
+                            ⚠️ <strong>Disclaimer:</strong> This application is a simulation designed for fun and educational purposes only.
+                            It does not constitute professional financial advice. Please consult with a qualified financial advisor before making any financial decisions.
+                        </p>
+                    </footer>
 
                     {/* Mobile Nav */}
                     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-2 flex justify-around items-center z-50 pb-safe">
