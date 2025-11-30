@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Adventure - Naksh's Game Arcade</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/png" href="../logo.png">
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Back to Arcade Button -->
+        <a href="../index.html" class="back-btn">
+            <span class="icon">◀</span> Back to Arcade
+        </a>
+
+        <!-- Welcome Screen -->
+        <section id="welcome-screen" class="screen active">
+            <h1 class="game-title">Spanish Adventure</h1>
+            <p class="subtitle">Learn Spanish the Fun Way!</p>
+            <div class="mascot-container">
+                <div class="mascot">🦜</div>
+            </div>
+            <button class="btn-primary" id="start-btn">Start Adventure</button>
+        </section>
+
+        <!-- Level Selection Screen -->
+        <section id="level-screen" class="screen">
+            <h2>Select Your Level</h2>
+            <div class="levels-grid">
+                <button class="level-card" data-level="numbers">
+                    <span class="level-icon">1️⃣</span>
+                    <span class="level-name">Numbers</span>
+                    <span class="level-desc">1 to 100</span>
+                </button>
+                <button class="level-card" data-level="colors">
+                    <span class="level-icon">🎨</span>
+                    <span class="level-name">Colors</span>
+                    <span class="level-desc">Red, Blue, Green</span>
+                </button>
+                <button class="level-card" data-level="days">
+                    <span class="level-icon">📅</span>
+                    <span class="level-name">Days</span>
+                    <span class="level-desc">Mon to Sun</span>
+                </button>
+                <button class="level-card" data-level="months">
+                    <span class="level-icon">🗓️</span>
+                    <span class="level-name">Months</span>
+                    <span class="level-desc">Jan to Dec</span>
+                </button>
+                <button class="level-card" data-level="shapes">
+                    <span class="level-icon">🔺</span>
+                    <span class="level-name">Shapes</span>
+                    <span class="level-desc">Circle, Square</span>
+                </button>
+                <button class="level-card" data-level="body_parts">
+                    <span class="level-icon">👀</span>
+                    <span class="level-name">Body Parts</span>
+                    <span class="level-desc">Head, Shoulders</span>
+                </button>
+                <button class="level-card" data-level="alphabet">
+                    <span class="level-icon">🔤</span>
+                    <span class="level-name">Alphabet</span>
+                    <span class="level-desc">A to Z</span>
+                </button>
+                <button class="level-card" data-level="animals">
+                    <span class="level-icon">🦁</span>
+                    <span class="level-name">Animals</span>
+                    <span class="level-desc">Farm & Wild</span>
+                </button>
+                <button class="level-card" data-level="nature">
+                    <span class="level-icon">🌳</span>
+                    <span class="level-name">Nature</span>
+                    <span class="level-desc">Sun, Moon, Rain</span>
+                </button>
+                <button class="level-card" data-level="daily_life">
+                    <span class="level-icon">🏠</span>
+                    <span class="level-name">Daily Life</span>
+                    <span class="level-desc">School, Home</span>
+                </button>
+                <button class="level-card" data-level="family">
+                    <span class="level-icon">👨‍👩‍👧‍👦</span>
+                    <span class="level-name">Family</span>
+                    <span class="level-desc">Family Members</span>
+                </button>
+                <button class="level-card" data-level="phrases">
+                    <span class="level-icon">💬</span>
+                    <span class="level-name">Phrases</span>
+                    <span class="level-desc">Greetings</span>
+                </button>
+                <button class="level-card" data-level="sentences">
+                    <span class="level-icon">📝</span>
+                    <span class="level-name">Sentences</span>
+                    <span class="level-desc">Simple Sentences</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Game Screen -->
+        <section id="game-screen" class="screen">
+            <div class="game-header">
+                <button class="btn-small" id="back-to-levels">Levels</button>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="score-display">⭐ <span id="score">0</span></div>
+            </div>
+
+            <div class="card-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="card-image" id="card-image">🍎</div>
+                    <h3 class="word-english" id="word-english">Apple</h3>
+                    <h2 class="word-spanish" id="word-spanish">Manzana</h2>
+                    <p class="pronunciation" id="pronunciation">/man-sa-na/</p>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn-action" id="listen-btn">
+                    <span class="icon">🔊</span> Listen
+                </button>
+                <button class="btn-action" id="speak-btn">
+                    <span class="icon">🎤</span> Speak
+                </button>
+            </div>
+
+            <div class="feedback-area" id="feedback-area">
+                <!-- Feedback messages will appear here -->
+            </div>
+
+            <div class="navigation-controls">
+                <button class="btn-nav" id="prev-word">Previous</button>
+                <button class="btn-nav" id="next-word">Next</button>
+            </div>
+
+            <button class="btn-quiz" id="start-quiz-btn">Take Quiz!</button>
+        </section>
+
+        <!-- Quiz Screen -->
+        <section id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <h2>Quiz Time!</h2>
+                <div class="score-display">⭐ <span id="quiz-score">0</span></div>
+            </div>
+
+            <div class="quiz-question" id="quiz-question">
+                What is "Apple" in Spanish?
+            </div>
+
+            <div class="quiz-options" id="quiz-options">
+                <!-- Options generated by JS -->
+            </div>
+
+            <div class="quiz-feedback" id="quiz-feedback"></div>
+
+            <button class="btn-secondary" id="quit-quiz">Quit Quiz</button>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
