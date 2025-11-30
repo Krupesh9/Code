@@ -63,16 +63,20 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             z-index: 20;
             pointer-events: auto;
             cursor: default;
             padding: 20px;
+            padding-top: 10vh;
+            /* Ensure title is not cut off */
             box-sizing: border-box;
+            overflow-y: auto;
+            /* Allow scrolling if content is too tall */
         }
 
         h1 {
@@ -152,6 +156,34 @@
             box-shadow: 0 0 20px #ff3333;
         }
 
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 243, 255, 0.1);
+            color: #00f3ff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid #00f3ff;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            pointer-events: auto;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px #00f3ff;
+        }
+
+        .back-btn:hover {
+            background: #00f3ff;
+            color: #000;
+            box-shadow: 0 0 20px #00f3ff;
+            transform: translateY(-2px);
+        }
+
         .hidden {
             display: none !important;
         }
@@ -180,596 +212,596 @@
         <div id="ui-layer">
             <div id="timer" class="hud-item">01:00</div>
             <div id="score" class="hud-item">Cleaned: 0/50</div>
-        </div>
+            <a href="../index.html" class="back-btn">🏠 Portal</a>
 
-        <div id="message-overlay">
-            <h1 id="title">SPACE CLEAN UP</h1>
-            <p id="description">
-                Use your mouse or touch to create a Gravity Well to collect debris.
-                <br><br>
-            <div class="mode-selection">
-                <button class="btn mode-btn" onclick="startGame(false)" ontouchstart="startGame(false)">
-                    <span class="btn-icon">🧹</span>
-                    SPACE CLEAN
-                    <span class="btn-sub">Standard Mission</span>
-                </button>
-                <button class="btn mode-btn pro" onclick="startGame(true)" ontouchstart="startGame(true)">
-                    <span class="btn-icon">👾</span>
-                    SPACE CLEAN PRO
-                    <span class="btn-sub">With Hunters (+30s Time)</span>
-                </button>
+            <div id="message-overlay">
+                <h1 id="title">SPACE CLEAN UP</h1>
+                <p id="description">
+                    Use your mouse or touch to create a Gravity Well to collect debris.
+                    <br><br>
+                <div class="mode-selection">
+                    <button class="btn mode-btn" onclick="startGame(false)" ontouchstart="startGame(false)">
+                        <span class="btn-icon">🧹</span>
+                        SPACE CLEAN
+                        <span class="btn-sub">Standard Mission</span>
+                    </button>
+                    <button class="btn mode-btn pro" onclick="startGame(true)" ontouchstart="startGame(true)">
+                        <span class="btn-icon">👾</span>
+                        SPACE CLEAN PRO
+                        <span class="btn-sub">With Hunters (+30s Time)</span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const container = document.getElementById('game-container');
+        <script>
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('game-container');
 
-        // Resize canvas to full screen
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
+            // Resize canvas to full screen
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
 
-        // Game State
-        let isPlaying = false;
-        let score = 0;
-        let totalObjects = 50;
-        let timeLeft = 60; // 1 minute base
-        let huntersEnabled = true;
-        let timerInterval;
-        let enemySpawnInterval;
-        let objects = [];
-        let enemies = [];
-        let particles = [];
+            // Game State
+            let isPlaying = false;
+            let score = 0;
+            let totalObjects = 50;
+            let timeLeft = 60; // 1 minute base
+            let huntersEnabled = true;
+            let timerInterval;
+            let enemySpawnInterval;
+            let objects = [];
+            let enemies = [];
+            let particles = [];
 
-        // Mouse & Touch Handling
-        const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+            // Mouse & Touch Handling
+            const mouse = { x: canvas.width / 2, y: canvas.height / 2 };
 
-        function updateInput(x, y) {
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = x - rect.left;
-            mouse.y = y - rect.top;
-        }
-
-        window.addEventListener('mousemove', (e) => {
-            updateInput(e.clientX, e.clientY);
-        });
-
-        window.addEventListener('touchmove', (e) => {
-            e.preventDefault(); // Prevent scrolling
-            const touch = e.touches[0];
-            updateInput(touch.clientX, touch.clientY);
-        }, { passive: false });
-
-        window.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            updateInput(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-
-        // Colors
-        const colors = ['#FF0055', '#00FF99', '#00CCFF', '#FFEE00', '#FF33CC'];
-
-        // Objects
-        class SpaceObject {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.vx = (Math.random() - 0.5) * 2;
-                this.vy = (Math.random() - 0.5) * 2;
-                this.size = Math.random() * 15 + 10;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-                this.type = Math.floor(Math.random() * 3); // 0: Circle, 1: Square, 2: Triangle
-                this.friction = 0.98;
-                this.isCollected = false;
-                this.scale = 1;
+            function updateInput(x, y) {
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = x - rect.left;
+                mouse.y = y - rect.top;
             }
 
-            update() {
-                if (this.isCollected) {
-                    this.scale -= 0.1;
-                    return this.scale > 0; // Keep alive until scale is 0
-                }
+            window.addEventListener('mousemove', (e) => {
+                updateInput(e.clientX, e.clientY);
+            });
 
-                // Gravity Well Logic
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+            window.addEventListener('touchmove', (e) => {
+                e.preventDefault(); // Prevent scrolling
+                const touch = e.touches[0];
+                updateInput(touch.clientX, touch.clientY);
+            }, { passive: false });
 
-                // Attraction force (stronger when closer)
-                if (distance < 400) {
-                    const force = 500 / (distance * distance + 100); // Inverse square law-ish
-                    this.vx += (dx / distance) * force;
-                    this.vy += (dy / distance) * force;
-                }
-
-                // Apply velocity
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Friction/Damping
-                this.vx *= 0.99;
-                this.vy *= 0.99;
-
-                // Bounce off screen edges
-                if (this.x < this.size || this.x > canvas.width - this.size) {
-                    this.vx *= -0.8;
-                }
-                if (this.y < this.size || this.y > canvas.height - this.size) {
-                    this.vy *= -0.8;
-                }
-
-                // Clamp position within screen
-                this.x = Math.max(this.size, Math.min(canvas.width - this.size, this.x));
-                this.y = Math.max(this.size, Math.min(canvas.height - this.size, this.y));
-
-                // Collection Check
-                if (distance < 30) {
-                    this.isCollected = true;
-                    score++;
-                    updateHUD();
-                    if (score === totalObjects) {
-                        endGame(true);
-                    }
-                }
-
-                return true;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.scale(this.scale, this.scale);
-                ctx.fillStyle = this.color;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = this.color;
-
-                ctx.beginPath();
-                if (this.type === 0) { // Circle
-                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-                } else if (this.type === 1) { // Square
-                    ctx.rect(-this.size / 2, -this.size / 2, this.size, this.size);
-                } else if (this.type === 2) { // Triangle
-                    ctx.moveTo(0, -this.size);
-                    ctx.lineTo(this.size, this.size);
-                    ctx.lineTo(-this.size, this.size);
-                    ctx.closePath();
-                }
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        class Enemy {
-            constructor() {
-                // Spawn at edges
-                if (Math.random() < 0.5) {
-                    this.x = Math.random() < 0.5 ? -50 : canvas.width + 50;
-                    this.y = Math.random() * canvas.height;
-                } else {
-                    this.x = Math.random() * canvas.width;
-                    this.y = Math.random() < 0.5 ? -50 : canvas.height + 50;
-                }
-
-                this.vx = 0;
-                this.vy = 0;
-                this.size = 20;
-                this.speed = 3 + Math.random() * 2; // Faster than debris
-                this.angle = 0;
-            }
-
-            update() {
-                // Chase Logic
-                const dx = mouse.x - this.x;
-                const dy = mouse.y - this.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                this.angle = Math.atan2(dy, dx);
-
-                this.vx = Math.cos(this.angle) * this.speed;
-                this.vy = Math.sin(this.angle) * this.speed;
-
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Collision with Player
-                if (distance < 30) {
-                    // Damage!
-                    timeLeft -= 10;
-                    if (timeLeft < 0) timeLeft = 0;
-                    updateHUD();
-
-                    // Visual Feedback
-                    container.classList.add('damage-flash');
-                    setTimeout(() => container.classList.remove('damage-flash'), 500);
-
-                    return false; // Remove enemy
-                }
-
-                return true;
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-
-                ctx.fillStyle = '#ff3333';
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#ff0000';
-
-                // Draw Spiky Shape
-                ctx.beginPath();
-                ctx.moveTo(15, 0);
-                ctx.lineTo(-10, 10);
-                ctx.lineTo(-5, 0);
-                ctx.lineTo(-10, -10);
-                ctx.closePath();
-                ctx.fill();
-
-                ctx.restore();
-            }
-        }
-
-        // Particles for Confetti
-        class Particle {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.vx = (Math.random() - 0.5) * 10;
-                this.vy = (Math.random() - 0.5) * 10;
-                this.life = 100;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-                this.life--;
-                return this.life > 0;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.fillRect(this.x, this.y, 5, 5);
-            }
-        }
-
-        let animationId;
-
-        function init() {
-            objects = [];
-            enemies = [];
-            for (let i = 0; i < totalObjects; i++) {
-                objects.push(new SpaceObject());
-            }
-        }
-
-        function spawnEnemy() {
-            if (isPlaying) {
-                enemies.push(new Enemy());
-            }
-        }
-
-        function startGame(enableHunters) {
-            // Check hunter toggle
-            huntersEnabled = enableHunters;
-            timeLeft = huntersEnabled ? 60 : 45; // 60s with hunters, 45s without
-
-            isPlaying = true;
-            score = 0;
-            init();
-            updateHUD();
-
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                updateHUD();
-                if (timeLeft <= 0) {
-                    endGame(false);
-                }
-            }, 1000);
-
-            if (enemySpawnInterval) clearInterval(enemySpawnInterval);
-            // Only spawn enemies if enabled
-            if (huntersEnabled) {
-                enemySpawnInterval = setInterval(spawnEnemy, 4000); // Spawn every 4 seconds
-            }
-
-            // Reset overlay UI for next time
-            const title = document.getElementById('title');
-            const desc = document.getElementById('description');
-            const overlay = document.getElementById('message-overlay');
-
-            // We don't need to reset the innerHTML every time, just show the overlay
-            // But if we want to reset text:
-            title.innerText = "SPACE CLEAN UP";
-            desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.<br><br>`;
-
-            // Restore buttons if they were replaced by "Play Again"
-            const modeSelection = document.querySelector('.mode-selection');
-            if (modeSelection) {
-                modeSelection.style.display = 'flex';
-                // Remove any "Play Again" button if it exists outside
-                const playAgainBtn = overlay.querySelector('.play-again-btn');
-                if (playAgainBtn) playAgainBtn.remove();
-            }
-
-            // Hide overlay
-            document.getElementById('message-overlay').classList.add('hidden');
-
-            // Stop any existing loops or music
-            if (animationId) cancelAnimationFrame(animationId);
-            stopMusic();
-
-            loop();
-            startMusic();
-        }
-
-        function updateHUD() {
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-            const timerEl = document.getElementById('timer');
-            timerEl.innerText = timeString;
-
-            if (timeLeft <= 10) {
-                timerEl.style.color = '#ff3333';
-                timerEl.style.textShadow = '0 0 20px red';
-            } else {
-                timerEl.style.color = '#00f3ff';
-                timerEl.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
-            }
-
-            document.getElementById('score').innerText = `Cleaned: ${score}/${totalObjects}`;
-        }
-
-        function endGame(win) {
-            isPlaying = false;
-            clearInterval(timerInterval);
-            clearInterval(enemySpawnInterval);
-            stopMusic();
-
-            const overlay = document.getElementById('message-overlay');
-            const title = document.getElementById('title');
-            const desc = document.getElementById('description');
-
-            // Hide the original start button if it's still there (it shouldn't be, but just in case)
-            const startBtn = document.querySelector('.btn:not(.mode-btn):not(.play-again-btn)');
-            if (startBtn) startBtn.style.display = 'none';
-
-            overlay.classList.remove('hidden');
-
-            if (win) {
-                title.innerText = "YOU WIN!";
-                desc.innerText = `Sector cleared with ${timeLeft}s remaining!`;
-                // Spawn confetti
-                for (let i = 0; i < 100; i++) {
-                    particles.push(new Particle(canvas.width / 2, canvas.height / 2));
-                }
-                if (!animationId) loop();
-            } else {
-                title.innerText = "TIME'S UP!";
-                desc.innerText = "Mission Failed.";
-                playSadMusic();
-            }
-
-            // Hide mode selection
-            const modeSelection = document.querySelector('.mode-selection');
-            if (modeSelection) modeSelection.style.display = 'none';
-
-            // Remove any existing play again button to avoid duplicates
-            const existingBtn = overlay.querySelector('.play-again-btn');
-            if (existingBtn) existingBtn.remove();
-
-            // Create fresh Play Again button
-            const playAgainBtn = document.createElement('button');
-            playAgainBtn.className = 'btn play-again-btn';
-            playAgainBtn.innerText = "Play Again";
-
-            const resetGame = (e) => {
+            window.addEventListener('touchstart', (e) => {
                 e.preventDefault();
-                e.stopPropagation();
+                updateInput(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: false });
 
-                // Reset to main menu
+            // Colors
+            const colors = ['#FF0055', '#00FF99', '#00CCFF', '#FFEE00', '#FF33CC'];
+
+            // Objects
+            class SpaceObject {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = (Math.random() - 0.5) * 2;
+                    this.size = Math.random() * 15 + 10;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.type = Math.floor(Math.random() * 3); // 0: Circle, 1: Square, 2: Triangle
+                    this.friction = 0.98;
+                    this.isCollected = false;
+                    this.scale = 1;
+                }
+
+                update() {
+                    if (this.isCollected) {
+                        this.scale -= 0.1;
+                        return this.scale > 0; // Keep alive until scale is 0
+                    }
+
+                    // Gravity Well Logic
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    // Attraction force (stronger when closer)
+                    if (distance < 400) {
+                        const force = 500 / (distance * distance + 100); // Inverse square law-ish
+                        this.vx += (dx / distance) * force;
+                        this.vy += (dy / distance) * force;
+                    }
+
+                    // Apply velocity
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Friction/Damping
+                    this.vx *= 0.99;
+                    this.vy *= 0.99;
+
+                    // Bounce off screen edges
+                    if (this.x < this.size || this.x > canvas.width - this.size) {
+                        this.vx *= -0.8;
+                    }
+                    if (this.y < this.size || this.y > canvas.height - this.size) {
+                        this.vy *= -0.8;
+                    }
+
+                    // Clamp position within screen
+                    this.x = Math.max(this.size, Math.min(canvas.width - this.size, this.x));
+                    this.y = Math.max(this.size, Math.min(canvas.height - this.size, this.y));
+
+                    // Collection Check
+                    if (distance < 30) {
+                        this.isCollected = true;
+                        score++;
+                        updateHUD();
+                        if (score === totalObjects) {
+                            endGame(true);
+                        }
+                    }
+
+                    return true;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.scale(this.scale, this.scale);
+                    ctx.fillStyle = this.color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = this.color;
+
+                    ctx.beginPath();
+                    if (this.type === 0) { // Circle
+                        ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    } else if (this.type === 1) { // Square
+                        ctx.rect(-this.size / 2, -this.size / 2, this.size, this.size);
+                    } else if (this.type === 2) { // Triangle
+                        ctx.moveTo(0, -this.size);
+                        ctx.lineTo(this.size, this.size);
+                        ctx.lineTo(-this.size, this.size);
+                        ctx.closePath();
+                    }
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            class Enemy {
+                constructor() {
+                    // Spawn at edges
+                    if (Math.random() < 0.5) {
+                        this.x = Math.random() < 0.5 ? -50 : canvas.width + 50;
+                        this.y = Math.random() * canvas.height;
+                    } else {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() < 0.5 ? -50 : canvas.height + 50;
+                    }
+
+                    this.vx = 0;
+                    this.vy = 0;
+                    this.size = 20;
+                    this.speed = 3 + Math.random() * 2; // Faster than debris
+                    this.angle = 0;
+                }
+
+                update() {
+                    // Chase Logic
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    this.angle = Math.atan2(dy, dx);
+
+                    this.vx = Math.cos(this.angle) * this.speed;
+                    this.vy = Math.sin(this.angle) * this.speed;
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Collision with Player
+                    if (distance < 30) {
+                        // Damage!
+                        timeLeft -= 10;
+                        if (timeLeft < 0) timeLeft = 0;
+                        updateHUD();
+
+                        // Visual Feedback
+                        container.classList.add('damage-flash');
+                        setTimeout(() => container.classList.remove('damage-flash'), 500);
+
+                        return false; // Remove enemy
+                    }
+
+                    return true;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.angle);
+
+                    ctx.fillStyle = '#ff3333';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#ff0000';
+
+                    // Draw Spiky Shape
+                    ctx.beginPath();
+                    ctx.moveTo(15, 0);
+                    ctx.lineTo(-10, 10);
+                    ctx.lineTo(-5, 0);
+                    ctx.lineTo(-10, -10);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.restore();
+                }
+            }
+
+            // Particles for Confetti
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.vx = (Math.random() - 0.5) * 10;
+                    this.vy = (Math.random() - 0.5) * 10;
+                    this.life = 100;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    this.life--;
+                    return this.life > 0;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, 5, 5);
+                }
+            }
+
+            let animationId;
+
+            function init() {
+                objects = [];
+                enemies = [];
+                for (let i = 0; i < totalObjects; i++) {
+                    objects.push(new SpaceObject());
+                }
+            }
+
+            function spawnEnemy() {
+                if (isPlaying) {
+                    enemies.push(new Enemy());
+                }
+            }
+
+            function startGame(enableHunters) {
+                // Check hunter toggle
+                huntersEnabled = enableHunters;
+                timeLeft = huntersEnabled ? 60 : 45; // 60s with hunters, 45s without
+
+                isPlaying = true;
+                score = 0;
+                init();
+                updateHUD();
+
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateHUD();
+                    if (timeLeft <= 0) {
+                        endGame(false);
+                    }
+                }, 1000);
+
+                if (enemySpawnInterval) clearInterval(enemySpawnInterval);
+                // Only spawn enemies if enabled
+                if (huntersEnabled) {
+                    enemySpawnInterval = setInterval(spawnEnemy, 4000); // Spawn every 4 seconds
+                }
+
+                // Reset overlay UI for next time
+                const title = document.getElementById('title');
+                const desc = document.getElementById('description');
+                const overlay = document.getElementById('message-overlay');
+
+                // We don't need to reset the innerHTML every time, just show the overlay
+                // But if we want to reset text:
                 title.innerText = "SPACE CLEAN UP";
                 desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.<br><br>`;
-                modeSelection.style.display = 'flex';
-                playAgainBtn.remove();
-            };
 
-            playAgainBtn.addEventListener('click', resetGame);
-            playAgainBtn.addEventListener('touchstart', resetGame, { passive: false });
-
-            overlay.appendChild(playAgainBtn);
-        }
-
-        function loop() {
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; // Trails
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            // Draw Vacuum Cleaner (Cursor)
-            if (isPlaying) {
-                ctx.save();
-                ctx.translate(mouse.x, mouse.y);
-
-                // Vacuum body
-                ctx.fillStyle = '#00f3ff';
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#00f3ff';
-                ctx.beginPath();
-                ctx.ellipse(0, 0, 25, 20, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Vacuum handle
-                ctx.strokeStyle = '#00f3ff';
-                ctx.lineWidth = 6;
-                ctx.beginPath();
-                ctx.moveTo(-15, -15);
-                ctx.lineTo(-25, -30);
-                ctx.stroke();
-
-                // Suction area (glowing)
-                ctx.beginPath();
-                ctx.arc(0, 0, 35, 0, Math.PI * 2);
-                ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
-                ctx.lineWidth = 3;
-                ctx.stroke();
-
-                // Animated suction particles
-                const time = Date.now() * 0.005;
-                for (let i = 0; i < 3; i++) {
-                    const angle = (time + i * Math.PI * 2 / 3) % (Math.PI * 2);
-                    const radius = 30 + Math.sin(time * 2 + i) * 5;
-                    const px = Math.cos(angle) * radius;
-                    const py = Math.sin(angle) * radius;
-                    ctx.beginPath();
-                    ctx.arc(px, py, 2, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
-                    ctx.fill();
+                // Restore buttons if they were replaced by "Play Again"
+                const modeSelection = document.querySelector('.mode-selection');
+                if (modeSelection) {
+                    modeSelection.style.display = 'flex';
+                    // Remove any "Play Again" button if it exists outside
+                    const playAgainBtn = overlay.querySelector('.play-again-btn');
+                    if (playAgainBtn) playAgainBtn.remove();
                 }
 
-                ctx.restore();
+                // Hide overlay
+                document.getElementById('message-overlay').classList.add('hidden');
+
+                // Stop any existing loops or music
+                if (animationId) cancelAnimationFrame(animationId);
+                stopMusic();
+
+                loop();
+                startMusic();
             }
 
-            // Update Objects
-            if (isPlaying) {
-                objects = objects.filter(obj => obj.update());
-                objects.forEach(obj => obj.draw());
+            function updateHUD() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-                enemies = enemies.filter(enemy => enemy.update());
-                enemies.forEach(enemy => enemy.draw());
+                const timerEl = document.getElementById('timer');
+                timerEl.innerText = timeString;
+
+                if (timeLeft <= 10) {
+                    timerEl.style.color = '#ff3333';
+                    timerEl.style.textShadow = '0 0 20px red';
+                } else {
+                    timerEl.style.color = '#00f3ff';
+                    timerEl.style.textShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+                }
+
+                document.getElementById('score').innerText = `Cleaned: ${score}/${totalObjects}`;
             }
 
-            // Update Particles
-            particles = particles.filter(p => p.update());
-            particles.forEach(p => p.draw());
+            function endGame(win) {
+                isPlaying = false;
+                clearInterval(timerInterval);
+                clearInterval(enemySpawnInterval);
+                stopMusic();
 
-            if (isPlaying || particles.length > 0) {
-                animationId = requestAnimationFrame(loop);
-            } else {
-                animationId = null;
+                const overlay = document.getElementById('message-overlay');
+                const title = document.getElementById('title');
+                const desc = document.getElementById('description');
+
+                // Hide the original start button if it's still there (it shouldn't be, but just in case)
+                const startBtn = document.querySelector('.btn:not(.mode-btn):not(.play-again-btn)');
+                if (startBtn) startBtn.style.display = 'none';
+
+                overlay.classList.remove('hidden');
+
+                if (win) {
+                    title.innerText = "YOU WIN!";
+                    desc.innerText = `Sector cleared with ${timeLeft}s remaining!`;
+                    // Spawn confetti
+                    for (let i = 0; i < 100; i++) {
+                        particles.push(new Particle(canvas.width / 2, canvas.height / 2));
+                    }
+                    if (!animationId) loop();
+                } else {
+                    title.innerText = "TIME'S UP!";
+                    desc.innerText = "Mission Failed.";
+                    playSadMusic();
+                }
+
+                // Hide mode selection
+                const modeSelection = document.querySelector('.mode-selection');
+                if (modeSelection) modeSelection.style.display = 'none';
+
+                // Remove any existing play again button to avoid duplicates
+                const existingBtn = overlay.querySelector('.play-again-btn');
+                if (existingBtn) existingBtn.remove();
+
+                // Create fresh Play Again button
+                const playAgainBtn = document.createElement('button');
+                playAgainBtn.className = 'btn play-again-btn';
+                playAgainBtn.innerText = "Play Again";
+
+                const resetGame = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Reset to main menu
+                    title.innerText = "SPACE CLEAN UP";
+                    desc.innerHTML = `Use your mouse or touch to create a Gravity Well to collect debris.<br><br>`;
+                    modeSelection.style.display = 'flex';
+                    playAgainBtn.remove();
+                };
+
+                playAgainBtn.addEventListener('click', resetGame);
+                playAgainBtn.addEventListener('touchstart', resetGame, { passive: false });
+
+                overlay.appendChild(playAgainBtn);
             }
-        }
 
-        // Initial render
-        ctx.fillStyle = '#050505';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+            function loop() {
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; // Trails
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // ============= SPACE MUSIC =============
-        let audioContext, musicOscs = [];
+                // Draw Vacuum Cleaner (Cursor)
+                if (isPlaying) {
+                    ctx.save();
+                    ctx.translate(mouse.x, mouse.y);
 
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Vacuum body
+                    ctx.fillStyle = '#00f3ff';
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = '#00f3ff';
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, 25, 20, 0, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Vacuum handle
+                    ctx.strokeStyle = '#00f3ff';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(-15, -15);
+                    ctx.lineTo(-25, -30);
+                    ctx.stroke();
+
+                    // Suction area (glowing)
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 35, 0, Math.PI * 2);
+                    ctx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // Animated suction particles
+                    const time = Date.now() * 0.005;
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (time + i * Math.PI * 2 / 3) % (Math.PI * 2);
+                        const radius = 30 + Math.sin(time * 2 + i) * 5;
+                        const px = Math.cos(angle) * radius;
+                        const py = Math.sin(angle) * radius;
+                        ctx.beginPath();
+                        ctx.arc(px, py, 2, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
+                        ctx.fill();
+                    }
+
+                    ctx.restore();
+                }
+
+                // Update Objects
+                if (isPlaying) {
+                    objects = objects.filter(obj => obj.update());
+                    objects.forEach(obj => obj.draw());
+
+                    enemies = enemies.filter(enemy => enemy.update());
+                    enemies.forEach(enemy => enemy.draw());
+                }
+
+                // Update Particles
+                particles = particles.filter(p => p.update());
+                particles.forEach(p => p.draw());
+
+                if (isPlaying || particles.length > 0) {
+                    animationId = requestAnimationFrame(loop);
+                } else {
+                    animationId = null;
+                }
             }
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+
+            // Initial render
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // ============= SPACE MUSIC =============
+            let audioContext, musicOscs = [];
+
+            function initAudio() {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
             }
-        }
 
-        function startMusic() {
-            initAudio();
-            if (musicOscs.length > 0) return;
+            function startMusic() {
+                initAudio();
+                if (musicOscs.length > 0) return;
 
-            const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; // A3-G4
-            const pattern = [0, 2, 4, 2, 1, 3, 4, 0];
-            let noteIndex = 0;
+                const notes = [220.00, 246.94, 293.66, 329.63, 392.00]; // A3-G4
+                const pattern = [0, 2, 4, 2, 1, 3, 4, 0];
+                let noteIndex = 0;
 
-            function playNote() {
-                if (musicOscs.length === 0) return;
+                function playNote() {
+                    if (musicOscs.length === 0) return;
 
-                const now = audioContext.currentTime;
+                    const now = audioContext.currentTime;
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.value = notes[pattern[noteIndex]];
+
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.03, now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+
+                    noteIndex = (noteIndex + 1) % pattern.length;
+                    setTimeout(playNote, 350);
+                }
+
+                // Deep space bass
+                const bass = audioContext.createOscillator();
+                const bassGain = audioContext.createGain();
+                bass.type = 'sine';
+                bass.frequency.value = 55; // A1
+                bassGain.gain.value = 0.025;
+                bass.connect(bassGain);
+                bassGain.connect(audioContext.destination);
+                bass.start();
+
+                musicOscs.push(bass);
+                playNote();
+            }
+
+            function playSadMusic() {
+                initAudio();
+                stopMusic(); // Ensure other music is off
+
                 const osc = audioContext.createOscillator();
                 const gain = audioContext.createGain();
 
-                osc.type = 'sawtooth';
-                osc.frequency.value = notes[pattern[noteIndex]];
+                osc.type = 'triangle';
+                // Sad minor chord arpeggio (slow)
+                const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
+                let i = 0;
 
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.03, now + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                function playSadNote() {
+                    if (i >= notes.length) {
+                        // Drone
+                        const drone = audioContext.createOscillator();
+                        const dGain = audioContext.createGain();
+                        drone.type = 'sine';
+                        drone.frequency.value = 65.41; // C2
+                        dGain.gain.value = 0.1;
+                        drone.connect(dGain);
+                        dGain.connect(audioContext.destination);
+                        drone.start();
+                        dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
+                        drone.stop(audioContext.currentTime + 3);
+                        return;
+                    }
 
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                osc.start(now);
-                osc.stop(now + 0.4);
+                    const now = audioContext.currentTime;
+                    const o = audioContext.createOscillator();
+                    const g = audioContext.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = notes[i];
+                    g.gain.setValueAtTime(0, now);
+                    g.gain.linearRampToValueAtTime(0.1, now + 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
 
-                noteIndex = (noteIndex + 1) % pattern.length;
-                setTimeout(playNote, 350);
-            }
+                    o.connect(g);
+                    g.connect(audioContext.destination);
+                    o.start(now);
+                    o.stop(now + 1.5);
 
-            // Deep space bass
-            const bass = audioContext.createOscillator();
-            const bassGain = audioContext.createGain();
-            bass.type = 'sine';
-            bass.frequency.value = 55; // A1
-            bassGain.gain.value = 0.025;
-            bass.connect(bassGain);
-            bassGain.connect(audioContext.destination);
-            bass.start();
-
-            musicOscs.push(bass);
-            playNote();
-        }
-
-        function playSadMusic() {
-            initAudio();
-            stopMusic(); // Ensure other music is off
-
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-
-            osc.type = 'triangle';
-            // Sad minor chord arpeggio (slow)
-            const notes = [196.00, 155.56, 130.81]; // G3, Eb3, C3 (Cm descending)
-            let i = 0;
-
-            function playSadNote() {
-                if (i >= notes.length) {
-                    // Drone
-                    const drone = audioContext.createOscillator();
-                    const dGain = audioContext.createGain();
-                    drone.type = 'sine';
-                    drone.frequency.value = 65.41; // C2
-                    dGain.gain.value = 0.1;
-                    drone.connect(dGain);
-                    dGain.connect(audioContext.destination);
-                    drone.start();
-                    dGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 3);
-                    drone.stop(audioContext.currentTime + 3);
-                    return;
+                    i++;
+                    setTimeout(playSadNote, 800);
                 }
-
-                const now = audioContext.currentTime;
-                const o = audioContext.createOscillator();
-                const g = audioContext.createGain();
-                o.type = 'sine';
-                o.frequency.value = notes[i];
-                g.gain.setValueAtTime(0, now);
-                g.gain.linearRampToValueAtTime(0.1, now + 0.1);
-                g.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-
-                o.connect(g);
-                g.connect(audioContext.destination);
-                o.start(now);
-                o.stop(now + 1.5);
-
-                i++;
-                setTimeout(playSadNote, 800);
+                playSadNote();
             }
-            playSadNote();
-        }
 
-        function stopMusic() {
-            musicOscs.forEach(o => o.stop());
-            musicOscs = [];
-        }
+            function stopMusic() {
+                musicOscs.forEach(o => o.stop());
+                musicOscs = [];
+            }
 
-    </script>
+        </script>
 </body>
 
 </html>

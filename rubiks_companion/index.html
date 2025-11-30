@@ -47,6 +47,27 @@
             color: #a0a0b0;
         }
 
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
         .card {
             background: rgba(26, 26, 46, 0.8);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -361,6 +382,7 @@
 
 <body>
     <div class="container">
+        <a href="../index.html" class="back-btn">🏠 Portal</a>
         <header>
             <h1>🎲 Rubik's Cube Solver</h1>
             <p class="subtitle">Learn to solve your cube step-by-step with interactive guidance!</p>

@@ -52,12 +52,19 @@ body {
 /* Start Screen */
 .game-title {
     font-size: 4rem;
-    color: #2C3E50;
-    text-shadow: 3px 3px 0 #fff;
-    -webkit-text-stroke: 2px #fff;
+    color: #000;
+    background: #FFD700;
+    padding: 10px 30px;
+    border-radius: 20px;
+    border: 4px solid #000;
     margin-bottom: 0.5rem;
     text-align: center;
     font-weight: 800;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
+    -webkit-text-fill-color: #000;
+    /* Force black text */
+    box-shadow: 5px 5px 0px #000;
 }
 
 .game-subtitle {
@@ -127,6 +134,33 @@ body {
     font-weight: 600;
 }
 
+.back-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--text-color);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    background: white;
+}
+
 /* Game Screen */
 .game-header {
     display: flex;
@@ -164,21 +198,16 @@ body {
 
 .score-box.active-turn {
     transform: scale(1.1);
-    box-shadow: 0 0 15px var(--accent-color);
-    border: 3px solid var(--accent-color);
-    background: rgba(255, 255, 255, 0.3);
+    background: #FFD700;
+    border: 3px solid #000;
+    box-shadow: 5px 5px 0px #000;
+    color: #000;
 }
 
-.score-box.p1.active-turn {
-    border-color: #FF6B6B;
-    /* Red-ish for P1 */
-    box-shadow: 0 0 15px #FF6B6B;
-}
-
+.score-box.p1.active-turn,
 .score-box.p2.active-turn {
-    border-color: #4ECDC4;
-    /* Teal-ish for P2 */
-    box-shadow: 0 0 15px #4ECDC4;
+    border-color: #000;
+    box-shadow: 5px 5px 0px #000;
 }
 
 .score-box .label {
@@ -191,32 +220,32 @@ body {
     margin-bottom: 5px;
 }
 
+.score-box.active-turn .label {
+    color: #000;
+    text-shadow: none;
+}
+
 .score-box.p1 .label {
     color: #FF6B6B;
-    text-shadow:
-        0 0 5px #FF6B6B,
-        0 0 10px #FF6B6B,
-        0 0 20px #FF6B6B;
 }
 
 .score-box.p2 .label {
     color: #4ECDC4;
-    text-shadow:
-        0 0 5px #4ECDC4,
-        0 0 10px #4ECDC4,
-        0 0 20px #4ECDC4;
+}
+
+.score-box.active-turn .score {
+    color: #000;
+    text-shadow: none;
 }
 
 .score-box .score {
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary-color);
-    text-shadow: 0 0 5px rgba(255, 107, 107, 0.4);
 }
 
 .score-box.p2 .score {
     color: var(--secondary-color);
-    text-shadow: 0 0 5px rgba(78, 205, 196, 0.4);
 }
 
 .level-info {

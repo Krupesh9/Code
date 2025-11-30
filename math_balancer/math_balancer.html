@@ -32,6 +32,35 @@
             --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.2);
         }
 
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            width: auto;
+            /* Prevent stretching */
+            z-index: 9999;
+            /* Ensure on top */
+            background: white;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            z-index: 10000;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: #667eea;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -215,8 +244,8 @@
         }
 
         .mode-icon {
-            fontSize: 3rem;
-            marginBottom: 16px;
+            font-size: 3rem;
+            margin-bottom: 16px;
             display: block;
         }
 
@@ -759,12 +788,39 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #667eea;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background-color: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
     </style>
 </head>
 
 <body>
     <div id="root"></div>
-
+    <a href="../index.html" class="back-btn">
+        <span>🏠</span> Back to Portal
+    </a>
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 

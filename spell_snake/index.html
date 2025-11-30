@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -359,6 +360,27 @@
                 transform: translateY(0);
             }
         }
+
+        .back-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
@@ -398,6 +420,7 @@
 
     <!-- Game Screen -->
     <div id="gameScreen">
+        <a href="../index.html" class="back-btn">🏠 Portal</a>
         <div class="hud">
             <div class="hud-item">
                 <span class="hud-label">SCORE</span>
@@ -616,9 +639,11 @@
             const startX = Math.floor(tileCountX / 2);
             const startY = Math.floor(tileCountY / 2);
 
-            // Initial snake: Just head
+            // Initial snake: 3 segments (Head + 2 Body)
             snake = [
-                { x: startX, y: startY, char: '', color: 'head' }
+                { x: startX, y: startY, char: '', color: 'head' },
+                { x: startX, y: startY + 1, char: '', color: 'body' },
+                { x: startX, y: startY + 2, char: '', color: 'body' }
             ];
 
             velocity = { x: 0, y: -1 };
@@ -841,6 +866,7 @@
         }
 
         function handleCrash() {
+            playSound('crash');
             lives--;
             updateHUD();
 
@@ -991,13 +1017,20 @@
             clearInterval(gameLoop);
             playSound('win');
 
+            // Confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
             if (currentNameIndex >= names.length - 1) {
                 // Last name finished - Go to Main Menu
                 setTimeout(() => {
                     names = []; // Clear names to pick new ones
                     renderNamesList();
                     showStartScreen();
-                }, 1500);
+                }, 3000);
             } else {
                 // Show modal for next name
                 document.getElementById('victoryMsg').innerText = `You spelled ${currentName}!`;
