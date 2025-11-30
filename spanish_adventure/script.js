@@ -500,7 +500,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+    document.getElementById('start-quiz-5').addEventListener('click', () => startQuiz(5));
+    document.getElementById('start-quiz-10').addEventListener('click', () => startQuiz(10));
     document.getElementById('quit-quiz').addEventListener('click', () => showScreen('level'));
 });
 
@@ -512,7 +513,7 @@ function startLevel(level) {
     updateScore();
     showScreen('game');
     updateCard();
-    document.getElementById('start-quiz-btn').style.display = 'none';
+    document.getElementById('quiz-selection').style.display = 'none';
 }
 
 function updateCard() {
@@ -532,9 +533,11 @@ function updateCard() {
     document.getElementById('prev-word').disabled = currentIndex === 0;
     document.getElementById('next-word').disabled = currentIndex === gameData[currentLevel].length - 1;
 
-    // Show Quiz Button if at end
+    // Show Quiz Selection if at end
     if (currentIndex === gameData[currentLevel].length - 1) {
-        document.getElementById('start-quiz-btn').style.display = 'block';
+        document.getElementById('quiz-selection').style.display = 'flex';
+    } else {
+        document.getElementById('quiz-selection').style.display = 'none';
     }
 
     // Clear feedback
@@ -617,15 +620,16 @@ function updateScore() {
 let quizQuestions = [];
 let currentQuizIndex = 0;
 
-function startQuiz() {
+function startQuiz(numQuestions) {
     quizScore = 0;
     currentQuizIndex = 0;
     // Create a copy of current level data and shuffle it
     quizQuestions = [...gameData[currentLevel]].sort(() => Math.random() - 0.5);
-    // Limit quiz to 5 questions if the set is huge (like alphabet)
-    if (quizQuestions.length > 5) {
-        quizQuestions = quizQuestions.slice(0, 5);
-    }
+
+    // Limit quiz to requested number of questions
+    // If category has fewer items than requested, use all of them
+    const limit = Math.min(numQuestions, quizQuestions.length);
+    quizQuestions = quizQuestions.slice(0, limit);
 
     showScreen('quiz');
     showQuizQuestion();

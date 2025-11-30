@@ -416,8 +416,29 @@ body::before {
     width: 100%;
     max-width: 300px;
     margin-top: 1rem;
-    display: none;
-    /* Hidden until level complete */
+}
+
+.quiz-selection {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.quiz-selection h3 {
+    color: var(--accent-yellow);
+    font-size: 1.5rem;
+}
+
+.quiz-buttons {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 /* Quiz Mode */
@@ -606,5 +627,9 @@ body::before {
 
     .levels-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    #speak-btn {
+        display: none;
     }
 }
