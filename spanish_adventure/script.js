@@ -638,8 +638,18 @@ function showQuizQuestion() {
     }
 
     const question = quizQuestions[currentQuizIndex];
+
+    // Update Header
     document.getElementById('quiz-score').textContent = quizScore;
-    document.getElementById('quiz-question').textContent = `What is "${question.english}" in Spanish?`;
+    document.getElementById('quiz-progress').textContent = `Question ${currentQuizIndex + 1}/${quizQuestions.length}`;
+
+    // Update Question with Icon
+    const questionEl = document.getElementById('quiz-question');
+    questionEl.innerHTML = `
+        <div class="question-icon">${question.icon}</div>
+        <div>What is "${question.english}" in Spanish?</div>
+    `;
+
     document.getElementById('quiz-feedback').textContent = '';
 
     // Clean text for speech (remove parentheses)
