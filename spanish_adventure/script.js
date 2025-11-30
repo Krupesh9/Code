@@ -728,6 +728,7 @@ function checkAnswer(selected, correct, btnElement) {
         document.getElementById('quiz-feedback').style.color = '#2ecc71';
         quizScore += 20;
         playSound('success');
+        fireConfetti(); // 🎉
     } else {
         btnElement.classList.add('wrong');
         document.getElementById('quiz-feedback').textContent = `Oops! It was "${correct.spanish}"`;
@@ -745,7 +746,41 @@ function checkAnswer(selected, correct, btnElement) {
     setTimeout(() => {
         currentQuizIndex++;
         showQuizQuestion();
-    }, 2000);
+    }, 2500); // Increased delay slightly to enjoy the confetti
+}
+
+function fireConfetti() {
+    const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#6C5CE7', '#FF9FF3', '#54A0FF'];
+    const confettiCount = 100;
+
+    for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti');
+
+        // Random properties
+        const bg = colors[Math.floor(Math.random() * colors.length)];
+        const left = Math.random() * 100;
+        const animDuration = Math.random() * 2 + 1.5; // 1.5s to 3.5s
+        const size = Math.random() * 8 + 5; // 5px to 13px
+
+        confetti.style.backgroundColor = bg;
+        confetti.style.left = `${left}vw`;
+        confetti.style.animationDuration = `${animDuration}s`;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+
+        // Random shape (square or circle)
+        if (Math.random() > 0.5) {
+            confetti.style.borderRadius = '50%';
+        }
+
+        document.body.appendChild(confetti);
+
+        // Cleanup
+        setTimeout(() => {
+            confetti.remove();
+        }, animDuration * 1000);
+    }
 }
 
 function endQuiz() {
