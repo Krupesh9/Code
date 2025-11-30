@@ -38,6 +38,7 @@
             font-size: clamp(1.8rem, 5vw, 2.5rem);
             background: linear-gradient(90deg, #00f0ff, #7000ff);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
@@ -381,146 +382,146 @@
 </head>
 
 <body>
-    <div class="container">
-        <a href="../index.html" class="back-btn">🏠 Portal</a>
-        <header>
-            <h1>🎲 Rubik's Cube Solver</h1>
-            <p class="subtitle">Learn to solve your cube step-by-step with interactive guidance!</p>
-        </header>
+    <div id="root"></div>
+    <a href="../index.html" class="back-btn">🏠 Arcade Home</a>
+    <header>
+        <h1>🎲 Rubik's Cube Solver</h1>
+        <p class="subtitle">Learn to solve your cube step-by-step with interactive guidance!</p>
+    </header>
 
-        <!-- Phase 1: Input -->
-        <div id="input-phase">
-            <div class="card">
-                <h2>Step 1: Input Your Cube's Colors</h2>
-                <p style="color: #a0a0b0; margin-bottom: 20px;">
-                    Select a color below, then click on each sticker to match your physical cube.
-                    The center pieces are fixed and show the face colors.
-                </p>
+    <!-- Phase 1: Input -->
+    <div id="input-phase">
+        <div class="card">
+            <h2>Step 1: Input Your Cube's Colors</h2>
+            <p style="color: #a0a0b0; margin-bottom: 20px;">
+                Select a color below, then click on each sticker to match your physical cube.
+                The center pieces are fixed and show the face colors.
+            </p>
 
-                <div class="color-picker">
-                    <div class="color-btn selected" style="background: #fff;" data-color="white"
-                        onclick="selectColor('white')"></div>
-                    <div class="color-btn" style="background: #ffd500;" data-color="yellow"
-                        onclick="selectColor('yellow')"></div>
-                    <div class="color-btn" style="background: #b90000;" data-color="red" onclick="selectColor('red')">
-                    </div>
-                    <div class="color-btn" style="background: #ff5900;" data-color="orange"
-                        onclick="selectColor('orange')"></div>
-                    <div class="color-btn" style="background: #009e60;" data-color="green"
-                        onclick="selectColor('green')"></div>
-                    <div class="color-btn" style="background: #0045ad;" data-color="blue" onclick="selectColor('blue')">
-                    </div>
+            <div class="color-picker">
+                <div class="color-btn selected" style="background: #fff;" data-color="white"
+                    onclick="selectColor('white')"></div>
+                <div class="color-btn" style="background: #ffd500;" data-color="yellow" onclick="selectColor('yellow')">
                 </div>
-
-                <div class="cube-layout">
-                    <div class="face-container" id="face-U">
-                        <div class="face-label">TOP (White)</div>
-                        <div class="face-grid" data-face="U"></div>
-                    </div>
-                    <div class="face-container" id="face-L">
-                        <div class="face-label">LEFT (Orange)</div>
-                        <div class="face-grid" data-face="L"></div>
-                    </div>
-                    <div class="face-container" id="face-F">
-                        <div class="face-label">FRONT (Green)</div>
-                        <div class="face-grid" data-face="F"></div>
-                    </div>
-                    <div class="face-container" id="face-R">
-                        <div class="face-label">RIGHT (Red)</div>
-                        <div class="face-grid" data-face="R"></div>
-                    </div>
-                    <div class="face-container" id="face-B">
-                        <div class="face-label">BACK (Blue)</div>
-                        <div class="face-grid" data-face="B"></div>
-                    </div>
-                    <div class="face-container" id="face-D">
-                        <div class="face-label">BOTTOM (Yellow)</div>
-                        <div class="face-grid" data-face="D"></div>
-                    </div>
+                <div class="color-btn" style="background: #b90000;" data-color="red" onclick="selectColor('red')">
                 </div>
-
-                <button class="btn btn-primary" onclick="showPreview()">
-                    👁️ Preview in 3D & Verify
-                </button>
-                <button class="btn btn-secondary" onclick="resetCube()">
-                    ↺ Reset to Solved State
-                </button>
+                <div class="color-btn" style="background: #ff5900;" data-color="orange" onclick="selectColor('orange')">
+                </div>
+                <div class="color-btn" style="background: #009e60;" data-color="green" onclick="selectColor('green')">
+                </div>
+                <div class="color-btn" style="background: #0045ad;" data-color="blue" onclick="selectColor('blue')">
+                </div>
             </div>
-        </div>
 
-        <!-- Phase 2: Preview & Verify -->
-        <div id="preview-phase" class="hidden">
-            <div class="card">
-                <h2>Step 2: Verify Your Cube</h2>
-                <p style="color: #a0a0b0; margin-bottom: 20px;">
-                    Rotate the 3D model below to verify it matches your physical cube.
-                    If it looks correct, proceed to get your solution!
-                </p>
-
-                <div id="canvas-container">
-                    <canvas id="canvas"></canvas>
+            <div class="cube-layout">
+                <div class="face-container" id="face-U">
+                    <div class="face-label">TOP (White)</div>
+                    <div class="face-grid" data-face="U"></div>
                 </div>
-
-                <div class="hint">
-                    💡 <strong>Tip:</strong> Click and drag to rotate the cube. Make sure all colors match your physical
-                    cube before continuing!
+                <div class="face-container" id="face-L">
+                    <div class="face-label">LEFT (Orange)</div>
+                    <div class="face-grid" data-face="L"></div>
                 </div>
-
-                <button class="btn btn-primary" onclick="generateSolution()">
-                    ✅ Looks Good! Generate Solution
-                </button>
-                <button class="btn btn-secondary" onclick="backToInput()">
-                    ← Back to Edit Colors
-                </button>
+                <div class="face-container" id="face-F">
+                    <div class="face-label">FRONT (Green)</div>
+                    <div class="face-grid" data-face="F"></div>
+                </div>
+                <div class="face-container" id="face-R">
+                    <div class="face-label">RIGHT (Red)</div>
+                    <div class="face-grid" data-face="R"></div>
+                </div>
+                <div class="face-container" id="face-B">
+                    <div class="face-label">BACK (Blue)</div>
+                    <div class="face-grid" data-face="B"></div>
+                </div>
+                <div class="face-container" id="face-D">
+                    <div class="face-label">BOTTOM (Yellow)</div>
+                    <div class="face-grid" data-face="D"></div>
+                </div>
             </div>
+
+            <button class="btn btn-primary" onclick="showPreview()">
+                👁️ Preview in 3D & Verify
+            </button>
+            <button class="btn btn-secondary" onclick="resetCube()">
+                ↺ Reset to Solved State
+            </button>
         </div>
+    </div>
 
-        <!-- Phase 3: Solve -->
-        <div id="solve-phase" class="hidden">
-            <div class="card">
-                <div class="instruction-box">
-                    <div class="step-number" id="step-number">Step 1</div>
-                    <div class="move-notation" id="move-notation">R U R' U'</div>
-                    <div class="move-description" id="move-description">
-                        Turn the Right face Clockwise, then Top Clockwise, then Right Counter-clockwise, then Top
-                        Counter-clockwise
-                    </div>
+    <!-- Phase 2: Preview & Verify -->
+    <div id="preview-phase" class="hidden">
+        <div class="card">
+            <h2>Step 2: Verify Your Cube</h2>
+            <p style="color: #a0a0b0; margin-bottom: 20px;">
+                Rotate the 3D model below to verify it matches your physical cube.
+                If it looks correct, proceed to get your solution!
+            </p>
 
-                    <div class="visual-guide">
-                        <div class="guide-item">
-                            <strong>R (Right Clockwise)</strong>
-                            Turn the right face 90° clockwise when looking at it
-                        </div>
-                        <div class="guide-item">
-                            <strong>R' (Right Counter-clockwise)</strong>
-                            Turn the right face 90° counter-clockwise
-                        </div>
-                        <div class="guide-item">
-                            <strong>U (Top Clockwise)</strong>
-                            Turn the top face 90° clockwise
-                        </div>
-                        <div class="guide-item">
-                            <strong>U' (Top Counter-clockwise)</strong>
-                            Turn the top face 90° counter-clockwise
-                        </div>
-                    </div>
-                </div>
-
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progress-fill"></div>
-                </div>
-
-                <div class="control-buttons">
-                    <button class="btn btn-secondary" onclick="prevStep()">← Previous</button>
-                    <button class="btn btn-primary" onclick="repeatInstruction()">🔊 Repeat</button>
-                    <button class="btn btn-primary" onclick="nextStep()">Next →</button>
-                </div>
-
-                <button class="btn btn-secondary" onclick="startOver()">
-                    ↺ Start Over
-                </button>
+            <div id="canvas-container">
+                <canvas id="canvas"></canvas>
             </div>
+
+            <div class="hint">
+                💡 <strong>Tip:</strong> Click and drag to rotate the cube. Make sure all colors match your physical
+                cube before continuing!
+            </div>
+
+            <button class="btn btn-primary" onclick="generateSolution()">
+                ✅ Looks Good! Generate Solution
+            </button>
+            <button class="btn btn-secondary" onclick="backToInput()">
+                ← Back to Edit Colors
+            </button>
         </div>
+    </div>
+
+    <!-- Phase 3: Solve -->
+    <div id="solve-phase" class="hidden">
+        <div class="card">
+            <div class="instruction-box">
+                <div class="step-number" id="step-number">Step 1</div>
+                <div class="move-notation" id="move-notation">R U R' U'</div>
+                <div class="move-description" id="move-description">
+                    Turn the Right face Clockwise, then Top Clockwise, then Right Counter-clockwise, then Top
+                    Counter-clockwise
+                </div>
+
+                <div class="visual-guide">
+                    <div class="guide-item">
+                        <strong>R (Right Clockwise)</strong>
+                        Turn the right face 90° clockwise when looking at it
+                    </div>
+                    <div class="guide-item">
+                        <strong>R' (Right Counter-clockwise)</strong>
+                        Turn the right face 90° counter-clockwise
+                    </div>
+                    <div class="guide-item">
+                        <strong>U (Top Clockwise)</strong>
+                        Turn the top face 90° clockwise
+                    </div>
+                    <div class="guide-item">
+                        <strong>U' (Top Counter-clockwise)</strong>
+                        Turn the top face 90° counter-clockwise
+                    </div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="control-buttons">
+                <button class="btn btn-secondary" onclick="prevStep()">← Previous</button>
+                <button class="btn btn-primary" onclick="repeatInstruction()">🔊 Repeat</button>
+                <button class="btn btn-primary" onclick="nextStep()">Next →</button>
+            </div>
+
+            <button class="btn btn-secondary" onclick="startOver()">
+                ↺ Start Over
+            </button>
+        </div>
+    </div>
     </div>
 
     <div class="toast" id="toast"></div>

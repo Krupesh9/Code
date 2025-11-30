@@ -142,38 +142,12 @@
         .pb-safe {
             padding-bottom: env(safe-area-inset-bottom);
         }
-
-        .back-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 20px;
-            background: white;
-            color: #4f46e5;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            z-index: 10000;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        }
     </style>
 </head>
 
 <body>
     <div id="root"></div>
-    <a href="../index.html" class="back-btn">
-        <span>🏠</span> Back to Portal
-    </a>
+
 
     <script type="text/babel">
         const { useState, useMemo, useEffect } = React;
@@ -780,6 +754,13 @@
                                 <NavButton id="house" icon={Home} label="The House" />
                                 <NavButton id="turbo" icon={Zap} label="Turbo Pay" />
                                 <NavButton id="tree" icon={Sprout} label="Money Tree" />
+                                <a
+                                    href="../index.html"
+                                    className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:px-6 md:py-3 rounded-xl transition-all duration-300 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                                >
+                                    <ArrowRight size={24} className="stroke-2 rotate-180" />
+                                    <span className="text-xs md:text-sm">Arcade Home</span>
+                                </a>
                             </nav>
                         </div>
                     </header>
@@ -802,6 +783,13 @@
                         <NavButton id="house" icon={Home} label="The House" />
                         <NavButton id="turbo" icon={Zap} label="Turbo Pay" />
                         <NavButton id="tree" icon={Sprout} label="Money Tree" />
+                        <a
+                            href="../index.html"
+                            className="flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 p-2 md:px-6 md:py-3 rounded-xl transition-all duration-300 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                        >
+                            <ArrowRight size={24} className="stroke-2 rotate-180" />
+                            <span className="text-xs md:text-sm">Arcade Home</span>
+                        </a>
                     </nav>
                 </div>
             );
