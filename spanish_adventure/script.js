@@ -92,7 +92,149 @@ const gameData = {
         { id: 7, english: "Foot", spanish: "Pie", pronunciation: "/pie/", icon: "🦶" },
         { id: 8, english: "Arm", spanish: "Brazo", pronunciation: "/bra-so/", icon: "💪" },
         { id: 9, english: "Leg", spanish: "Pierna", pronunciation: "/pier-na/", icon: "🦵" },
-        { id: 10, english: "Hair", spanish: "Pelo", pronunciation: "/pe-lo/", icon: "💇" }
+        { id: 10, english: "Hair", spanish: "Pelo", pronunciation: "/pe-lo/", icon: "💇" },
+        { id: 11, english: "Finger", spanish: "Dedo", pronunciation: "/de-do/", icon: "👆" },
+        { id: 12, english: "Knee", spanish: "Rodilla", pronunciation: "/ro-di-ya/", icon: "🦵" },
+        { id: 13, english: "Shoulder", spanish: "Hombro", pronunciation: "/om-bro/", icon: "🤷" },
+        { id: 14, english: "Stomach", spanish: "Estómago", pronunciation: "/es-to-ma-go/", icon: "🤰" },
+        { id: 15, english: "Back", spanish: "Espalda", pronunciation: "/es-pal-da/", icon: "🔙" },
+        { id: 16, english: "Neck", spanish: "Cuello", pronunciation: "/cue-yo/", icon: "🧣" },
+        { id: 17, english: "Teeth", spanish: "Dientes", pronunciation: "/dien-tes/", icon: "🦷" },
+        { id: 18, english: "Tongue", spanish: "Lengua", pronunciation: "/len-gua/", icon: "👅" },
+        { id: 19, english: "Face", spanish: "Cara", pronunciation: "/ca-ra/", icon: "😀" },
+        { id: 20, english: "Heart", spanish: "Corazón", pronunciation: "/co-ra-son/", icon: "❤️" }
+    ],
+    food: [
+        { id: 1, english: "Apple", spanish: "Manzana", pronunciation: "/man-sa-na/", icon: "🍎" },
+        { id: 2, english: "Banana", spanish: "Plátano", pronunciation: "/pla-ta-no/", icon: "🍌" },
+        { id: 3, english: "Bread", spanish: "Pan", pronunciation: "/pan/", icon: "🍞" },
+        { id: 4, english: "Milk", spanish: "Leche", pronunciation: "/le-che/", icon: "🥛" },
+        { id: 5, english: "Water", spanish: "Agua", pronunciation: "/a-gua/", icon: "💧" },
+        { id: 6, english: "Cheese", spanish: "Queso", pronunciation: "/ke-so/", icon: "🧀" },
+        { id: 7, english: "Egg", spanish: "Huevo", pronunciation: "/hue-bo/", icon: "🥚" },
+        { id: 8, english: "Chicken", spanish: "Pollo", pronunciation: "/po-yo/", icon: "🍗" },
+        { id: 9, english: "Fish", spanish: "Pescado", pronunciation: "/pes-ca-do/", icon: "🐟" },
+        { id: 10, english: "Rice", spanish: "Arroz", pronunciation: "/a-rros/", icon: "🍚" },
+        { id: 11, english: "Pizza", spanish: "Pizza", pronunciation: "/pit-sa/", icon: "🍕" },
+        { id: 12, english: "Burger", spanish: "Hamburguesa", pronunciation: "/am-bur-gue-sa/", icon: "🍔" },
+        { id: 13, english: "Fries", spanish: "Papas fritas", pronunciation: "/pa-pas fri-tas/", icon: "🍟" },
+        { id: 14, english: "Ice Cream", spanish: "Helado", pronunciation: "/e-la-do/", icon: "🍦" },
+        { id: 15, english: "Cake", spanish: "Pastel", pronunciation: "/pas-tel/", icon: "🍰" },
+        { id: 16, english: "Cookie", spanish: "Galleta", pronunciation: "/ga-ye-ta/", icon: "🍪" },
+        { id: 17, english: "Chocolate", spanish: "Chocolate", pronunciation: "/cho-co-la-te/", icon: "🍫" },
+        { id: 18, english: "Juice", spanish: "Jugo", pronunciation: "/hu-go/", icon: "🧃" },
+        { id: 19, english: "Fruit", spanish: "Fruta", pronunciation: "/fru-ta/", icon: "🍇" },
+        { id: 20, english: "Vegetable", spanish: "Verdura", pronunciation: "/ber-du-ra/", icon: "🥦" }
+    ],
+    jobs: [
+        { id: 1, english: "Doctor", spanish: "Doctor", pronunciation: "/doc-tor/", icon: "👨‍⚕️" },
+        { id: 2, english: "Teacher", spanish: "Maestro", pronunciation: "/ma-es-tro/", icon: "👨‍🏫" },
+        { id: 3, english: "Police", spanish: "Policía", pronunciation: "/po-li-si-a/", icon: "👮" },
+        { id: 4, english: "Firefighter", spanish: "Bombero", pronunciation: "/bom-be-ro/", icon: "👨‍🚒" },
+        { id: 5, english: "Chef", spanish: "Cocinero", pronunciation: "/co-si-ne-ro/", icon: "👨‍🍳" },
+        { id: 6, english: "Artist", spanish: "Artista", pronunciation: "/ar-tis-ta/", icon: "🎨" },
+        { id: 7, english: "Musician", spanish: "Músico", pronunciation: "/mu-si-co/", icon: "🎵" },
+        { id: 8, english: "Pilot", spanish: "Piloto", pronunciation: "/pi-lo-to/", icon: "👨‍✈️" },
+        { id: 9, english: "Astronaut", spanish: "Astronauta", pronunciation: "/as-tro-nau-ta/", icon: "👨‍🚀" },
+        { id: 10, english: "Farmer", spanish: "Granjero", pronunciation: "/gran-he-ro/", icon: "👨‍🌾" },
+        { id: 11, english: "Nurse", spanish: "Enfermera", pronunciation: "/en-fer-me-ra/", icon: "👩‍⚕️" },
+        { id: 12, english: "Dentist", spanish: "Dentista", pronunciation: "/den-tis-ta/", icon: "🦷" },
+        { id: 13, english: "Scientist", spanish: "Científico", pronunciation: "/sien-ti-fi-co/", icon: "👨‍🔬" },
+        { id: 14, english: "Vet", spanish: "Veterinario", pronunciation: "/be-te-ri-na-rio/", icon: "🐶" },
+        { id: 15, english: "Builder", spanish: "Constructor", pronunciation: "/cons-truc-tor/", icon: "👷" },
+        { id: 16, english: "Driver", spanish: "Conductor", pronunciation: "/con-duc-tor/", icon: "🚕" },
+        { id: 17, english: "Singer", spanish: "Cantante", pronunciation: "/can-tan-te/", icon: "🎤" },
+        { id: 18, english: "Dancer", spanish: "Bailarín", pronunciation: "/bai-la-rin/", icon: "💃" },
+        { id: 19, english: "Writer", spanish: "Escritor", pronunciation: "/es-cri-tor/", icon: "✍️" },
+        { id: 20, english: "Student", spanish: "Estudiante", pronunciation: "/es-tu-dian-te/", icon: "🎒" }
+    ],
+    sports: [
+        { id: 1, english: "Soccer", spanish: "Fútbol", pronunciation: "/fut-bol/", icon: "⚽" },
+        { id: 2, english: "Basketball", spanish: "Baloncesto", pronunciation: "/ba-lon-ces-to/", icon: "🏀" },
+        { id: 3, english: "Baseball", spanish: "Béisbol", pronunciation: "/beis-bol/", icon: "⚾" },
+        { id: 4, english: "Tennis", spanish: "Tenis", pronunciation: "/te-nis/", icon: "🎾" },
+        { id: 5, english: "Volleyball", spanish: "Voleibol", pronunciation: "/bo-lei-bol/", icon: "🏐" },
+        { id: 6, english: "Swimming", spanish: "Natación", pronunciation: "/na-ta-sion/", icon: "🏊" },
+        { id: 7, english: "Running", spanish: "Correr", pronunciation: "/co-rrer/", icon: "🏃" },
+        { id: 8, english: "Cycling", spanish: "Ciclismo", pronunciation: "/ci-clis-mo/", icon: "🚴" },
+        { id: 9, english: "Dancing", spanish: "Baile", pronunciation: "/bai-le/", icon: "💃" },
+        { id: 10, english: "Karate", spanish: "Karate", pronunciation: "/ka-ra-te/", icon: "🥋" },
+        { id: 11, english: "Golf", spanish: "Golf", pronunciation: "/golf/", icon: "⛳" },
+        { id: 12, english: "Boxing", spanish: "Boxeo", pronunciation: "/box-e-o/", icon: "🥊" },
+        { id: 13, english: "Skiing", spanish: "Esquí", pronunciation: "/es-ki/", icon: "⛷️" },
+        { id: 14, english: "Surfing", spanish: "Surf", pronunciation: "/surf/", icon: "🏄" },
+        { id: 15, english: "Skating", spanish: "Patinaje", pronunciation: "/pa-ti-na-he/", icon: "⛸️" },
+        { id: 16, english: "Gymnastics", spanish: "Gimnasia", pronunciation: "/gim-na-sia/", icon: "🤸" },
+        { id: 17, english: "Yoga", spanish: "Yoga", pronunciation: "/yo-ga/", icon: "🧘" },
+        { id: 18, english: "Hiking", spanish: "Senderismo", pronunciation: "/sen-de-ris-mo/", icon: "🥾" },
+        { id: 19, english: "Fishing", spanish: "Pesca", pronunciation: "/pes-ca/", icon: "🎣" },
+        { id: 20, english: "Hockey", spanish: "Hockey", pronunciation: "/ho-key/", icon: "🏒" }
+    ],
+    transport: [
+        { id: 1, english: "Car", spanish: "Coche", pronunciation: "/co-che/", icon: "🚗" },
+        { id: 2, english: "Bus", spanish: "Autobús", pronunciation: "/au-to-bus/", icon: "🚌" },
+        { id: 3, english: "Train", spanish: "Tren", pronunciation: "/tren/", icon: "🚂" },
+        { id: 4, english: "Airplane", spanish: "Avión", pronunciation: "/a-bion/", icon: "✈️" },
+        { id: 5, english: "Bicycle", spanish: "Bicicleta", pronunciation: "/bi-ci-cle-ta/", icon: "🚲" },
+        { id: 6, english: "Boat", spanish: "Barco", pronunciation: "/bar-co/", icon: "⛵" },
+        { id: 7, english: "Motorcycle", spanish: "Moto", pronunciation: "/mo-to/", icon: "🏍️" },
+        { id: 8, english: "Truck", spanish: "Camión", pronunciation: "/ca-mion/", icon: "🚛" },
+        { id: 9, english: "Taxi", spanish: "Taxi", pronunciation: "/tak-si/", icon: "🚖" },
+        { id: 10, english: "Subway", spanish: "Metro", pronunciation: "/me-tro/", icon: "🚇" },
+        { id: 11, english: "Helicopter", spanish: "Helicóptero", pronunciation: "/e-li-cop-te-ro/", icon: "🚁" },
+        { id: 12, english: "Rocket", spanish: "Cohete", pronunciation: "/co-e-te/", icon: "🚀" },
+        { id: 13, english: "Scooter", spanish: "Patinete", pronunciation: "/pa-ti-ne-te/", icon: "🛴" },
+        { id: 14, english: "Van", spanish: "Furgoneta", pronunciation: "/fur-go-ne-ta/", icon: "🚐" },
+        { id: 15, english: "Ambulance", spanish: "Ambulancia", pronunciation: "/am-bu-lan-cia/", icon: "🚑" },
+        { id: 16, english: "Police Car", spanish: "Patrulla", pronunciation: "/pa-tru-ya/", icon: "🚓" },
+        { id: 17, english: "Fire Truck", spanish: "Camión de bomberos", pronunciation: "/ca-mion de bom-be-ros/", icon: "🚒" },
+        { id: 18, english: "Tractor", spanish: "Tractor", pronunciation: "/trac-tor/", icon: "🚜" },
+        { id: 19, english: "Ship", spanish: "Buque", pronunciation: "/bu-ke/", icon: "🚢" },
+        { id: 20, english: "Skateboard", spanish: "Monopatín", pronunciation: "/mo-no-pa-tin/", icon: "🛹" }
+    ],
+    places: [
+        { id: 1, english: "School", spanish: "Escuela", pronunciation: "/es-cue-la/", icon: "🏫" },
+        { id: 2, english: "Park", spanish: "Parque", pronunciation: "/par-ke/", icon: "🌳" },
+        { id: 3, english: "House", spanish: "Casa", pronunciation: "/ca-sa/", icon: "🏠" },
+        { id: 4, english: "Store", spanish: "Tienda", pronunciation: "/tien-da/", icon: "🏪" },
+        { id: 5, english: "Hospital", spanish: "Hospital", pronunciation: "/os-pi-tal/", icon: "🏥" },
+        { id: 6, english: "Restaurant", spanish: "Restaurante", pronunciation: "/res-tau-ran-te/", icon: "🍽️" },
+        { id: 7, english: "Zoo", spanish: "Zoológico", pronunciation: "/so-o-lo-hi-co/", icon: "🦁" },
+        { id: 8, english: "Beach", spanish: "Playa", pronunciation: "/pla-ya/", icon: "🏖️" },
+        { id: 9, english: "Library", spanish: "Biblioteca", pronunciation: "/bi-blio-te-ca/", icon: "📚" },
+        { id: 10, english: "Cinema", spanish: "Cine", pronunciation: "/ci-ne/", icon: "🎬" },
+        { id: 11, english: "Museum", spanish: "Museo", pronunciation: "/mu-se-o/", icon: "🏛️" },
+        { id: 12, english: "Bank", spanish: "Banco", pronunciation: "/ban-co/", icon: "🏦" },
+        { id: 13, english: "Airport", spanish: "Aeropuerto", pronunciation: "/a-e-ro-puer-to/", icon: "✈️" },
+        { id: 14, english: "Hotel", spanish: "Hotel", pronunciation: "/o-tel/", icon: "🏨" },
+        { id: 15, english: "Farm", spanish: "Granja", pronunciation: "/gran-ha/", icon: "🚜" },
+        { id: 16, english: "City", spanish: "Ciudad", pronunciation: "/ciu-dad/", icon: "🏙️" },
+        { id: 17, english: "Street", spanish: "Calle", pronunciation: "/ca-ye/", icon: "🛣️" },
+        { id: 18, english: "Bridge", spanish: "Puente", pronunciation: "/puen-te/", icon: "🌉" },
+        { id: 19, english: "Pool", spanish: "Piscina", pronunciation: "/pis-ci-na/", icon: "🏊" },
+        { id: 20, english: "Playground", spanish: "Patio de juegos", pronunciation: "/pa-tio de hue-gos/", icon: "🛝" }
+    ],
+    emotions: [
+        { id: 1, english: "Happy", spanish: "Feliz", pronunciation: "/fe-lis/", icon: "😊" },
+        { id: 2, english: "Sad", spanish: "Triste", pronunciation: "/tris-te/", icon: "😢" },
+        { id: 3, english: "Angry", spanish: "Enojado", pronunciation: "/e-no-ha-do/", icon: "😠" },
+        { id: 4, english: "Tired", spanish: "Cansado", pronunciation: "/can-sa-do/", icon: "😴" },
+        { id: 5, english: "Excited", spanish: "Emocionado", pronunciation: "/e-mo-cio-na-do/", icon: "🤩" },
+        { id: 6, english: "Scared", spanish: "Asustado", pronunciation: "/a-sus-ta-do/", icon: "😱" },
+        { id: 7, english: "Surprised", spanish: "Sorprendido", pronunciation: "/sor-pren-di-do/", icon: "😲" },
+        { id: 8, english: "Bored", spanish: "Aburrido", pronunciation: "/a-bu-rri-do/", icon: "😐" },
+        { id: 9, english: "Hungry", spanish: "Hambriento", pronunciation: "/am-brien-to/", icon: "😋" },
+        { id: 10, english: "Thirsty", spanish: "Sediento", pronunciation: "/se-dien-to/", icon: "🥤" },
+        { id: 11, english: "Sick", spanish: "Enfermo", pronunciation: "/en-fer-mo/", icon: "🤒" },
+        { id: 12, english: "Confused", spanish: "Confundido", pronunciation: "/con-fun-di-do/", icon: "😕" },
+        { id: 13, english: "Nervous", spanish: "Nervioso", pronunciation: "/ner-bio-so/", icon: "😬" },
+        { id: 14, english: "Proud", spanish: "Orgulloso", pronunciation: "/or-gu-yo-so/", icon: "😎" },
+        { id: 15, english: "Shy", spanish: "Tímido", pronunciation: "/ti-mi-do/", icon: "🫣" },
+        { id: 16, english: "Funny", spanish: "Gracioso", pronunciation: "/gra-cio-so/", icon: "🤪" },
+        { id: 17, english: "Calm", spanish: "Tranquilo", pronunciation: "/tran-ki-lo/", icon: "😌" },
+        { id: 18, english: "Loved", spanish: "Amado", pronunciation: "/a-ma-do/", icon: "🥰" },
+        { id: 19, english: "Strong", spanish: "Fuerte", pronunciation: "/fuer-te/", icon: "💪" },
+        { id: 20, english: "Sleepy", spanish: "Soñoliento", pronunciation: "/so-ño-lien-to/", icon: "🥱" }
     ],
     alphabet: [
         { id: 1, english: "A (Apple)", spanish: "A (Manzana)", pronunciation: "/a/", icon: "🍎" },
@@ -500,8 +642,14 @@ function showQuizQuestion() {
     document.getElementById('quiz-question').textContent = `What is "${question.english}" in Spanish?`;
     document.getElementById('quiz-feedback').textContent = '';
 
+    // Clean text for speech (remove parentheses)
+    let englishWord = question.english;
+    if (englishWord.includes('(')) {
+        englishWord = englishWord.split('(')[0].trim();
+    }
+
     // Speak the question
-    speakText(`What is ${question.english} in Spanish?`, 'en-US');
+    speakText(`What is ${englishWord} in Spanish?`, 'en-US');
 
     // Generate options (1 correct + 3 random wrong)
     const options = [question];
@@ -554,6 +702,16 @@ function speakText(text, lang = 'en-US') {
             preferredVoices[0];
         if (selectedVoice) utterance.voice = selectedVoice;
         utterance.pitch = 1.2;
+    } else if (lang === 'en-US') {
+        // Use preferred English voices to avoid robotic default
+        const preferredVoices = voices.filter(voice => voice.lang.includes('en'));
+        let selectedVoice = preferredVoices.find(v => v.name.includes('Google US English')) ||
+            preferredVoices.find(v => v.name.includes('Samantha')) ||
+            preferredVoices.find(v => v.name.includes('Victoria')) ||
+            preferredVoices.find(v => v.name.includes('Zira')) ||
+            preferredVoices[0];
+        if (selectedVoice) utterance.voice = selectedVoice;
+        utterance.pitch = 1.1; // Slightly higher/thinner to match the style
     }
 
     window.speechSynthesis.speak(utterance);
