@@ -33,7 +33,7 @@
 
         <!-- Level Selection Screen -->
         <section id="level-screen" class="screen">
-            <h2>Select Your Level</h2>
+            <h2>Select Your Category</h2>
             <div class="levels-grid">
                 <button class="level-card" data-level="numbers">
                     <span class="level-icon">1️⃣</span>
@@ -136,10 +136,11 @@
         <!-- Game Screen -->
         <section id="game-screen" class="screen">
             <div class="game-header">
-                <button class="btn-small" id="back-to-levels">Levels</button>
+                <button class="btn-small" id="back-to-levels">Categories</button>
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
+                <button class="btn-small" id="timer-toggle">⏱️ 15s</button>
                 <div class="score-display">⭐ <span id="score">0</span></div>
             </div>
 
@@ -167,7 +168,10 @@
 
             <div class="navigation-controls">
                 <button class="btn-nav" id="prev-word">Previous</button>
-                <button class="btn-nav" id="next-word">Next</button>
+                <button class="btn-nav" id="next-word">
+                    Next
+                    <div class="btn-progress"></div>
+                </button>
             </div>
 
             <div id="quiz-selection" class="quiz-selection" style="display: none;">

@@ -403,11 +403,31 @@ body::before {
     color: rgba(255, 255, 255, 0.7);
     padding: 0.8rem 2rem;
     font-size: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-nav:hover {
     background: rgba(255, 255, 255, 0.1);
     color: white;
+}
+
+.btn-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    background: var(--secondary-color);
+    width: 0%;
+    transition: width linear;
+}
+
+#timer-toggle {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
 }
 
 .btn-quiz {

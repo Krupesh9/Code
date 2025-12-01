@@ -397,6 +397,9 @@ let score = 0;
 let quizScore = 0;
 let recognition = null;
 let voices = [];
+let autoAdvanceTimer = null;
+let speakTimers = [];
+let autoAdvanceDuration = 15000; // Default 15s
 
 // DOM Elements
 const screens = {
@@ -445,6 +448,7 @@ function initSpeechRecognition() {
 
 // Navigation Functions
 function showScreen(screenName) {
+    clearTimers(); // Clear any active game timers
     Object.values(screens).forEach(s => s.classList.remove('active'));
     screens[screenName].classList.add('active');
 }
@@ -500,6 +504,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Timer Toggle
+    const timerBtn = document.getElementById('timer-toggle');
+    timerBtn.addEventListener('click', () => {
+        if (autoAdvanceDuration === 15000) {
+            autoAdvanceDuration = 30000;
+            timerBtn.textContent = '⏱️ 30s';
+        } else {
+            autoAdvanceDuration = 15000;
+            timerBtn.textContent = '⏱️ 15s';
+        }
+        // Restart timer if in game
+        if (screens.game.classList.contains('active')) {
+            updateCard();
+        }
+    });
+
     document.getElementById('start-quiz-5').addEventListener('click', () => startQuiz(5));
     document.getElementById('start-quiz-10').addEventListener('click', () => startQuiz(10));
     document.getElementById('quit-quiz').addEventListener('click', () => showScreen('level'));
@@ -516,7 +536,23 @@ function startLevel(level) {
     document.getElementById('quiz-selection').style.display = 'none';
 }
 
+function clearTimers() {
+    if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+    speakTimers.forEach(timer => clearTimeout(timer));
+    speakTimers = [];
+    window.speechSynthesis.cancel();
+
+    // Reset progress bar
+    const bar = document.querySelector('.btn-progress');
+    if (bar) {
+        bar.style.transition = 'none';
+        bar.style.width = '0%';
+    }
+}
+
 function updateCard() {
+    clearTimers(); // Reset timers for new card
+
     const data = gameData[currentLevel][currentIndex];
 
     // Update DOM
@@ -538,6 +574,21 @@ function updateCard() {
         document.getElementById('quiz-selection').style.display = 'flex';
     } else {
         document.getElementById('quiz-selection').style.display = 'none';
+
+        // Auto-Advance Logic (only if not at the end)
+        // Start Progress Bar Animation
+        const bar = document.querySelector('.btn-progress');
+        // Force reflow
+        void bar.offsetWidth;
+        bar.style.transition = `width ${autoAdvanceDuration}ms linear`;
+        bar.style.width = '100%';
+
+        autoAdvanceTimer = setTimeout(() => {
+            if (currentIndex < gameData[currentLevel].length - 1) {
+                currentIndex++;
+                updateCard();
+            }
+        }, autoAdvanceDuration);
     }
 
     // Clear feedback
@@ -549,6 +600,16 @@ function updateCard() {
     setTimeout(() => {
         card.style.transform = 'rotateY(0deg)';
     }, 200);
+
+    // Auto-Speak Logic: 3 times with 5s pause
+    // 1st: Immediate
+    speakWord();
+
+    // 2nd: After 5s
+    speakTimers.push(setTimeout(speakWord, 5000));
+
+    // 3rd: After 10s (5s after 2nd)
+    speakTimers.push(setTimeout(speakWord, 10000));
 }
 
 function speakWord() {
