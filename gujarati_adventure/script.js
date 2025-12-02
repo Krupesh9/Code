@@ -323,7 +323,6 @@ let currentLevel = null;
 let currentIndex = 0;
 let score = 0;
 let quizScore = 0;
-let recognition = null;
 let voices = [];
 let autoAdvanceTimer = null;
 let speakTimers = [];
@@ -346,34 +345,6 @@ if (window.speechSynthesis.onvoiceschanged !== undefined) {
     window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-// Initialize Speech Recognition
-function initSpeechRecognition() {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.lang = 'gu-IN';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript.toLowerCase();
-            checkPronunciation(transcript);
-        };
-
-        recognition.onerror = (event) => {
-            showFeedback('Error: ' + event.error, 'error');
-            document.getElementById('speak-btn').classList.remove('listening');
-        };
-
-        recognition.onend = () => {
-            document.getElementById('speak-btn').classList.remove('listening');
-        };
-    } else {
-        console.warn('Speech recognition not supported');
-        document.getElementById('speak-btn').style.display = 'none';
-    }
-}
-
 // Navigation Functions
 function showScreen(screenName) {
     clearTimers(); // Clear any active game timers
@@ -383,7 +354,6 @@ function showScreen(screenName) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    initSpeechRecognition();
     loadVoices();
 
     // Start Button
@@ -419,18 +389,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('listen-btn').addEventListener('click', speakWord);
-
-    document.getElementById('speak-btn').addEventListener('click', () => {
-        if (recognition) {
-            try {
-                recognition.start();
-                document.getElementById('speak-btn').classList.add('listening');
-                showFeedback('Listening...', 'neutral');
-            } catch (e) {
-                console.error(e);
-            }
-        }
-    });
 
     // Timer Toggle
     const timerBtn = document.getElementById('timer-toggle');
@@ -701,26 +659,6 @@ function speakWord() {
     utterance.rate = 0.9; // Slightly slower for clarity
 
     window.speechSynthesis.speak(utterance);
-}
-
-function checkPronunciation(transcript) {
-    let target = gameData[currentLevel][currentIndex].gujarati.toLowerCase();
-
-    // Clean target for comparison (remove parentheses)
-    if (target.includes('(')) {
-        target = target.split('(')[0].trim();
-    }
-
-    // Simple fuzzy match or exact match
-    if (transcript.includes(target) || target.includes(transcript)) {
-        showFeedback('ખૂબ સરસ! (Very Good!)', 'success');
-        score += 10;
-        updateScore();
-        playSound('success');
-    } else {
-        showFeedback(`Try again! You said: "${transcript}"`, 'error');
-        playSound('error');
-    }
 }
 
 function showFeedback(msg, type) {
