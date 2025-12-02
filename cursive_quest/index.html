@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Cursive Quest - Learn Beautiful Writing</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Inter:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-family: 'Dancing Script', cursive;
+            color: white;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            flex: 1;
+        }
+
+        .star-tracker {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            padding: 8px 20px;
+            border-radius: 25px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            animation: starGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes starGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 4px 25px rgba(255, 215, 0, 0.6);
+            }
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            color: white;
+        }
+
+        .start-screen h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-screen p {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .mode-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .mode-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 25px 40px;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .mode-btn .icon {
+            font-size: 2rem;
+        }
+
+        /* Selection Screen */
+        .selection-screen {
+            width: 100%;
+            max-width: 1200px;
+            display: none;
+        }
+
+        .selection-screen h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .selection-item {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid transparent;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+
+        .selection-item:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        .word-item {
+            font-size: 1.5rem;
+            padding: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Drawing Screen */
+        .drawing-screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+        }
+
+        #drawingCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        #guideCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .color-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .color-btn.active {
+            border-color: #ffd700;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+
+        .rainbow-btn {
+            background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+        }
+
+        .thickness-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+
+        .thickness-control input {
+            width: 100px;
+        }
+
+        /* Fixed Position Buttons */
+        .top-right-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(76, 175, 80, 0.95);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            z-index: 10;
+        }
+
+        .top-right-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .bottom-left-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .bottom-left-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .bottom-right-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(102, 126, 234, 0.95);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 10;
+        }
+
+        .bottom-right-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Bottom color panel */
+        .color-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* Small utility buttons */
+        .utility-buttons {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .utility-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .utility-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Current Letter Display */
+        .current-letter-display {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .selection-grid {
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                gap: 10px;
+            }
+
+            .selection-item {
+                padding: 15px;
+                font-size: 2rem;
+            }
+
+            .word-item {
+                font-size: 1.2rem;
+                padding: 12px;
+            }
+
+            .controls {
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .control-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .color-btn {
+                width: 35px;
+                height: 35px;
+            }
+
+            .current-letter-display {
+                font-size: 1.5rem;
+                padding: 10px 20px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Practice Lines */
+        .practice-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Star Rating Display */
+        .star-rating-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .star-rating-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .star-rating-content h2 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .stars-display {
+            font-size: 4rem;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .star {
+            display: inline-block;
+            animation: starPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .star:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .star:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes starPop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2) rotate(10deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .rating-message {
+            font-size: 1.3rem;
+            color: #666;
+            margin: 20px 0;
+            font-weight: 600;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .rating-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .rating-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .rating-btn.secondary {
+            background: #98D8C8;
+        }
+
+        /* Drawing feedback */
+        .drawing-particle {
+            position: absolute;
+            pointer-events: none;
+            animation: particleFade 1s ease-out forwards;
+        }
+
+        @keyframes particleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.5);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>✍️ Cursive Quest</h1>
+            <div class="star-tracker">
+                <span>⭐</span>
+                <span id="totalStars">0</span>
+            </div>
+            <button class="home-btn" onclick="goHome()">🏠 Home</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Start Screen -->
+            <div class="start-screen" id="startScreen">
+                <h2>Welcome to Cursive Quest!</h2>
+                <p>Learn beautiful cursive writing ✨</p>
+                <div class="mode-buttons">
+                    <button class="mode-btn" onclick="selectMode('uppercase')">
+                        <span class="icon">🔤</span>
+                        <span>Uppercase Letters (A-Z)</span>
+                    </button>
+                    <button class="mode-btn" onclick="selectMode('lowercase')">
+                        <span class="icon">🔡</span>
+                        <span>Lowercase Letters (a-z)</span>
+                    </button>
+                    <button class="mode-btn" onclick="selectMode('words')">
+                        <span class="icon">📝</span>
+                        <span>Words & Spelling</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Letter Selection Screen -->
+            <div class="selection-screen" id="letterSelection">
+                <h2>Choose a Letter to Practice</h2>
+                <div class="selection-grid" id="letterGrid"></div>
+                <button class="back-btn" onclick="backToStart()">← Back</button>
+            </div>
+
+            <!-- Word Selection Screen -->
+            <div class="selection-screen" id="wordSelection">
+                <h2>Choose a Word to Practice</h2>
+                <div class="selection-grid" id="wordGrid"></div>
+                <button class="back-btn" onclick="backToStart()">← Back</button>
+            </div>
+
+            <!-- Drawing Screen -->
+            <div class="drawing-screen" id="drawingScreen">
+                <div class="canvas-container">
+                    <div class="current-letter-display" id="currentLetterDisplay"></div>
+
+                    <!-- Utility buttons -->
+                    <div class="utility-buttons">
+                        <button class="utility-btn" onclick="toggleGuide()">👁️ Guide</button>
+                        <button class="utility-btn" onclick="clearCanvas()">🗑️ Clear</button>
+                    </div>
+
+                    <canvas id="guideCanvas"></canvas>
+                    <canvas id="drawingCanvas"></canvas>
+
+                    <!-- Done button in top right -->
+                    <button class="top-right-btn" onclick="celebrate()">🎉 Done!</button>
+                </div>
+
+                <!-- Back button bottom left -->
+                <button class="bottom-left-btn" onclick="backToSelection()">← Back</button>
+
+                <!-- Next button bottom right (initially hidden) -->
+                <button class="bottom-right-btn hidden" id="nextLetterBtn" onclick="nextLetterQuick()">Next →</button>
+
+                <!-- Color palette centered at bottom -->
+                <div class="color-panel">
+                    <div class="color-btn rainbow-btn" onclick="selectColor('rainbow')" title="Rainbow Mode"></div>
+                    <div class="color-btn" style="background: #FF6B6B;" onclick="selectColor('#FF6B6B')"></div>
+                    <div class="color-btn" style="background: #4ECDC4;" onclick="selectColor('#4ECDC4')"></div>
+                    <div class="color-btn" style="background: #45B7D1;" onclick="selectColor('#45B7D1')"></div>
+                    <div class="color-btn" style="background: #FFA07A;" onclick="selectColor('#FFA07A')"></div>
+                    <div class="color-btn" style="background: #98D8C8;" onclick="selectColor('#98D8C8')"></div>
+                    <div class="color-btn" style="background: #F7DC6F;" onclick="selectColor('#F7DC6F')"></div>
+                    <div class="color-btn" style="background: #BB8FCE;" onclick="selectColor('#BB8FCE')"></div>
+                    <div class="color-btn active" style="background: #667eea;" onclick="selectColor('#667eea')"></div>
+                    <span style="color: white; font-weight: 600; margin-left: 10px;">🎨 Colors</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Star Rating Modal -->
+    <div class="star-rating-modal" id="starRatingModal">
+        <div class="star-rating-content">
+            <h2>Great Work!</h2>
+            <div class="stars-display" id="starsDisplay"></div>
+            <p class="rating-message" id="ratingMessage"></p>
+            <div class="rating-buttons">
+                <button class="rating-btn" onclick="nextLetter()">✨ Next</button>
+                <button class="rating-btn secondary" onclick="tryAgain()">🔄 Try Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let currentMode = '';
+        let currentLetter = '';
+        let currentColor = '#667eea';
+        let rainbowMode = false;
+        let rainbowHue = 0;
+        let lineThickness = 8;
+        let isDrawing = false;
+        let showGuide = true;
+        let lastX = 0;
+        let lastY = 0;
+
+        // Star System
+        let totalStars = parseInt(localStorage.getItem('cursiveQuestStars') || '0');
+        let drawingStartTime = 0;
+        let strokeCount = 0;
+        let drawingTime = 0;
+
+        // Canvas Setup
+        const drawingCanvas = document.getElementById('drawingCanvas');
+        const guideCanvas = document.getElementById('guideCanvas');
+        const drawingCtx = drawingCanvas.getContext('2d');
+        const guideCtx = guideCanvas.getContext('2d');
+
+        // Reference canvas for accurate comparison (invisible)
+        const referenceCanvas = document.createElement('canvas');
+        const referenceCtx = referenceCanvas.getContext('2d');
+
+        // Letters and Words
+        const uppercaseLetters = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ];
+
+        const lowercaseLetters = [
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+        ];
+
+        const words = [
+            // Family
+            'Mom', 'Dad', 'Sister', 'Brother', 'Family', 'Grandma', 'Grandpa',
+            // Animals
+            'Cat', 'Dog', 'Bird', 'Fish', 'Lion', 'Tiger', 'Bear', 'Elephant', 'Monkey',
+            // Colors
+            'Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange', 'Pink', 'Brown',
+            // Common Words
+            'Hello', 'Love', 'Happy', 'Friend', 'Thank', 'Please', 'School', 'Book',
+            'Sun', 'Moon', 'Star', 'Tree', 'Flower', 'Water', 'House', 'Heart'
+        ];
+
+        // Initialize
+        function init() {
+            setupCanvas();
+            populateWordGrid();
+            updateStarsDisplay();
+            window.addEventListener('resize', setupCanvas);
+        }
+
+        function updateStarsDisplay() {
+            document.getElementById('totalStars').textContent = totalStars;
+        }
+
+        function setupCanvas() {
+            const container = drawingCanvas.parentElement;
+            drawingCanvas.width = container.clientWidth;
+            drawingCanvas.height = container.clientHeight;
+            guideCanvas.width = container.clientWidth;
+            guideCanvas.height = container.clientHeight;
+
+            // Setup reference canvas with same dimensions
+            referenceCanvas.width = container.clientWidth;
+            referenceCanvas.height = container.clientHeight;
+
+            drawingCtx.lineCap = 'round';
+            drawingCtx.lineJoin = 'round';
+
+            referenceCtx.lineCap = 'round';
+            referenceCtx.lineJoin = 'round';
+
+            drawPracticeLines();
+            if (currentLetter) {
+                drawGuide();
+                drawReferenceGuide();
+            }
+        }
+
+        function drawPracticeLines() {
+            guideCtx.strokeStyle = '#e0e0e0';
+            guideCtx.lineWidth = 1;
+
+            const height = guideCanvas.height;
+            const baseline = height * 0.7;
+            const midline = height * 0.45;
+
+            // Baseline
+            guideCtx.beginPath();
+            guideCtx.moveTo(0, baseline);
+            guideCtx.lineTo(guideCanvas.width, baseline);
+            guideCtx.stroke();
+
+            // Midline (dashed)
+            guideCtx.setLineDash([5, 5]);
+            guideCtx.beginPath();
+            guideCtx.moveTo(0, midline);
+            guideCtx.lineTo(guideCanvas.width, midline);
+            guideCtx.stroke();
+            guideCtx.setLineDash([]);
+        }
+
+        function populateLetterGrid(letters) {
+            const grid = document.getElementById('letterGrid');
+            grid.innerHTML = ''; // Clear existing
+            letters.forEach(letter => {
+                const div = document.createElement('div');
+                div.className = 'selection-item';
+                div.textContent = letter;
+                div.onclick = () => startPractice(letter);
+                grid.appendChild(div);
+            });
+        }
+
+        function populateWordGrid() {
+            const grid = document.getElementById('wordGrid');
+            words.forEach(word => {
+                const div = document.createElement('div');
+                div.className = 'selection-item word-item';
+                div.textContent = word;
+                div.onclick = () => startPractice(word);
+                grid.appendChild(div);
+            });
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            document.getElementById('startScreen').style.display = 'none';
+
+            if (mode === 'uppercase') {
+                populateLetterGrid(uppercaseLetters);
+                document.getElementById('letterSelection').querySelector('h2').textContent = 'Choose an Uppercase Letter (A-Z)';
+                document.getElementById('letterSelection').style.display = 'block';
+            } else if (mode === 'lowercase') {
+                populateLetterGrid(lowercaseLetters);
+                document.getElementById('letterSelection').querySelector('h2').textContent = 'Choose a Lowercase Letter (a-z)';
+                document.getElementById('letterSelection').style.display = 'block';
+            } else if (mode === 'words') {
+                document.getElementById('wordSelection').style.display = 'block';
+            }
+        }
+
+        function backToStart() {
+            document.getElementById('letterSelection').style.display = 'none';
+            document.getElementById('wordSelection').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+
+
+        function backToSelection() {
+            document.getElementById('drawingScreen').style.display = 'none';
+            if (currentMode === 'uppercase' || currentMode === 'lowercase') {
+                document.getElementById('letterSelection').style.display = 'block';
+            } else if (currentMode === 'words') {
+                document.getElementById('wordSelection').style.display = 'block';
+            }
+            clearCanvas();
+        }
+
+        function startPractice(text) {
+            currentLetter = text;
+            document.getElementById('letterSelection').style.display = 'none';
+            document.getElementById('wordSelection').style.display = 'none';
+            document.getElementById('drawingScreen').style.display = 'flex';
+            document.getElementById('currentLetterDisplay').textContent = text;
+
+            // Reset metrics for star rating
+            drawingStartTime = Date.now();
+            strokeCount = 0;
+            drawingTime = 0;
+
+            setupCanvas();
+            setupDrawing();
+        }
+
+        function drawGuide() {
+            if (!showGuide) return;
+
+            guideCtx.save();
+            drawPracticeLines();
+
+            // Draw cursive letter as guide
+            guideCtx.fillStyle = 'rgba(102, 126, 234, 0.2)';
+            guideCtx.strokeStyle = 'rgba(102, 126, 234, 0.4)';
+            guideCtx.lineWidth = 3;
+
+            const fontSize = currentLetter.length > 1 ?
+                Math.min(200, guideCanvas.width / currentLetter.length * 0.8) :
+                Math.min(300, guideCanvas.width * 0.6);
+
+            guideCtx.font = `${fontSize}px "Dancing Script", cursive`;
+            guideCtx.textAlign = 'center';
+            guideCtx.textBaseline = 'middle';
+
+            const x = guideCanvas.width / 2;
+            const y = guideCanvas.height / 2;
+
+            guideCtx.fillText(currentLetter, x, y);
+            guideCtx.strokeText(currentLetter, x, y);
+
+            guideCtx.restore();
+        }
+
+        function drawReferenceGuide() {
+            // Clear reference canvas
+            referenceCtx.clearRect(0, 0, referenceCanvas.width, referenceCanvas.height);
+
+            // Draw solid letter for pixel comparison
+            referenceCtx.fillStyle = '#000000';
+            referenceCtx.strokeStyle = '#000000';
+            referenceCtx.lineWidth = 20; // Thicker for easier matching
+
+            const fontSize = currentLetter.length > 1 ?
+                Math.min(200, referenceCanvas.width / currentLetter.length * 0.8) :
+                Math.min(300, referenceCanvas.width * 0.6);
+
+            referenceCtx.font = `${fontSize}px "Dancing Script", cursive`;
+            referenceCtx.textAlign = 'center';
+            referenceCtx.textBaseline = 'middle';
+
+            const x = referenceCanvas.width / 2;
+            const y = referenceCanvas.height / 2;
+
+            referenceCtx.fillText(currentLetter, x, y);
+            referenceCtx.strokeText(currentLetter, x, y);
+        }
+
+        function toggleGuide() {
+            showGuide = !showGuide;
+            guideCtx.clearRect(0, 0, guideCanvas.width, guideCanvas.height);
+            if (showGuide) {
+                drawGuide();
+            } else {
+                drawPracticeLines();
+            }
+        }
+
+        function setupDrawing() {
+            // Mouse events
+            drawingCanvas.addEventListener('mousedown', startDrawing);
+            drawingCanvas.addEventListener('mousemove', draw);
+            drawingCanvas.addEventListener('mouseup', stopDrawing);
+            drawingCanvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch events
+            drawingCanvas.addEventListener('touchstart', handleTouch);
+            drawingCanvas.addEventListener('touchmove', handleTouch);
+            drawingCanvas.addEventListener('touchend', stopDrawing);
+            drawingCanvas.addEventListener('touchcancel', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            strokeCount++; // Track number of strokes for rating
+            const rect = drawingCanvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            drawingCtx.beginPath();
+            drawingCtx.moveTo(lastX, lastY);
+            drawingCtx.lineTo(x, y);
+
+            if (rainbowMode) {
+                drawingCtx.strokeStyle = `hsl(${rainbowHue}, 100%, 50%)`;
+                rainbowHue = (rainbowHue + 2) % 360;
+            } else {
+                drawingCtx.strokeStyle = currentColor;
+            }
+
+            drawingCtx.lineWidth = lineThickness;
+            drawingCtx.stroke();
+
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            if (!touch) return;
+
+            const rect = drawingCanvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            if (e.type === 'touchstart') {
+                isDrawing = true;
+                strokeCount++; // Track strokes for touch users too
+                lastX = x;
+                lastY = y;
+            } else if (e.type === 'touchmove' && isDrawing) {
+                drawingCtx.beginPath();
+                drawingCtx.moveTo(lastX, lastY);
+                drawingCtx.lineTo(x, y);
+
+                if (rainbowMode) {
+                    drawingCtx.strokeStyle = `hsl(${rainbowHue}, 100%, 50%)`;
+                    rainbowHue = (rainbowHue + 2) % 360;
+                } else {
+                    drawingCtx.strokeStyle = currentColor;
+                }
+
+                drawingCtx.lineWidth = lineThickness;
+                drawingCtx.stroke();
+
+                lastX = x;
+                lastY = y;
+            }
+        }
+
+        function clearCanvas() {
+            drawingCtx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        }
+
+        function selectColor(color) {
+            // Update active state
+            document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (color === 'rainbow') {
+                rainbowMode = true;
+                rainbowHue = 0;
+            } else {
+                rainbowMode = false;
+                currentColor = color;
+            }
+        }
+
+        function updateThickness() {
+            lineThickness = document.getElementById('thicknessSlider').value;
+        }
+
+        function celebrate() {
+            // Calculate drawing time
+            drawingTime = (Date.now() - drawingStartTime) / 1000; // in seconds
+
+            // Calculate star rating based on effort
+            let stars = calculateStars();
+
+            // Show star rating modal
+            showStarRating(stars);
+
+            // Add stars to total
+            totalStars += stars;
+            localStorage.setItem('cursiveQuestStars', totalStars);
+            updateStarsDisplay();
+        }
+
+        function calculateStars() {
+            // Get pixel data from both canvases
+            const userDrawing = drawingCtx.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
+            const referenceGuide = referenceCtx.getImageData(0, 0, referenceCanvas.width, referenceCanvas.height);
+
+            const userPixels = userDrawing.data;
+            const refPixels = referenceGuide.data;
+
+            let totalRefPixels = 0;
+            let matchedPixels = 0;
+
+            // Count reference pixels (pixels that are part of the guide letter)
+            for (let i = 0; i < refPixels.length; i += 4) {
+                const alpha = refPixels[i + 3];
+                if (alpha > 50) { // If pixel is visible in reference
+                    totalRefPixels++;
+                }
+            }
+
+            // If no reference pixels (shouldn't happen), give 1 star
+            if (totalRefPixels === 0) return 1;
+
+            // Check how many reference pixels have nearby user-drawn pixels
+            const width = drawingCanvas.width;
+            const searchRadius = 15; // Pixels to search around each reference pixel
+
+            for (let i = 0; i < refPixels.length; i += 4) {
+                const refAlpha = refPixels[i + 3];
+                if (refAlpha > 50) { // This is a reference pixel
+                    const pixelIndex = i / 4;
+                    const x = pixelIndex % width;
+                    const y = Math.floor(pixelIndex / width);
+
+                    // Check if there's a user-drawn pixel nearby
+                    let found = false;
+                    for (let dy = -searchRadius; dy <= searchRadius && !found; dy++) {
+                        for (let dx = -searchRadius; dx <= searchRadius && !found; dx++) {
+                            const newX = x + dx;
+                            const newY = y + dy;
+
+                            if (newX >= 0 && newX < width && newY >= 0 && newY < drawingCanvas.height) {
+                                const newIndex = (newY * width + newX) * 4;
+                                const userAlpha = userPixels[newIndex + 3];
+
+                                if (userAlpha > 50) { // User drew here
+                                    found = true;
+                                    matchedPixels++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Calculate accuracy percentage
+            const accuracy = (matchedPixels / totalRefPixels) * 100;
+
+            console.log(`Tracing accuracy: ${accuracy.toFixed(1)}% (${matchedPixels}/${totalRefPixels} pixels)`);
+
+            // Award stars based on accuracy
+            if (accuracy >= 70) {
+                return 3; // Excellent tracing!
+            } else if (accuracy >= 45) {
+                return 2; // Good attempt
+            } else if (accuracy >= 25) {
+                return 1; // Keep practicing
+            } else {
+                return 0; // Need to trace the letter
+            }
+        }
+
+        function showStarRating(stars) {
+            const modal = document.getElementById('starRatingModal');
+            const starsDisplay = document.getElementById('starsDisplay');
+            const message = document.getElementById('ratingMessage');
+
+            // Create confetti only for 2+ stars
+            if (stars >= 2) {
+                for (let i = 0; i < 150; i++) {
+                    createConfetti();
+                }
+            }
+
+            // Create star display
+            starsDisplay.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('span');
+                star.className = 'star';
+                star.textContent = i < stars ? '⭐' : '☆';
+                starsDisplay.appendChild(star);
+            }
+
+            // Set encouraging message based on stars (accuracy-based)
+            const messages = {
+                3: ["Amazing! You traced it perfectly! 🎉", "Fantastic writing! You're a star! ✨", "Wow! Perfect tracing! Keep it up! 🌟"],
+                2: ["Great job! Almost perfect! 👍", "Nice work! Getting better! 💪", "Good tracing! You're learning! 🎯"],
+                1: ["Keep trying! Follow the guide closer! 📝", "Practice makes perfect! Trace the letter! 🌱", "Good start! Stay on the guide line! 🚀"],
+                0: ["Try tracing the letter guide! 📋", "Follow the cursive guide to earn stars! ✏️", "Trace over the letter to get stars! 🎯"]
+            };
+
+            const messageList = messages[stars];
+            message.textContent = messageList[Math.floor(Math.random() * messageList.length)];
+
+            // Show modal
+            modal.style.display = 'flex';
+        }
+
+        function nextLetter() {
+            // Close modal
+            document.getElementById('starRatingModal').style.display = 'none';
+
+            // Go back to selection to choose next letter/word
+            clearCanvas();
+            backToSelection();
+        }
+
+        function tryAgain() {
+            // Close modal
+            document.getElementById('starRatingModal').style.display = 'none';
+
+            // Clear canvas and reset metrics
+            clearCanvas();
+            drawingStartTime = Date.now();
+            strokeCount = 0;
+            drawingTime = 0;
+        }
+
+        function nextLetterQuick() {
+            // Quick next without modal - just go back to selection
+            clearCanvas();
+            backToSelection();
+        }
+
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '0px';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            document.body.appendChild(confetti);
+
+            setTimeout(() => confetti.remove(), 3000);
+        }
+
+        function goHome() {
+            window.location.href = '../index.html';
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+
+</html>
