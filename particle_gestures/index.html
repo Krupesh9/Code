@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hand Gesture Particles</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    #container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #webcam {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      opacity: 0.3;
+    }
+
+    #output_canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    #ui-layer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 2;
+      color: white;
+      pointer-events: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    p {
+      margin: 5px 0 0 0;
+      font-size: 1rem;
+      opacity: 0.9;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    #stats {
+      margin-top: 10px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    #start-btn {
+      margin-top: 10px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      pointer-events: all;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s;
+    }
+
+    #start-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <video id="webcam" autoplay playsinline></video>
+    <canvas id="output_canvas"></canvas>
+    <div id="ui-layer">
+      <h1>✨ Gesture Particles</h1>
+      <p>Show your hand! 🖐️</p>
+      <button id="start-btn">Start Camera</button>
+      <div id="stats">Click Start to begin...</div>
+    </div>
+  </div>
+
+  <!-- Load Three.js from CDN (global build) -->
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+  <!-- Load MediaPipe vis script tags -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <script>
+    const videoElement = document.getElementById('webcam');
+    const canvasElement = document.getElementById('output_canvas');
+    const statsElement = document.getElementById('stats');
+    const startBtn = document.getElementById('start-btn');
+
+    // Three.js Setup (THREE is now global)
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvasElement,
+      alpha: true,
+      antialias: true
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Particle System
+    class ParticleSystem {
+      constructor(scene) {
+        this.scene = scene;
+        this.count = 1500; // Reduced for better performance
+        this.geometry = new THREE.BufferGeometry();
+
+        // Create circular sprite texture
+        const canvas = document.createElement('canvas');
+        canvas.width = 32;
+        canvas.height = 32;
+        const ctx = canvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(0.5, 'rgba(255,255,255,0.5)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 32, 32);
+
+        const texture = new THREE.CanvasTexture(canvas);
+
+        this.material = new THREE.PointsMaterial({
+          size: 0.08, // Smaller particles
+          map: texture,
+          opacity: 0.85,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          vertexColors: true,
+          depthWrite: false,
+          sizeAttenuation: true
+        });
+        this.init();
+      }
+
+      init() {
+        const positions = new Float32Array(this.count * 3);
+        const colors = new Float32Array(this.count * 3);
+
+        for (let i = 0; i < this.count; i++) {
+          positions[i * 3] = (Math.random() - 0.5) * 10;
+          positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+          colors[i * 3] = 1;
+          colors[i * 3 + 1] = 1;
+          colors[i * 3 + 2] = 1;
+        }
+
+        this.targetPositions = new Float32Array(this.count * 3);
+        this.geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        this.geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        this.particles = new THREE.Points(this.geometry, this.material);
+        this.scene.add(this.particles);
+
+        this.currentShape = 'random';
+        this.lerpFactor = 0.08; // Faster shape transitions
+        this.time = 0;
+        this.calculateTargets('random');
+      } calculateTargets(shape) {
+        const targets = this.targetPositions;
+        for (let i = 0; i < this.count; i++) {
+          let x = 0, y = 0, z = 0;
+          const idx = i * 3;
+
+          switch (shape) {
+            case 'heart':
+              const t = (i / this.count) * Math.PI * 2;
+              x = 16 * Math.pow(Math.sin(t), 3) * 0.1;
+              y = (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * 0.1;
+              z = (Math.random() - 0.5) * 2;
+              break;
+            case 'flower':
+              const theta = (i / this.count) * Math.PI * 20;
+              const r = Math.cos(4 * theta);
+              x = r * Math.cos(theta) * 3;
+              y = r * Math.sin(theta) * 3;
+              z = (Math.random() - 0.5) * 5;
+              break;
+            case 'saturn':
+              if (i < this.count * 0.7) {
+                const phi = Math.acos(-1 + (2 * (i / (this.count * 0.7))));
+                const sqrtPh5 = Math.sqrt(this.count * 0.7 * Math.PI) * phi;
+                const radius = 1.5;
+                x = radius * Math.cos(sqrtPh5) * Math.sin(phi);
+                y = radius * Math.sin(sqrtPh5) * Math.sin(phi);
+                z = radius * Math.cos(phi);
+              } else {
+                const angle = (i / (this.count * 0.3)) * Math.PI * 2;
+                const ringRadius = 2.5 + Math.random() * 0.5;
+                x = ringRadius * Math.cos(angle);
+                z = ringRadius * Math.sin(angle);
+                y = (Math.random() - 0.5) * 0.2;
+              }
+              break;
+            case 'fireworks':
+              const u = Math.random();
+              const v = Math.random();
+              const theta2 = 2 * Math.PI * u;
+              const phi2 = Math.acos(2 * v - 1);
+              const r2 = 3 + Math.random() * 2;
+              x = r2 * Math.sin(phi2) * Math.cos(theta2);
+              y = r2 * Math.sin(phi2) * Math.sin(theta2);
+              z = r2 * Math.cos(phi2);
+              break;
+            default:
+              x = (Math.random() - 0.5) * 10;
+              y = (Math.random() - 0.5) * 10;
+              z = (Math.random() - 0.5) * 10;
+          }
+          targets[idx] = x;
+          targets[idx + 1] = y;
+          targets[idx + 2] = z;
+        }
+      }
+
+      setShape(shapeName) {
+        if (this.currentShape !== shapeName) {
+          this.currentShape = shapeName;
+          this.calculateTargets(shapeName);
+        }
+      }
+
+      cycleShape() {
+        const shapes = ['random', 'heart', 'flower', 'saturn', 'fireworks'];
+        const currentIndex = shapes.indexOf(this.currentShape);
+        const nextIndex = (currentIndex + 1) % shapes.length;
+        this.setShape(shapes[nextIndex]);
+      }
+
+      update(handData) {
+        this.time += 0.016; // Smoother time increment
+        const positions = this.geometry.attributes.position.array;
+        const colors = this.geometry.attributes.color.array;
+        const targets = this.targetPositions;
+
+        let influenceX = 0, influenceY = 0, influenceZ = 0;
+        let handActive = false;
+
+        if (handData) {
+          handActive = true;
+          // Better coordinate mapping with z-depth
+          influenceX = (0.5 - handData.x) * 15;
+          influenceY = (0.5 - handData.y) * 12;
+          influenceZ = handData.z * 8; // Add depth tracking
+        }
+
+        const handRepelRadius = 3.5; // Larger interaction radius
+        const handAttractRadius = 4.0;
+
+        for (let i = 0; i < this.count; i++) {
+          const px = positions[i * 3];
+          const py = positions[i * 3 + 1];
+          const pz = positions[i * 3 + 2];
+
+          const tx = targets[i * 3];
+          const ty = targets[i * 3 + 1];
+          const tz = targets[i * 3 + 2];
+
+          // Smoother interpolation to target shape
+          positions[i * 3] += (tx - px) * this.lerpFactor;
+          positions[i * 3 + 1] += (ty - py) * this.lerpFactor;
+          positions[i * 3 + 2] += (tz - pz) * this.lerpFactor;
+
+          if (handActive) {
+            const dx = px - influenceX;
+            const dy = py - influenceY;
+            const dz = pz - influenceZ;
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+            // Repel on open hand (more responsive)
+            if (dist < handRepelRadius && !handData.isPinch) {
+              const force = Math.pow((handRepelRadius - dist) / handRepelRadius, 1.5);
+              positions[i * 3] += dx * force * 0.25;
+              positions[i * 3 + 1] += dy * force * 0.25;
+              positions[i * 3 + 2] += dz * force * 0.15;
+            }
+
+            // Attract on pinch (stronger pull)
+            if (handData.isPinch && dist < handAttractRadius) {
+              const attractForce = 0.15;
+              positions[i * 3] -= dx * attractForce;
+              positions[i * 3 + 1] -= dy * attractForce;
+              positions[i * 3 + 2] -= dz * attractForce * 0.8;
+
+              // Hot colors on pinch
+              colors[i * 3] += (1.0 - colors[i * 3]) * 0.15;
+              colors[i * 3 + 1] += (0.3 - colors[i * 3 + 1]) * 0.15;
+              colors[i * 3 + 2] += (0.1 - colors[i * 3 + 2]) * 0.15;
+            } else {
+              colors[i * 3] += (0.4 - colors[i * 3]) * 0.05;
+              colors[i * 3 + 1] += (0.8 - colors[i * 3 + 1]) * 0.05;
+              colors[i * 3 + 2] += (1.0 - colors[i * 3 + 2]) * 0.05;
+            }
+          } else {
+            const pulse = Math.sin(this.time + px * 0.5) * 0.2 + 0.8;
+            colors[i * 3] = pulse;
+            colors[i * 3 + 1] = pulse * 0.8;
+            colors[i * 3 + 2] = 1.0;
+          }
+
+          if (this.currentShape === 'saturn') {
+            const xx = positions[i * 3];
+            const zz = positions[i * 3 + 2];
+            const angle = 0.01;
+            positions[i * 3] = xx * Math.cos(angle) - zz * Math.sin(angle);
+            positions[i * 3 + 2] = xx * Math.sin(angle) + zz * Math.cos(angle);
+          }
+        }
+
+        this.geometry.attributes.position.needsUpdate = true;
+        this.geometry.attributes.color.needsUpdate = true;
+      }
+    }
+
+    const particleSystem = new ParticleSystem(scene);
+    let hands, handData = null;
+
+    async function initCamera() {
+      try {
+        statsElement.innerText = "Requesting camera access...";
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 1280, height: 720, facingMode: 'user' }
+        });
+        videoElement.srcObject = stream;
+        await new Promise(resolve => videoElement.onloadedmetadata = resolve);
+        await videoElement.play();
+        statsElement.innerText = "Loading hand tracking model...";
+        await initHandTracking();
+      } catch (error) {
+        statsElement.innerText = `Camera Error: ${error.message}`;
+        statsElement.style.color = 'red';
+        startBtn.style.display = 'block';
+      }
+    }
+
+    async function initHandTracking() {
+      try {
+        hands = new Hands({
+          locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+          }
+        });
+
+        hands.setOptions({
+          maxNumHands: 2,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.7, // Higher confidence for stability
+          minTrackingConfidence: 0.7  // Better tracking smoothness
+        });
+
+        hands.onResults(onResults);
+
+        statsElement.innerText = "Ready! Show your hand 🖐️";
+        startBtn.style.display = 'none';
+
+        // Start both animation loops
+        animate();
+        sendToHandTracking();
+      } catch (error) {
+        statsElement.innerText = `Hand Tracking Error: ${error.message}`;
+        statsElement.style.color = 'red';
+      }
+    }
+
+    function onResults(results) {
+      if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        const landmarks = results.multiHandLandmarks[0];
+        const thumbTip = landmarks[4];
+        const indexTip = landmarks[8];
+        const palmCenter = landmarks[9];
+
+        const distance = Math.sqrt(
+          Math.pow(thumbTip.x - indexTip.x, 2) +
+          Math.pow(thumbTip.y - indexTip.y, 2) +
+          Math.pow(thumbTip.z - indexTip.z, 2)
+        );
+
+        handData = {
+          x: palmCenter.x,
+          y: palmCenter.y,
+          z: palmCenter.z || 0,
+          isPinch: distance < 0.08
+        };
+
+        statsElement.innerText = `Hands: ${results.multiHandLandmarks.length} | ${handData.isPinch ? '🤏 Pinching!' : '✋ Open'}`;
+      } else {
+        handData = null;
+        statsElement.innerText = "No hands detected";
+      }
+    }
+
+    async function sendToHandTracking() {
+      if (hands && videoElement.readyState >= 2) {
+        await hands.send({ image: videoElement });
+      }
+      requestAnimationFrame(sendToHandTracking);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      particleSystem.update(handData);
+      renderer.render(scene, camera);
+    }
+
+    // Shape cycling
+    setInterval(() => {
+      particleSystem.cycleShape();
+      const shapeName = particleSystem.currentShape;
+      const shapeCapitalized = shapeName.charAt(0).toUpperCase() + shapeName.slice(1);
+      document.querySelector('p').innerText = `Shape: ${shapeCapitalized} | Show your hand! 🖐️`;
+    }, 5000);
+
+    startBtn.addEventListener('click', async () => {
+      startBtn.innerText = "Loading...";
+      startBtn.disabled = true;
+      await initCamera();
+    });
+
+    // Try auto-start
+    window.addEventListener('load', () => {
+      startBtn.click();
+    });
+  </script>
+</body>
+
+</html>
