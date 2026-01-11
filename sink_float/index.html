@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sink or Float? - Naksh's Game Arcade</title>
+    <!-- Use the same font as the main portal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <header>
+            <a href="../index.html" class="back-btn">← Back to Arcade</a>
+            <h1>Sink or Float?</h1>
+            <p class="subtitle">Will it sink or will it swim? You decide!</p>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <div class="water-tank-container">
+                    <div class="water-tank">
+                        <div class="water">
+                            <div class="wave"></div>
+                            <div class="wave"></div>
+                        </div>
+                        <div id="game-object" class="object-display">❓</div>
+                    </div>
+                </div>
+
+                <div class="controls-area">
+                    <div id="prediction-panel" class="panel">
+                        <h2>Current Object: <span id="object-name">Loading...</span></h2>
+                        <p class="question">What will happen?</p>
+                        <div class="buttons">
+                            <button id="btn-sink" class="action-btn sink-btn">👇 Sink</button>
+                            <button id="btn-float" class="action-btn float-btn">⛵ Float</button>
+                        </div>
+                    </div>
+
+                    <div id="result-panel" class="panel hidden">
+                        <h2 id="result-title">Result</h2>
+                        <p id="result-message">Message goes here</p>
+                        <div class="explanation-box">
+                            <h3>Why?</h3>
+                            <p id="explanation-text">Explanation goes here</p>
+                        </div>
+                        <button id="btn-next" class="action-btn next-btn">Next Object ➡️</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="score-board">
+                <span>Score: <span id="score">0</span></span>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
