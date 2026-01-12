@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML to JSON Converter - Naksh's Game Arcade</title>
+    <link rel="icon" type="image/png" href="../logo.png">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Orbitron:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --border-color: #ffffff;
+            --dim-color: #666666;
+            --accent-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header-bar {
+            display: flex;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--border-color);
+            flex-shrink: 0;
+            justify-content: space-between;
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 300px 1fr;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Columns */
+        .col {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--dim-color);
+        }
+
+        .col:last-child {
+            border-right: none;
+        }
+
+        .col-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        textarea {
+            flex: 1;
+            background-color: #111;
+            color: #fff;
+            border: 1px solid var(--dim-color);
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* Controls Section */
+        .controls-container {
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 0.8rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: 1px solid var(--text-color);
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--text-color);
+        }
+
+        .btn-small {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--dim-color);
+        }
+
+        .btn-small:hover {
+            border-color: var(--text-color);
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #333;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+
+        .field-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .field-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px;
+        }
+
+        .field-item:hover {
+            background-color: #222;
+        }
+
+        .error-msg {
+            color: #ff3333;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            min-height: 1.2em;
+        }
+
+        .back-link {
+            color: var(--dim-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-right: 1rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header-bar">
+        <div class="header-title">XML to JSON Converter</div>
+        <a href="../index.html" class="back-link">EXIT TOOL</a>
+    </header>
+
+    <div class="main-container">
+        <!-- Input Column -->
+        <div class="col">
+            <div class="col-header">
+                <span>XML INPUT</span>
+                <button class="btn-small" onclick="pasteSample()">PASTE SAMPLE</button>
+            </div>
+            <textarea id="xmlInput" placeholder="<?xml...>"></textarea>
+            <div id="xmlError" class="error-msg"></div>
+        </div>
+
+        <!-- Controls Column -->
+        <div class="col options-col">
+            <div class="col-header">SETTINGS</div>
+
+            <div class="controls-container">
+                <button class="btn" onclick="processConversion()">CONVERT >></button>
+
+                <div class="options-group">
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="stripNamespaces" checked onchange="processConversion()">
+                        <span>Strip Namespaces</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="ignoreAttributes" checked onchange="processConversion()">
+                        <span>Ignore Attributes</span>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="simplifyStructure" checked onchange="processConversion()">
+                        <span>Simplify Structure</span>
+                    </label>
+                </div>
+
+                <div class="options-group">
+                    <div class="col-header" style="font-size: 0.9rem; margin-bottom: 0.5rem;">SELECT FIELDS</div>
+                    <div id="fieldsList" class="field-list">
+                        <div style="color: #666; font-size: 0.8rem; font-style: italic;">Provide XML input to see
+                            fields...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output Column -->
+        <div class="col">
+            <div class="col-header">
+                <span>JSON OUTPUT</span>
+                <button class="btn-small" onclick="copyJson()">COPY JSON</button>
+            </div>
+            <textarea id="jsonOutput" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        const sampleXML = `<?xml version="1.0" encoding="utf-8"?><feed xml:base="https://covgov.sharepoint.com/sites/DOE-TechnologySysDev/_api/" xmlns="http://www.w3.org/2005/Atom" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml"><id>57ddff94-4928-4c2f-9fa6-dd2448bf6b98</id><title /><updated>2026-01-12T02:26:18Z</updated><entry><id>https://covgov.sharepoint.com/sites/DOE-TechnologySysDev/_api/Web/RoleAssignments/GetByPrincipalId(3)</id><category term="SP.RoleAssignment" scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme" /><content type="application/xml"><m:properties><d:Id m:type="Edm.Int32">3</d:Id><d:LoginName>TechnologySysDev Owners</d:LoginName></m:properties></content></entry><entry><id>https://covgov.sharepoint.com/sites/DOE-TechnologySysDev/_api/Web/RoleAssignments/GetByPrincipalId(4)</id><content type="application/xml"><m:properties><d:Id m:type="Edm.Int32">4</d:Id><d:LoginName>TechnologySysDev Visitors</d:LoginName></m:properties></content></entry></feed>`;
+
+        let rawParsedData = null; // Stores the Array<Object> after simplification
+        let availableKeys = new Set();
+        let selectedKeys = new Set();
+
+        function pasteSample() {
+            document.getElementById('xmlInput').value = sampleXML;
+            processConversion(true); // reset fields
+        }
+
+        // Main Orchestrator
+        function processConversion(resetFields = false) {
+            const xmlText = document.getElementById('xmlInput').value;
+            const errorDiv = document.getElementById('xmlError');
+            const jsonOutput = document.getElementById('jsonOutput');
+            const config = {
+                stripNamespaces: document.getElementById('stripNamespaces').checked,
+                ignoreAttributes: document.getElementById('ignoreAttributes').checked,
+                simplifyStructure: document.getElementById('simplifyStructure').checked
+            };
+
+            errorDiv.textContent = '';
+
+            if (!xmlText.trim()) {
+                jsonOutput.value = '';
+                return;
+            }
+
+            try {
+                // 1. XML -> Basic JSON
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                if (xmlDoc.querySelector("parsererror")) {
+                    throw new Error("Invalid XML Format");
+                }
+                let json = xmlToJson(xmlDoc.documentElement, config);
+
+                // 2. Simplify
+                if (config.simplifyStructure) {
+                    json = simplifyDeep(json);
+                }
+
+                // Normalizing to Array for filtering
+                if (!Array.isArray(json)) {
+                    json = [json];
+                }
+
+                rawParsedData = json;
+
+                // 3. Extract Keys (Only if text changed significantly or requested)
+                // For simplicity, we re-extract keys on every success conversion unless just toggling checkboxes
+                // But we want to preserve selection if possible.
+                // If resetFields is true (new input), we re-gen everything.
+                if (resetFields || availableKeys.size === 0) {
+                    extractKeys(rawParsedData);
+                    renderFieldList();
+                }
+
+                // 4. Filter Data based on selection
+                const filteredData = filterData(rawParsedData);
+
+                // 5. Output
+                jsonOutput.value = JSON.stringify(filteredData, null, 2);
+
+            } catch (e) {
+                errorDiv.textContent = e.message;
+            }
+        }
+
+        function extractKeys(data) {
+            availableKeys.clear();
+            selectedKeys.clear();
+
+            data.forEach(item => {
+                if (item && typeof item === 'object') {
+                    Object.keys(item).forEach(k => {
+                        availableKeys.add(k);
+                        selectedKeys.add(k); // Default select all
+                    });
+                }
+            });
+        }
+
+        function renderFieldList() {
+            const container = document.getElementById('fieldsList');
+            container.innerHTML = '';
+
+            if (availableKeys.size === 0) {
+                container.innerHTML = '<div style="color: #666; font-size: 0.8rem; font-style: italic;">No fields found</div>';
+                return;
+            }
+
+            // "Select All" / "Deselect All" helper logic could go here, but simple list for now.
+
+            const sortedKeys = Array.from(availableKeys).sort();
+
+            sortedKeys.forEach(key => {
+                const div = document.createElement('div');
+                div.className = 'field-item';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = selectedKeys.has(key);
+                checkbox.onchange = (e) => {
+                    if (e.target.checked) selectedKeys.add(key);
+                    else selectedKeys.delete(key);
+                    updateOutputOnly(); // Just re-filter, don't re-parse DOM
+                };
+
+                const label = document.createElement('span');
+                label.textContent = key;
+                label.style.fontSize = '0.9rem';
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+
+        function updateOutputOnly() {
+            if (!rawParsedData) return;
+            const filtered = filterData(rawParsedData);
+            document.getElementById('jsonOutput').value = JSON.stringify(filtered, null, 2);
+        }
+
+        function filterData(data) {
+            // Data is array of objects
+            return data.map(item => {
+                if (typeof item !== 'object' || item === null) return item;
+
+                const newItem = {};
+                let hasKey = false;
+                selectedKeys.forEach(key => {
+                    if (item.hasOwnProperty(key)) {
+                        newItem[key] = item[key];
+                        hasKey = true;
+                    }
+                });
+                // If filtering removed all keys, maybe don't return empty object? 
+                // Return newItem anyway.
+                return newItem;
+            });
+        }
+
+        // --- Core Logic Reused ---
+        function xmlToJson(xml, config) {
+            let obj = {};
+
+            if (xml.nodeType === 1) {
+                if (xml.attributes.length > 0 && !config.ignoreAttributes) {
+                    for (let j = 0; j < xml.attributes.length; j++) {
+                        const attribute = xml.attributes.item(j);
+                        if (attribute.nodeName.startsWith('xmlns') && config.stripNamespaces) continue;
+                        let attrName = attribute.nodeName;
+                        if (config.stripNamespaces && attrName.includes(':')) attrName = attrName.split(':')[1];
+                        obj["@" + attrName] = attribute.nodeValue;
+                    }
+                }
+            } else if (xml.nodeType === 3) {
+                return xml.nodeValue.trim();
+            }
+
+            if (xml.hasChildNodes()) {
+                for (let i = 0; i < xml.childNodes.length; i++) {
+                    const item = xml.childNodes.item(i);
+                    if (item.nodeType === 3) {
+                        const content = item.nodeValue.trim();
+                        if (content) {
+                            if (xml.childNodes.length === 1 && Object.keys(obj).length === 0) return content;
+                            if (!obj['#text']) obj['#text'] = [];
+                            obj['#text'].push(content);
+                        }
+                        continue;
+                    }
+                    let nodeName = item.nodeName;
+                    if (config.stripNamespaces && nodeName.includes(':')) nodeName = nodeName.split(':')[1];
+                    if (typeof (obj[nodeName]) == "undefined") obj[nodeName] = xmlToJson(item, config);
+                    else {
+                        if (typeof (obj[nodeName].push) == "undefined") {
+                            const old = obj[nodeName];
+                            obj[nodeName] = [];
+                            obj[nodeName].push(old);
+                        }
+                        obj[nodeName].push(xmlToJson(item, config));
+                    }
+                }
+            }
+            if (obj['#text']) {
+                if (obj['#text'].length === 1) obj['#text'] = obj['#text'][0];
+                if (Object.keys(obj).length === 1) return obj['#text'];
+            }
+            return obj;
+        }
+
+        function simplifyDeep(obj) {
+            const blacklist = ['id', 'link', 'category', 'updated', 'authored', 'title', 'xml:base', 'xmlns'];
+            if (Array.isArray(obj)) return obj.map(simplifyDeep);
+            if (typeof obj === 'object' && obj !== null) {
+                if (obj.properties) return simplifyDeep(obj.properties);
+                if (obj.content && typeof obj.content === 'object' && obj.content.properties) return simplifyDeep(obj.content.properties);
+                if (Object.keys(obj).length === 1 && obj.feed) return simplifyDeep(obj.feed);
+                if (Object.keys(obj).length === 1 && obj.entry) return simplifyDeep(obj.entry);
+
+                const newObj = {};
+                for (const key in obj) {
+                    if (blacklist.includes(key.toLowerCase())) continue;
+                    newObj[key] = simplifyDeep(obj[key]);
+                }
+                return newObj;
+            }
+            return obj;
+        }
+
+        function copyJson() {
+            const output = document.getElementById('jsonOutput');
+            output.select();
+            document.execCommand('copy');
+            const btn = document.querySelector('button[onclick="copyJson()"]');
+            btn.textContent = "COPIED!";
+            setTimeout(() => btn.textContent = "COPY JSON", 1500);
+        }
+
+        // Init with listeners
+        document.getElementById('xmlInput').addEventListener('input', () => processConversion(true)); // Re-gen fields on text change
+    </script>
+</body>
+
+</html>
