@@ -1,0 +1,2852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Helix · IT Portfolio & Resource Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* ===================== DESIGN TOKENS ===================== */
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-2: #f5f5f4;
+  --surface-3: #e7e5e4;
+  --border: #e7e5e4;
+  --border-strong: #d6d3d1;
+  --text: #0c0a09;
+  --text-muted: #57534e;
+  --text-soft: #a8a29e;
+
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-bg: #eef2ff;
+  --primary-ring: rgba(79,70,229,0.18);
+
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --warning: #d97706;
+  --warning-bg: #fef3c7;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
+  --info: #0284c7;
+  --info-bg: #e0f2fe;
+
+  --util-under: #0ea5e9;
+  --util-healthy: #10b981;
+  --util-stretched: #f59e0b;
+  --util-over: #ef4444;
+
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+  --shadow-xl: 0 20px 50px rgba(0,0,0,0.12);
+
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===================== RESET & BASE ===================== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+input, select, textarea { font-family: inherit; font-size: inherit; }
+.mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* ===================== HEADER ===================== */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+.brand-logo svg { width: 20px; height: 20px; stroke: white; }
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+.brand-tag { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+
+.main-nav { display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: var(--radius-lg); overflow-x: auto; max-width: 100%; }
+.nav-btn {
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 180ms var(--ease);
+  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { color: var(--text); background: rgba(255,255,255,0.6); }
+.nav-btn.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+.nav-btn svg { width: 14px; height: 14px; }
+.nav-btn.hidden { display: none; }
+
+.header-right { display: flex; align-items: center; gap: 12px; }
+.role-pill {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px 6px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+}
+.role-pill:hover { border-color: var(--border-strong); }
+.role-pill .role-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--primary); }
+.role-pill[data-role="manager"] .role-dot { background: var(--info); }
+.role-pill[data-role="pm"] .role-dot { background: #8b5cf6; }
+.role-pill[data-role="member"] .role-dot { background: var(--text-soft); }
+
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ===================== ROLE PICKER MODAL ===================== */
+.role-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 6px;
+  min-width: 240px;
+  display: none;
+  z-index: 100;
+  animation: menuOpen 180ms var(--ease-out);
+}
+.role-menu.open { display: block; }
+@keyframes menuOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.role-menu-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 10px 12px;
+  border-radius: var(--radius);
+  text-align: left;
+  font-size: 13px;
+  transition: background 120ms;
+}
+.role-menu-item:hover { background: var(--surface-2); }
+.role-menu-item .role-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.role-menu-item .role-info { flex: 1; }
+.role-menu-item .role-name { font-weight: 500; }
+.role-menu-item .role-desc { font-size: 11px; color: var(--text-soft); margin-top: 1px; }
+.role-menu-item.selected { background: var(--primary-bg); }
+
+/* ===================== LAYOUT ===================== */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.page { display: none; animation: pageEnter 280ms var(--ease-out); }
+.page.active { display: block; }
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap; gap: 12px;
+}
+.page-title-block h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+.page-title-block p { color: var(--text-muted); font-size: 13px; margin: 2px 0 0; }
+.page-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  transition: all 150ms var(--ease);
+}
+.btn:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow); }
+.btn-primary { background: var(--primary); color: white; border-color: var(--primary); }
+.btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+.btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
+.btn-danger:hover { background: #b91c1c; border-color: #b91c1c; }
+.btn svg { width: 14px; height: 14px; }
+.btn-icon { padding: 7px; width: 32px; height: 32px; justify-content: center; }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+.btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+
+/* ===================== CARDS & KPIs ===================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: border-color 180ms var(--ease);
+}
+.card-tight { padding: 16px; }
+.card-title {
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4px;
+}
+.card-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-5 { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 1100px) {
+  .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+}
+
+.kpi {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 200ms var(--ease);
+  cursor: pointer;
+}
+.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
+.kpi-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.kpi-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.kpi-icon svg { width: 18px; height: 18px; }
+.kpi-trend {
+  display: flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 500;
+  padding: 3px 7px; border-radius: 999px;
+}
+.kpi-trend.up { color: var(--success); background: var(--success-bg); }
+.kpi-trend.down { color: var(--danger); background: var(--danger-bg); }
+.kpi-value {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.kpi-label { font-size: 12px; color: var(--text-muted); }
+.kpi-sparkline {
+  position: absolute;
+  right: 0; bottom: 0;
+  width: 80px; height: 32px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ===================== BADGES ===================== */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 999px; }
+.badge-active { background: var(--success-bg); color: #15803d; }
+.badge-planning { background: var(--info-bg); color: #075985; }
+.badge-onhold { background: var(--warning-bg); color: #92400e; }
+.badge-completed { background: var(--surface-2); color: var(--text-muted); }
+.badge-active .badge-dot { background: var(--success); }
+.badge-planning .badge-dot { background: var(--info); }
+.badge-onhold .badge-dot { background: var(--warning); }
+.badge-completed .badge-dot { background: var(--text-soft); }
+.badge-priority-high { background: var(--danger-bg); color: #991b1b; }
+.badge-priority-medium { background: var(--warning-bg); color: #92400e; }
+.badge-priority-low { background: var(--surface-2); color: var(--text-muted); }
+
+/* ===================== AVATARS ===================== */
+.avatar {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  border: 2px solid white;
+  cursor: default;
+  transition: transform 150ms var(--ease);
+}
+.avatar:hover { transform: scale(1.1); z-index: 1; }
+.avatar.sm { width: 22px; height: 22px; font-size: 9px; }
+.avatar.lg { width: 40px; height: 40px; font-size: 13px; border-width: 3px; }
+.avatar-stack { display: flex; }
+.avatar-stack .avatar:not(:first-child) { margin-left: -8px; }
+.avatar-stack .avatar.sm:not(:first-child) { margin-left: -6px; }
+.avatar-more {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+  margin-left: -8px;
+}
+
+/* ===================== CHARTS ===================== */
+.chart-container { position: relative; width: 100%; }
+.chart-svg { width: 100%; display: block; }
+
+/* ===================== PROGRESS ===================== */
+.progress {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 800ms var(--ease-out);
+  background: var(--primary);
+}
+.progress.thin { height: 4px; }
+
+/* ===================== PROJECT CARDS ===================== */
+.project-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: all 200ms var(--ease);
+}
+.project-row:hover { border-color: var(--border-strong); }
+.project-row-head {
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 16px;
+  cursor: pointer;
+}
+.project-expand-icon {
+  width: 18px; height: 18px;
+  color: var(--text-soft);
+  transition: transform 200ms var(--ease);
+}
+.project-row.expanded .project-expand-icon { transform: rotate(90deg); }
+.project-row.expanded { box-shadow: var(--shadow-lg); }
+.project-name-block { flex: 1; min-width: 0; }
+.project-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.project-code { font-size: 11px; color: var(--text-soft); font-family: 'Geist Mono', monospace; margin-top: 2px; }
+.project-meta {
+  display: flex; align-items: center; gap: 24px;
+  font-size: 12px;
+}
+.project-meta-item { display: flex; flex-direction: column; align-items: flex-end; }
+.project-meta-label { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; }
+.project-meta-value { font-weight: 500; }
+.project-health {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.phases-container {
+  display: none;
+  padding: 0 18px 14px 38px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  animation: phasesIn 300ms var(--ease-out);
+}
+.project-row.expanded .phases-container { display: block; }
+@keyframes phasesIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.phase-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.phase-item:last-child { border-bottom: none; }
+.phase-marker {
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.phase-name { font-weight: 500; flex: 1; }
+.phase-dates { font-size: 11px; color: var(--text-muted); font-family: 'Geist Mono', monospace; }
+.phase-progress { width: 140px; }
+.phase-progress-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.task-summary {
+  padding: 12px 0 4px;
+  border-top: 1px dashed var(--border);
+  margin-top: 8px;
+  display: flex; gap: 14px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.task-summary-item { display: flex; align-items: center; gap: 4px; }
+.task-summary-dot { width: 7px; height: 7px; border-radius: 999px; }
+
+/* ===================== GANTT ===================== */
+.gantt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.gantt-toolbar {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.gantt-zoom { display: flex; gap: 4px; padding: 3px; background: var(--surface-2); border-radius: var(--radius); }
+.gantt-zoom button {
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-radius: 5px;
+  transition: all 120ms var(--ease);
+}
+.gantt-zoom button:hover { color: var(--text); }
+.gantt-zoom button.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+
+.gantt-body {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  position: relative;
+}
+.gantt-sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.gantt-timeline {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.gantt-months {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  height: 40px;
+  position: sticky; top: 0;
+}
+.gantt-month {
+  flex: 1; min-width: 100px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-right: 1px solid var(--border);
+}
+.gantt-month-name { font-size: 11px; }
+.gantt-month-sub { font-size: 9px; color: var(--text-soft); }
+
+.gantt-sidebar-head {
+  height: 40px;
+  display: flex; align-items: center;
+  padding: 0 16px;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.gantt-row { height: 36px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 16px; font-size: 13px; gap: 8px; }
+.gantt-row.project-row-gantt { font-weight: 600; cursor: pointer; }
+.gantt-row.phase-row-gantt { padding-left: 36px; font-size: 12px; color: var(--text-muted); }
+.gantt-row .gantt-chevron { width: 14px; height: 14px; color: var(--text-soft); transition: transform 200ms var(--ease); }
+.gantt-row.expanded .gantt-chevron { transform: rotate(90deg); }
+.gantt-row .gantt-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gantt-row .gantt-row-meta { margin-left: auto; font-size: 10px; color: var(--text-soft); font-family: 'Geist Mono', monospace; }
+
+.gantt-canvas {
+  position: relative;
+  height: var(--gantt-canvas-height, 600px);
+  min-width: 800px;
+}
+.gantt-grid-row {
+  height: 36px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.gantt-bar {
+  position: absolute;
+  height: 22px;
+  top: 7px;
+  border-radius: 6px;
+  display: flex; align-items: center;
+  padding: 0 8px;
+  font-size: 11px;
+  color: white;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 200ms var(--ease);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  z-index: 2;
+}
+.gantt-bar:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10; }
+.gantt-bar.project-bar {
+  height: 6px;
+  top: 15px;
+  background: var(--text);
+  opacity: 0.15;
+  border-radius: 3px;
+  padding: 0;
+}
+.gantt-today {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 2px;
+  background: var(--danger);
+  z-index: 5;
+  pointer-events: none;
+}
+.gantt-today::before {
+  content: 'Today';
+  position: absolute;
+  top: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--danger);
+  color: white;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-family: 'Geist', sans-serif;
+}
+.dependency-svg {
+  position: absolute;
+  inset: 40px 0 0 0;
+  width: 100%;
+  height: calc(100% - 40px);
+  pointer-events: none;
+  z-index: 3;
+}
+.dependency-path {
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+  animation: dashFlow 4s linear infinite;
+}
+@keyframes dashFlow {
+  to { stroke-dashoffset: -10; }
+}
+
+/* ===================== ALLOCATION MATRIX ===================== */
+.matrix-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.matrix-toolbar {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.matrix-legend { display: flex; align-items: center; gap: 14px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.matrix-legend-item { display: flex; align-items: center; gap: 5px; }
+.matrix-legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+.matrix-table-wrap { overflow-x: auto; }
+.matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.matrix-table th, .matrix-table td { border-bottom: 1px solid var(--border); padding: 0; vertical-align: middle; }
+.matrix-table thead th {
+  background: var(--surface-2);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 8px;
+  text-align: center;
+  position: sticky; top: 0;
+  z-index: 5;
+}
+.matrix-table thead th.resource-col {
+  text-align: left;
+  padding-left: 16px;
+  min-width: 200px;
+  position: sticky;
+  left: 0;
+  z-index: 6;
+}
+.matrix-table .resource-cell {
+  padding: 8px 16px;
+  text-align: left;
+  background: var(--surface);
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  border-right: 1px solid var(--border);
+}
+.matrix-table .resource-info { display: flex; align-items: center; gap: 10px; }
+.matrix-table .resource-name { font-weight: 500; font-size: 12px; }
+.matrix-table .resource-role { font-size: 10px; color: var(--text-soft); }
+.matrix-table .alloc-cell {
+  text-align: center;
+  padding: 4px;
+}
+.alloc-pill {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-weight: 500;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+}
+.alloc-pill:hover { transform: scale(1.05); z-index: 1; position: relative; }
+.alloc-pill.idle { background: var(--surface-2); color: var(--text-soft); }
+.alloc-pill.under { background: #e0f2fe; color: #075985; }
+.alloc-pill.healthy { background: #d1fae5; color: #065f46; }
+.alloc-pill.stretched { background: #fef3c7; color: #92400e; }
+.alloc-pill.over { background: #fee2e2; color: #991b1b; box-shadow: inset 0 0 0 1px #fca5a5; }
+.matrix-table .total-cell {
+  text-align: center;
+  background: var(--surface-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  padding: 6px;
+}
+.matrix-table tfoot .total-cell {
+  background: var(--surface-3);
+}
+.matrix-table .project-header {
+  min-width: 80px;
+  max-width: 100px;
+}
+.matrix-table .project-header .project-code-sm {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.matrix-table .project-header .project-name-sm {
+  font-weight: 400;
+  font-size: 9px;
+  color: var(--text-soft);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ===================== KANBAN ===================== */
+.kanban-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.kanban-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.select {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text);
+  transition: border-color 150ms var(--ease);
+}
+.select:hover { border-color: var(--border-strong); }
+.select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
+
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  min-height: 60vh;
+}
+@media (max-width: 1100px) { .kanban-board { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .kanban-board { grid-template-columns: 1fr; } }
+
+.kanban-col {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  display: flex; flex-direction: column;
+  min-height: 200px;
+  transition: background 150ms var(--ease), border-color 150ms var(--ease);
+}
+.kanban-col.drag-over { background: var(--primary-bg); border-color: var(--primary); }
+.kanban-col-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.kanban-col-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
+.kanban-col-dot { width: 8px; height: 8px; border-radius: 999px; }
+.kanban-col-count {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: var(--surface);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.kanban-col-count.over-wip { background: var(--danger-bg); color: var(--danger); font-weight: 600; }
+.kanban-col-body {
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 8px;
+  flex: 1;
+}
+
+.task-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: grab;
+  transition: all 180ms var(--ease);
+  position: relative;
+}
+.task-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow); transform: translateY(-1px); }
+.task-card.dragging { opacity: 0.45; cursor: grabbing; }
+.task-card-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.task-card-title { font-size: 13px; font-weight: 500; line-height: 1.35; flex: 1; }
+.task-card-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.task-card-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-family: 'Geist Mono', monospace;
+}
+.task-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.task-card-due {
+  display: flex; align-items: center; gap: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.task-card-due.overdue { color: var(--danger); font-weight: 500; }
+.task-card-due.soon { color: var(--warning); font-weight: 500; }
+.task-card-proj {
+  font-family: 'Geist Mono', monospace;
+  font-size: 10px;
+  color: var(--text-soft);
+}
+.task-card-add {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  padding: 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+}
+.task-card-add:hover { background: var(--surface); color: var(--text); border-color: var(--primary); border-style: solid; }
+
+/* ===================== MODAL ===================== */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(12,10,9,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 24px;
+  animation: backdropIn 200ms var(--ease-out);
+}
+.modal-backdrop.open { display: flex; }
+@keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalIn 240ms var(--ease-spring);
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-head { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
+.modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-foot { padding: 14px 20px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); background: var(--surface-2); border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field-label { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.field-control {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text);
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+}
+.field-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ===================== PLAYGROUND ===================== */
+.playground-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  gap: 16px;
+  align-items: flex-start;
+}
+@media (max-width: 1300px) {
+  .playground-grid { grid-template-columns: 1fr; }
+}
+.scenario-builder {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+.scenario-action {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  background: var(--surface-2);
+  font-size: 12px;
+  transition: all 150ms var(--ease);
+}
+.scenario-action.add { border-color: var(--success); background: #f0fdf4; }
+.scenario-action.remove { border-color: var(--danger); background: #fef2f2; }
+.scenario-action-icon {
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+.scenario-action.add .scenario-action-icon { background: var(--success); color: white; }
+.scenario-action.remove .scenario-action-icon { background: var(--danger); color: white; }
+.scenario-action-text { flex: 1; }
+.scenario-action-title { font-weight: 500; }
+.scenario-action-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+.impact-stat {
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  margin-bottom: 10px;
+}
+.impact-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.impact-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.impact-stat-value.positive { color: var(--success); }
+.impact-stat-value.negative { color: var(--danger); }
+.impact-stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.forecast-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+/* ===================== TOOLTIP ===================== */
+.tooltip {
+  position: fixed;
+  z-index: 300;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 12px;
+  min-width: 220px;
+  max-width: 320px;
+  font-size: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+.tooltip.visible { opacity: 1; transform: translateY(0); }
+.tooltip-header {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px;
+}
+.tooltip-section { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.tooltip-row { display: flex; justify-content: space-between; align-items: center; padding: 2px 0; }
+.tooltip-row-label { color: var(--text-muted); font-size: 11px; }
+.tooltip-row-value { font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* ===================== ME / USER VIEW ===================== */
+.me-hero {
+  background: linear-gradient(135deg, #0c0a09 0%, #292524 100%);
+  color: white;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 28px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+.me-hero::before {
+  content: '';
+  position: absolute;
+  right: -100px;
+  top: -100px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+.me-hero h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.me-hero p { color: rgba(255,255,255,0.7); margin: 4px 0 0; font-size: 13px; }
+.me-ring-container { position: relative; width: 140px; height: 140px; }
+.me-ring-text {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.me-ring-value { font-size: 36px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.me-ring-label { font-size: 11px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.08em; }
+.me-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 18px; }
+.me-stat { border-left: 2px solid rgba(255,255,255,0.15); padding-left: 16px; }
+.me-stat-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+.me-stat-value { font-size: 22px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.me-stat-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+/* ===================== MILESTONES ===================== */
+.milestone-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.milestone-row:last-child { border-bottom: none; }
+.milestone-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.milestone-icon.done { background: var(--success-bg); color: var(--success); }
+.milestone-icon.upcoming { background: var(--info-bg); color: var(--info); }
+.milestone-icon.at_risk { background: var(--danger-bg); color: var(--danger); }
+.milestone-icon svg { width: 14px; height: 14px; }
+.milestone-info { flex: 1; min-width: 0; }
+.milestone-name { font-size: 13px; font-weight: 500; }
+.milestone-meta { font-size: 11px; color: var(--text-muted); font-family: 'Geist Mono', monospace; }
+
+/* ===================== TOAST ===================== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+}
+.toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast svg { width: 14px; height: 14px; }
+
+/* ===================== EMPTY STATE ===================== */
+.empty-state {
+  padding: 40px 24px;
+  text-align: center;
+  color: var(--text-soft);
+}
+.empty-state svg { width: 36px; height: 36px; margin: 0 auto 10px; display: block; opacity: 0.6; }
+.empty-state-title { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+.empty-state-sub { font-size: 12px; margin-top: 4px; }
+
+/* ===================== ANIMATIONS ===================== */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.stagger-item {
+  opacity: 0;
+  animation: slideIn 400ms var(--ease-out) forwards;
+}
+.bar-grow { transform-origin: left center; animation: barGrow 600ms var(--ease-out) forwards; }
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ===================== SCROLLBAR ===================== */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
+
+/* ===================== ACCESSIBILITY ===================== */
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4c4 4 12 12 16 16M20 4c-4 4-12 12-16 16"/>
+          <line x1="4" y1="8" x2="20" y2="8"/>
+          <line x1="4" y1="16" x2="20" y2="16"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name" id="brandName">Helix</span>
+        <span class="brand-tag" id="brandTag">IT Portfolio &amp; Resource OS</span>
+      </div>
+    </div>
+
+    <nav class="main-nav" id="mainNav">
+      <button class="nav-btn active" data-section="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-btn" data-section="projects">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Projects
+      </button>
+      <button class="nav-btn" data-section="kanban">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="6" height="18" rx="1"/><rect x="10" y="3" width="6" height="12" rx="1"/><rect x="17" y="3" width="4" height="8" rx="1"/></svg>
+        Kanban
+      </button>
+      <button class="nav-btn" data-section="gantt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="14" y2="6"/><line x1="8" y1="12" x2="18" y2="12"/><line x1="6" y1="18" x2="16" y2="18"/></svg>
+        Gantt
+      </button>
+      <button class="nav-btn" data-section="allocations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>
+        Allocations
+      </button>
+      <button class="nav-btn" data-section="playground" id="playgroundNav">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg>
+        Playground
+      </button>
+      <button class="nav-btn" data-section="me">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My View
+      </button>
+    </nav>
+
+    <div class="header-right">
+      <div style="position: relative;">
+        <button class="role-pill" id="rolePillBtn" data-role="admin" aria-haspopup="true" aria-expanded="false">
+          <span class="role-dot"></span>
+          <span id="roleLabel">Admin</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="role-menu" id="roleMenu" role="menu">
+          <button class="role-menu-item selected" data-role="admin" role="menuitem">
+            <div class="role-icon" style="background: var(--primary-bg);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg></div>
+            <div class="role-info">
+              <div class="role-name">Admin</div>
+              <div class="role-desc">Full access including financials</div>
+            </div>
+          </button>
+          <button class="role-menu-item" data-role="manager" role="menuitem">
+            <div class="role-icon" style="background: var(--info-bg);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+            <div class="role-info">
+              <div class="role-name">Manager</div>
+              <div class="role-desc">Team queue, no financials</div>
+            </div>
+          </button>
+          <button class="role-menu-item" data-role="pm" role="menuitem">
+            <div class="role-icon" style="background: #f3e8ff;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+            <div class="role-info">
+              <div class="role-name">Project Manager</div>
+              <div class="role-desc">Own projects only, no financials</div>
+            </div>
+          </button>
+          <button class="role-menu-item" data-role="member" role="menuitem">
+            <div class="role-icon" style="background: var(--surface-2);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a8a29e" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="role-info">
+              <div class="role-name">Team Member</div>
+              <div class="role-desc">Own bandwidth and allocations</div>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="user-avatar" id="userAvatar">KP</div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section id="dashboard-page" class="page active">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1 id="dashboardTitle">Portfolio overview</h1>
+        <p id="dashboardSubtitle">Active portfolio across IT — Apps, Infra, Data, and Security workstreams</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn" id="exportBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+        <button class="btn btn-primary" data-open-modal="project">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New project
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-4" id="kpiGrid"></div>
+
+    <div class="grid grid-3" style="margin-top: 16px;">
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title">Portfolio burn</div>
+        <div class="card-subtitle">Planned vs actual spend (last 7 months)</div>
+        <div id="burnChart"></div>
+        <div style="display: flex; gap: 18px; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
+          <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: #4f46e5;"></span>Planned</span>
+          <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: #10b981;"></span>Actual</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Status mix</div>
+        <div class="card-subtitle">Distribution by project count</div>
+        <div id="statusDonut"></div>
+        <div id="statusLegend" style="margin-top: 10px;"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-5" style="margin-top: 16px;">
+      <div class="card" style="grid-column: span 3;">
+        <div class="card-title">Resource utilization</div>
+        <div class="card-subtitle">Hours allocated vs weekly capacity · Hover for detail</div>
+        <div id="utilChart"></div>
+      </div>
+      <div class="card" style="grid-column: span 2;">
+        <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Projects at risk</span>
+          <span class="badge" style="background: var(--danger-bg); color: var(--danger);" id="riskCount">0</span>
+        </div>
+        <div class="card-subtitle">Over budget or low health score</div>
+        <div id="risksList"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top: 16px;">
+      <div class="card">
+        <div class="card-title">Upcoming milestones</div>
+        <div class="card-subtitle">Next 90 days across the portfolio</div>
+        <div id="milestoneList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Active sprint snapshot</div>
+        <div class="card-subtitle" id="sprintSubtitle">Tasks by status</div>
+        <div id="sprintSnapshot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PROJECTS ===================== -->
+  <section id="projects-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>Projects</h1>
+        <p>Click any project to expand and view its phases and tasks</p>
+      </div>
+      <div class="page-actions">
+        <select class="select" id="projectStatusFilter">
+          <option value="all">All statuses</option>
+          <option value="active">Active</option>
+          <option value="planning">Planning</option>
+          <option value="onhold">On hold</option>
+          <option value="completed">Completed</option>
+        </select>
+        <button class="btn btn-primary" data-open-modal="project">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New project
+        </button>
+      </div>
+    </div>
+    <div id="projectList"></div>
+  </section>
+
+  <!-- ===================== KANBAN ===================== -->
+  <section id="kanban-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>Kanban</h1>
+        <p>Drag a card to move it between columns · Click a card to edit</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn btn-primary" data-open-modal="task">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New task
+        </button>
+      </div>
+    </div>
+
+    <div class="kanban-toolbar">
+      <div class="kanban-filters">
+        <select class="select" id="kanbanProjectFilter">
+          <option value="all">All projects</option>
+        </select>
+        <select class="select" id="kanbanAssigneeFilter">
+          <option value="all">All assignees</option>
+        </select>
+        <select class="select" id="kanbanSprintFilter">
+          <option value="all">All sprints</option>
+        </select>
+        <select class="select" id="kanbanPriorityFilter">
+          <option value="all">All priorities</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div style="font-size: 12px; color: var(--text-muted);">
+        <span id="kanbanTaskCount">0 tasks</span>
+      </div>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard"></div>
+  </section>
+
+  <!-- ===================== GANTT ===================== -->
+  <section id="gantt-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>Gantt &amp; dependencies</h1>
+        <p>Phases nested under projects · Click bars for detail · Dashed lines are dependencies</p>
+      </div>
+      <div class="page-actions">
+        <div class="gantt-zoom">
+          <button>Day</button>
+          <button>Week</button>
+          <button class="active">Month</button>
+          <button>Quarter</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="gantt">
+      <div class="gantt-toolbar">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <span style="font-size: 12px; color: var(--text-muted);">Showing</span>
+          <span class="badge badge-active" id="ganttProjCount"><span class="badge-dot"></span>0 projects</span>
+          <span class="badge" style="background: var(--surface-2); color: var(--text-muted);" id="ganttPhaseCount">0 phases</span>
+          <span class="badge" style="background: var(--info-bg); color: var(--info);" id="ganttDepCount">0 dependencies</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
+          <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #4f46e5;"></span>Discovery</span>
+          <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #8b5cf6;"></span>Design</span>
+          <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #10b981;"></span>Build</span>
+          <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #f59e0b;"></span>Test</span>
+          <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 10px; height: 10px; border-radius: 3px; background: #06b6d4;"></span>Deploy</span>
+        </div>
+      </div>
+      <div class="gantt-body">
+        <div class="gantt-sidebar">
+          <div class="gantt-sidebar-head">Project / Phase</div>
+          <div id="ganttSidebar"></div>
+        </div>
+        <div class="gantt-timeline">
+          <div class="gantt-months" id="ganttMonths"></div>
+          <div class="gantt-canvas" id="ganttCanvas">
+            <svg class="dependency-svg" id="dependencySvg">
+              <defs>
+                <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="6" refY="3" orient="auto">
+                  <polygon points="0 0, 8 3, 0 6" fill="#78716c"/>
+                </marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ALLOCATIONS ===================== -->
+  <section id="allocations-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>Allocation matrix</h1>
+        <p>Hours per week · Hover any cell for detail · Color shows row utilization band</p>
+      </div>
+      <div class="page-actions">
+        <span style="font-size: 13px; font-weight: 500;" id="weekLabel">Week of May 11, 2026</span>
+      </div>
+    </div>
+
+    <div class="matrix-wrap">
+      <div class="matrix-toolbar">
+        <div class="matrix-legend">
+          <span class="matrix-legend-item"><span class="matrix-legend-swatch" style="background: #e0f2fe;"></span>Under (≤60%)</span>
+          <span class="matrix-legend-item"><span class="matrix-legend-swatch" style="background: #d1fae5;"></span>Healthy (61–95%)</span>
+          <span class="matrix-legend-item"><span class="matrix-legend-swatch" style="background: #fef3c7;"></span>Stretched (96–110%)</span>
+          <span class="matrix-legend-item"><span class="matrix-legend-swatch" style="background: #fee2e2;"></span>Over-allocated (&gt;110%)</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          <span id="overAllocCount" style="color: var(--danger); font-weight: 500;"></span>
+        </div>
+      </div>
+      <div class="matrix-table-wrap">
+        <table class="matrix-table" id="allocationMatrix"></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PLAYGROUND ===================== -->
+  <section id="playground-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>Scenario playground</h1>
+        <p>Model resource changes — see the cost &amp; timeline impact before committing</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Reset
+        </button>
+        <button class="btn">Save scenario</button>
+        <button class="btn btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          Apply
+        </button>
+      </div>
+    </div>
+
+    <div class="forecast-chart">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+        <div>
+          <div class="card-title">Effort forecast — Data Lake Migration</div>
+          <div class="card-subtitle">Cumulative hours over time · Baseline vs scenario projection</div>
+        </div>
+        <div style="display: flex; gap: 18px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap;">
+          <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 16px; height: 2px; background: #78716c;"></span>Baseline</span>
+          <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 16px; height: 2px; background: #4f46e5;"></span>Scenario</span>
+          <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 1px; height: 12px; border-left: 1px dashed var(--danger);"></span>Target end</span>
+        </div>
+      </div>
+      <div id="forecastChart"></div>
+    </div>
+
+    <div class="playground-grid">
+      <div class="card">
+        <div class="card-title">Baseline</div>
+        <div class="card-subtitle">Data Lake Migration · DL-MIG</div>
+        <div style="display: grid; gap: 14px; margin-top: 10px;">
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Team size</div>
+            <div style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">3 <span style="font-size: 12px; color: var(--text-muted); font-weight: 400;">resources</span></div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Weekly hours</div>
+            <div style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">85h</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Forecast end</div>
+            <div style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">Aug 28</div>
+            <div style="font-size: 11px; color: var(--danger);">2 months late vs target</div>
+          </div>
+          <div class="finance-only">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Weekly cost</div>
+            <div style="font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;">$10,675</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario-builder">
+        <div class="card-title">Scenario builder</div>
+        <div class="card-subtitle">3 changes proposed</div>
+        <div class="scenario-action add">
+          <div class="scenario-action-icon">+</div>
+          <div class="scenario-action-text">
+            <div class="scenario-action-title">Add Aisha Khan (QA Lead)</div>
+            <div class="scenario-action-meta">25h/week from Week 21</div>
+          </div>
+        </div>
+        <div class="scenario-action add">
+          <div class="scenario-action-icon">+</div>
+          <div class="scenario-action-text">
+            <div class="scenario-action-title">Add Alex Chen (Sr. Developer)</div>
+            <div class="scenario-action-meta">20h/week from Week 22</div>
+          </div>
+        </div>
+        <div class="scenario-action remove">
+          <div class="scenario-action-icon">−</div>
+          <div class="scenario-action-text">
+            <div class="scenario-action-title">Reduce James O'Brien (DevOps)</div>
+            <div class="scenario-action-meta">20h → 10h/week</div>
+          </div>
+        </div>
+        <button class="btn" style="width: 100%; margin-top: 8px; justify-content: center; border-style: dashed;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add change
+        </button>
+      </div>
+
+      <div>
+        <div class="impact-stat">
+          <div class="impact-stat-label">Timeline impact</div>
+          <div class="impact-stat-value positive">−24 days</div>
+          <div class="impact-stat-sub">Forecast end: <strong>Aug 4</strong> (target Jun 30)</div>
+        </div>
+        <div class="impact-stat finance-only">
+          <div class="impact-stat-label">Cost impact</div>
+          <div class="impact-stat-value negative">+$48,210</div>
+          <div class="impact-stat-sub">Cumulative over scenario duration</div>
+        </div>
+        <div class="impact-stat">
+          <div class="impact-stat-label">Team size</div>
+          <div class="impact-stat-value">3 → 5</div>
+          <div class="impact-stat-sub">+67% — Brooks's penalty: <strong>0.92×</strong></div>
+        </div>
+        <div class="impact-stat" style="background: #fffbeb; border: 1px solid #fde68a;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span style="font-size: 12px; font-weight: 500; color: #92400e;">Capacity warning</span>
+          </div>
+          <div style="font-size: 11px; color: #78350f; margin-top: 4px;">Alex Chen would hit 105% utilization. Aisha is at 95%. Both within recoverable range.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ME ===================== -->
+  <section id="me-page" class="page">
+    <div class="page-header">
+      <div class="page-title-block">
+        <h1>My dashboard</h1>
+        <p>Your current commitments and bandwidth</p>
+      </div>
+    </div>
+
+    <div class="me-hero" id="meHero"></div>
+
+    <div class="grid grid-2" style="margin-top: 16px;">
+      <div class="card">
+        <div class="card-title">Current allocations</div>
+        <div class="card-subtitle">Hours per week</div>
+        <div id="myAllocations" style="margin-top: 14px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">My tasks this sprint</div>
+        <div class="card-subtitle" id="mySprintSub">Sprint 19</div>
+        <div id="myTasks" style="margin-top: 14px;"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-2" style="margin-top: 16px;">
+      <div class="card">
+        <div class="card-title">8-week outlook</div>
+        <div class="card-subtitle">Projected allocation vs capacity</div>
+        <div id="myForecastChart"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Skills &amp; projects</div>
+        <div class="card-subtitle">Where you're plugged in</div>
+        <div id="mySkills" style="margin-top: 14px;"></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== TASK MODAL ===================== -->
+<div class="modal-backdrop" id="taskModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="taskModalTitle">New task</div>
+      <button class="btn btn-icon btn-ghost" data-close-modal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="taskTitle">Title</label>
+        <input class="field-control" id="taskTitle" placeholder="What needs to happen?" autocomplete="off" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="taskProject">Project</label>
+          <select class="field-control" id="taskProject"></select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="taskAssignee">Assignee</label>
+          <select class="field-control" id="taskAssignee"></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="taskStatus">Status</label>
+          <select class="field-control" id="taskStatus"></select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="taskPriority">Priority</label>
+          <select class="field-control" id="taskPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="taskDue">Due date</label>
+          <input class="field-control" id="taskDue" type="date" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="taskEstimate">Estimate (hours)</label>
+          <input class="field-control" id="taskEstimate" type="number" min="0" step="1" placeholder="8" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label" for="taskTags">Tags (comma-separated)</label>
+        <input class="field-control" id="taskTags" placeholder="backend, api" autocomplete="off" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="taskDeleteBtn" style="margin-right: auto; display: none;">Delete</button>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="taskSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== PROJECT MODAL ===================== -->
+<div class="modal-backdrop" id="projectModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">New project</div>
+      <button class="btn btn-icon btn-ghost" data-close-modal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="projName">Name</label>
+        <input class="field-control" id="projName" autocomplete="off" placeholder="ERP Modernization" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="projCode">Code</label>
+          <input class="field-control" id="projCode" autocomplete="off" placeholder="ERP-2026" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="projOwner">Owner</label>
+          <select class="field-control" id="projOwner"></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="projStart">Start</label>
+          <input class="field-control" id="projStart" type="date" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="projEnd">End</label>
+          <input class="field-control" id="projEnd" type="date" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="projStatus">Status</label>
+          <select class="field-control" id="projStatus">
+            <option value="planning">Planning</option>
+            <option value="active" selected>Active</option>
+            <option value="onhold">On hold</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label" for="projPriority">Priority</label>
+          <select class="field-control" id="projPriority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row finance-only">
+        <div class="field">
+          <label class="field-label" for="projBudget">Budget ($)</label>
+          <input class="field-control" id="projBudget" type="number" min="0" step="1000" placeholder="250000" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="projFunding">Funding ($)</label>
+          <input class="field-control" id="projFunding" type="number" min="0" step="1000" placeholder="250000" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="projSaveBtn">Create</button>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ========================================================================
+   HELIX — Single-page IT portfolio & resource management app
+   Data: ./data.json (with embedded fallback for file:// usage)
+   ======================================================================== */
+
+/* ===================== EMBEDDED FALLBACK ===================== */
+const FALLBACK_DATA = {
+  meta: { app_name: 'Helix', tagline: 'IT Portfolio & Resource OS', current_user: 'r3', week_of: '2026-05-11' },
+  resources: [
+    { id: 'r1', name: 'Alex Chen',       role: 'Sr. Developer',    team: 'Apps',   initials: 'AC', color: '#6366f1', cap: 40, rate: 95,  skills: ['React', 'Node'] },
+    { id: 'r2', name: 'Priya Patel',     role: 'Project Manager',  team: 'PMO',    initials: 'PP', color: '#ec4899', cap: 40, rate: 110, skills: ['Scrum'] },
+    { id: 'r3', name: 'Marcus Johnson',  role: 'Cloud Architect',  team: 'Infra',  initials: 'MJ', color: '#0ea5e9', cap: 40, rate: 145, skills: ['AWS', 'K8s'] },
+    { id: 'r4', name: 'Sarah Williams',  role: 'Business Analyst', team: 'Apps',   initials: 'SW', color: '#10b981', cap: 40, rate: 85,  skills: ['SQL'] },
+    { id: 'r5', name: 'David Kim',       role: 'Data Engineer',    team: 'Data',   initials: 'DK', color: '#f97316', cap: 40, rate: 105, skills: ['Spark'] },
+    { id: 'r6', name: 'Elena Rodriguez', role: 'UX Designer',      team: 'Design', initials: 'ER', color: '#f43f5e', cap: 32, rate: 90,  skills: ['Figma'] },
+    { id: 'r7', name: "James O'Brien",   role: 'DevOps Engineer',  team: 'Infra',  initials: 'JO', color: '#14b8a6', cap: 40, rate: 115, skills: ['CI/CD'] },
+    { id: 'r8', name: 'Aisha Khan',      role: 'QA Lead',          team: 'Apps',   initials: 'AK', color: '#eab308', cap: 40, rate: 90,  skills: ['Cypress'] }
+  ],
+  projects: [], phases: {}, dependencies: [], allocations: [], milestones: [], sprints: [], tasks: [],
+  task_columns: [
+    { id: 'backlog', label: 'Backlog', color: '#a8a29e', wip: null },
+    { id: 'in_progress', label: 'In progress', color: '#4f46e5', wip: 6 },
+    { id: 'review', label: 'Review', color: '#f59e0b', wip: 4 },
+    { id: 'done', label: 'Done', color: '#10b981', wip: null }
+  ],
+  burn_chart: []
+};
+
+/* ===================== STATE ===================== */
+let DATA = FALLBACK_DATA;
+let currentRole = 'admin';
+let editingTaskId = null;
+let projectStatusFilter = 'all';
+let kanbanFilters = { project: 'all', assignee: 'all', sprint: 'all', priority: 'all' };
+
+const STATUS_LABELS = { active: 'Active', planning: 'Planning', onhold: 'On hold', completed: 'Completed' };
+const ROLE_LABELS = { admin: 'Admin', manager: 'Manager', pm: 'Project Manager', member: 'Team Member' };
+
+/* ===================== FORMATTERS ===================== */
+const fmt = {
+  money: n => '$' + (n >= 1000 ? (n/1000).toFixed(0) + 'k' : n),
+  moneyFull: n => '$' + n.toLocaleString(),
+  shortDate: d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+  dateInput: d => new Date(d).toISOString().slice(0, 10),
+};
+
+/* ===================== HELPERS ===================== */
+const byId = id => document.getElementById(id);
+const $$ = sel => document.querySelectorAll(sel);
+const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const findResource = id => DATA.resources.find(r => r.id === id);
+const findProject = id => DATA.projects.find(p => p.id === id);
+const findColumn = id => DATA.task_columns.find(c => c.id === id);
+
+const visibleProjects = () => {
+  let list = DATA.projects;
+  if (currentRole === 'pm') list = list.filter(p => p.owner === DATA.meta.current_user || p.team.includes(DATA.meta.current_user));
+  else if (currentRole === 'member') list = list.filter(p => p.team.includes(DATA.meta.current_user));
+  if (projectStatusFilter !== 'all') list = list.filter(p => p.status === projectStatusFilter);
+  return list;
+};
+
+const taskAge = task => {
+  const today = new Date();
+  const due = new Date(task.due);
+  const daysToDue = Math.round((due - today) / 86400000);
+  if (task.status === 'done') return { label: fmt.shortDate(task.due), cls: '' };
+  if (daysToDue < 0) return { label: 'Overdue', cls: 'overdue' };
+  if (daysToDue <= 3) return { label: fmt.shortDate(task.due), cls: 'soon' };
+  return { label: fmt.shortDate(task.due), cls: '' };
+};
+
+/* ===================== ICONS ===================== */
+function iconSvg(name) {
+  const icons = {
+    briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+    dollar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+    activity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+    inbox: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>'
+  };
+  return icons[name] || '';
+}
+
+/* ===================== DATA LOAD ===================== */
+async function loadData() {
+  try {
+    const res = await fetch('./data.json');
+    if (res.ok) {
+      DATA = await res.json();
+    } else {
+      console.warn('data.json not reachable, using embedded fallback');
+    }
+  } catch (e) {
+    console.warn('Loading via file:// — using embedded fallback. Serve over http for full data.', e);
+  }
+  document.title = DATA.meta.app_name + ' · IT Portfolio & Resource Management';
+  byId('brandName').textContent = DATA.meta.app_name;
+  byId('brandTag').textContent = DATA.meta.tagline;
+}
+
+/* ===================== NAVIGATION ===================== */
+function setupNav() {
+  $$('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.section;
+      $$('.nav-btn').forEach(b => b.classList.toggle('active', b === btn));
+      $$('.page').forEach(p => p.classList.toggle('active', p.id === target + '-page'));
+      if (target === 'gantt') setTimeout(drawDependencies, 50);
+    });
+  });
+}
+
+/* ===================== ROLE SWITCHER ===================== */
+function setupRoleSwitcher() {
+  const pillBtn = byId('rolePillBtn');
+  const menu = byId('roleMenu');
+  pillBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = menu.classList.toggle('open');
+    pillBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', () => menu.classList.remove('open'));
+  $$('.role-menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+      currentRole = item.dataset.role;
+      $$('.role-menu-item').forEach(i => i.classList.toggle('selected', i === item));
+      pillBtn.dataset.role = currentRole;
+      byId('roleLabel').textContent = ROLE_LABELS[currentRole];
+      applyRoleVisibility();
+      renderAll();
+      menu.classList.remove('open');
+    });
+  });
+}
+
+function applyRoleVisibility() {
+  const canSeeFinance = currentRole === 'admin';
+  const canAccessPlayground = currentRole !== 'member';
+  $$('.finance-only').forEach(el => el.style.display = canSeeFinance ? '' : 'none');
+  byId('playgroundNav').classList.toggle('hidden', !canAccessPlayground);
+  if (currentRole === 'member') {
+    $$('.nav-btn[data-section="projects"], .nav-btn[data-section="gantt"], .nav-btn[data-section="allocations"]').forEach(b => b.classList.add('hidden'));
+    $$('.nav-btn').forEach(b => b.classList.remove('active'));
+    const meBtn = document.querySelector('.nav-btn[data-section="me"]');
+    if (meBtn) meBtn.classList.add('active');
+    $$('.page').forEach(p => p.classList.toggle('active', p.id === 'me-page'));
+  } else {
+    $$('.nav-btn').forEach(b => b.classList.remove('hidden'));
+    if (!canAccessPlayground) byId('playgroundNav').classList.add('hidden');
+  }
+  const titles  = { admin: 'Portfolio overview',         manager: "My team's portfolio",                pm: 'My projects',                                  member: 'My dashboard' };
+  const subs    = {
+    admin:   'Active portfolio across IT — Apps, Infra, Data, and Security workstreams',
+    manager: "Your direct reports and the projects they're on",
+    pm:      "Projects where you're the assigned PM",
+    member:  'Your current commitments and bandwidth'
+  };
+  byId('dashboardTitle').textContent = titles[currentRole];
+  byId('dashboardSubtitle').textContent = subs[currentRole];
+}
+
+/* ===================== KPI RENDERING ===================== */
+function renderKpis() {
+  const grid = byId('kpiGrid');
+  const visible = visibleProjects();
+  const active = visible.filter(p => p.status === 'active').length;
+  const budget = visible.reduce((s, p) => s + p.budget, 0);
+  const spent  = visible.reduce((s, p) => s + p.spent, 0);
+  const atRisk = visible.filter(p => p.spent > p.budget || p.health < 60).length;
+  const totalHours = DATA.allocations.reduce((s, a) => s + a.hours, 0);
+  const totalCap   = DATA.resources.reduce((s, r) => s + r.cap, 0);
+  const util       = totalCap === 0 ? 0 : Math.round(totalHours / totalCap * 100);
+
+  const items = [
+    { label: 'Active projects',       value: active, suffix: '',  icon: 'briefcase', color: '#4f46e5', bg: 'var(--primary-bg)', trend: '+12%', up: true },
+    { label: 'Total budget',          value: budget, format: 'money', icon: 'dollar', color: '#10b981', bg: 'var(--success-bg)', trend: '+8%', up: true, financeOnly: true },
+    { label: 'Resource utilization',  value: util,   suffix: '%', icon: 'activity',  color: '#f59e0b', bg: 'var(--warning-bg)', trend: '+5%', up: true },
+    { label: 'Projects at risk',      value: atRisk, suffix: '',  icon: 'alert',     color: '#dc2626', bg: 'var(--danger-bg)',  trend: '−2',  up: false }
+  ];
+
+  grid.innerHTML = items.map((k, i) => {
+    if (k.financeOnly && currentRole !== 'admin') return `
+      <div class="kpi" style="opacity: 0.5;">
+        <div class="kpi-head"><div class="kpi-icon" style="background: var(--surface-2); color: var(--text-soft);">${iconSvg('lock')}</div></div>
+        <div class="kpi-value" style="color: var(--text-soft);">—</div>
+        <div class="kpi-label">${k.label} (Admin only)</div>
+      </div>`;
+    return `
+      <div class="kpi stagger-item" style="animation-delay: ${i * 80}ms;">
+        <div class="kpi-head">
+          <div class="kpi-icon" style="background: ${k.bg}; color: ${k.color};">${iconSvg(k.icon)}</div>
+          <span class="kpi-trend ${k.up ? 'up' : 'down'}">${k.trend}</span>
+        </div>
+        <div class="kpi-value" data-count="${k.value}" data-format="${k.format || ''}" data-suffix="${k.suffix || ''}">0${k.suffix || ''}</div>
+        <div class="kpi-label">${k.label}</div>
+        <svg class="kpi-sparkline" viewBox="0 0 80 32" preserveAspectRatio="none">
+          <polyline points="${sparklinePoints()}" fill="none" stroke="${k.color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>`;
+  }).join('');
+  animateCounters();
+}
+
+function sparklinePoints() {
+  const n = 12;
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const x = (i / (n - 1)) * 80;
+    const y = 16 + Math.sin(i * 0.7) * 6 + Math.cos(i * 1.3) * 4 + (Math.random() - 0.5) * 3;
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
+
+function animateCounters() {
+  $$('[data-count]').forEach(el => {
+    const target = parseFloat(el.dataset.count);
+    const format = el.dataset.format;
+    const suffix = el.dataset.suffix || '';
+    const duration = 1000;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      const v = target * eased;
+      if (format === 'money') {
+        el.textContent = '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : Math.round(v));
+      } else {
+        el.textContent = Math.round(v) + suffix;
+      }
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+/* ===================== CHARTS ===================== */
+function renderBurnChart() {
+  const data = DATA.burn_chart;
+  if (!data || !data.length) { byId('burnChart').innerHTML = ''; return; }
+  const w = 620, h = 220, pad = { l: 36, r: 12, t: 12, b: 28 };
+  const max = Math.max(...data.flatMap(d => [d.planned, d.actual])) * 1.1;
+  const x = i => pad.l + (i / (data.length - 1)) * (w - pad.l - pad.r);
+  const y = v => pad.t + (1 - v / max) * (h - pad.t - pad.b);
+  const line = (key, color) => {
+    const pts = data.map((d, i) => `${x(i)},${y(d[key])}`).join(' L');
+    const area = `M${x(0)},${h - pad.b} L${pts.split(' ').map(p => 'L' + p).join(' ').slice(1)} L${x(data.length - 1)},${h - pad.b} Z`;
+    return `
+      <path d="${area}" fill="${color}" opacity="0.08"/>
+      <path d="M${pts.split(' ').map(p => 'L' + p).join(' ').slice(1)}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      ${data.map((d, i) => `<circle cx="${x(i)}" cy="${y(d[key])}" r="3" fill="white" stroke="${color}" stroke-width="2"/>`).join('')}
+    `;
+  };
+  const yLabels = [0, max*0.25, max*0.5, max*0.75, max].map(v => `
+    <line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" stroke="#f5f5f4" stroke-width="1"/>
+    <text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end" font-size="10" fill="#a8a29e">$${Math.round(v)}k</text>`).join('');
+  byId('burnChart').innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="font-family: 'Geist Mono', monospace;" role="img" aria-label="Portfolio burn chart">
+      ${yLabels}
+      ${line('planned', '#4f46e5')}
+      ${line('actual', '#10b981')}
+      ${data.map((d, i) => `<text x="${x(i)}" y="${h-8}" text-anchor="middle" font-size="10" fill="#78716c">${d.m}</text>`).join('')}
+    </svg>`;
+}
+
+function renderStatusDonut() {
+  const counts = {};
+  visibleProjects().forEach(p => counts[p.status] = (counts[p.status] || 0) + 1);
+  const total = Object.values(counts).reduce((s, v) => s + v, 0);
+  const colors = { active: '#10b981', planning: '#0ea5e9', onhold: '#f59e0b', completed: '#a8a29e' };
+  let offset = 0;
+  const circ = 2 * Math.PI * 50;
+  const slices = Object.entries(counts).map(([k, v]) => {
+    const portion = total === 0 ? 0 : v / total;
+    const dash = portion * circ;
+    const s = `<circle cx="80" cy="80" r="50" fill="none" stroke="${colors[k]}" stroke-width="22" stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${-offset}" transform="rotate(-90 80 80)" style="transition: stroke-dasharray 1s var(--ease-out);"/>`;
+    offset += dash;
+    return s;
+  }).join('');
+  byId('statusDonut').innerHTML = `
+    <svg viewBox="0 0 160 160" style="width: 100%; max-height: 160px;" role="img" aria-label="Project status mix">
+      ${slices}
+      <text x="80" y="78" text-anchor="middle" font-size="22" font-weight="600" fill="#0c0a09" style="font-family: Geist;">${total}</text>
+      <text x="80" y="94" text-anchor="middle" font-size="10" fill="#78716c" style="font-family: Geist;">Projects</text>
+    </svg>`;
+  byId('statusLegend').innerHTML = Object.entries(counts).map(([k, v]) => `
+    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 3px 0;">
+      <span style="display: flex; align-items: center; gap: 8px; color: var(--text-muted);">
+        <span style="width: 8px; height: 8px; border-radius: 999px; background: ${colors[k]};"></span>
+        ${STATUS_LABELS[k]}
+      </span>
+      <span style="font-weight: 600; font-variant-numeric: tabular-nums;">${v}</span>
+    </div>`).join('');
+}
+
+function renderUtilChart() {
+  const w = 560, h = 220, pad = { l: 32, r: 12, t: 20, b: 36 };
+  const barW = (w - pad.l - pad.r) / DATA.resources.length - 8;
+  const max = 50;
+  const html = DATA.resources.map((r, i) => {
+    const hours = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
+    const pct = Math.round(hours / r.cap * 100);
+    const x = pad.l + i * ((w - pad.l - pad.r) / DATA.resources.length) + 4;
+    const barH = (hours / max) * (h - pad.t - pad.b);
+    const capH = (r.cap / max) * (h - pad.t - pad.b);
+    const color = pct > 100 ? '#ef4444' : pct > 95 ? '#f59e0b' : pct > 60 ? '#10b981' : '#0ea5e9';
+    return `
+      <rect x="${x}" y="${h - pad.b - capH}" width="${barW}" height="${capH}" fill="#f5f5f4" rx="3"/>
+      <rect x="${x}" y="${h - pad.b - barH}" width="${barW}" height="${barH}" fill="${color}" rx="3" class="bar-grow" style="transform-origin: ${x + barW/2}px ${h - pad.b}px;"/>
+      <text x="${x + barW/2}" y="${h - 18}" text-anchor="middle" font-size="10" fill="#78716c" style="font-family: 'Geist Mono', monospace;">${r.initials}</text>
+      <text x="${x + barW/2}" y="${h - pad.b - barH - 5}" text-anchor="middle" font-size="10" fill="${color}" font-weight="600">${pct}%</text>`;
+  }).join('');
+  byId('utilChart').innerHTML = `<svg viewBox="0 0 ${w} ${h}" class="chart-svg" role="img" aria-label="Resource utilization">${html}</svg>`;
+}
+
+function renderRisks() {
+  const visible = visibleProjects();
+  const risks = visible.filter(p => p.spent > p.budget || p.health < 60).sort((a, b) => a.health - b.health);
+  byId('riskCount').textContent = risks.length;
+  byId('risksList').innerHTML = risks.length === 0 ? `
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="empty-state-title">All projects healthy</div>
+    </div>` : risks.map(p => `
+    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${p.spent > p.budget ? '#dc2626' : '#d97706'}" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+      <div style="flex: 1; min-width: 0;">
+        <div style="font-size: 13px; font-weight: 500;">${escapeHtml(p.name)}</div>
+        <div style="font-size: 11px; color: var(--text-muted);">${p.spent > p.budget ? (currentRole === 'admin' ? `Over by ${fmt.moneyFull(p.spent-p.budget)}` : 'Over budget') : 'Health ' + p.health}</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d6d3d1" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>`).join('');
+}
+
+/* ===================== MILESTONES & SPRINT ===================== */
+function renderMilestones() {
+  const today = new Date();
+  const ninety = new Date(today.getTime() + 90 * 86400000);
+  const items = DATA.milestones
+    .filter(m => new Date(m.date) <= ninety || m.status === 'at_risk')
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  const iconMap = { done: 'check', upcoming: 'flag', at_risk: 'alert' };
+  byId('milestoneList').innerHTML = items.length === 0 ? `
+    <div class="empty-state">${iconSvg('calendar')}<div class="empty-state-title">No milestones in window</div></div>` :
+    items.map(m => {
+      const p = findProject(m.project);
+      return `
+        <div class="milestone-row">
+          <div class="milestone-icon ${m.status}">${iconSvg(iconMap[m.status])}</div>
+          <div class="milestone-info">
+            <div class="milestone-name">${escapeHtml(m.name)}</div>
+            <div class="milestone-meta">${p ? p.code : ''} · ${fmt.shortDate(m.date)}</div>
+          </div>
+        </div>`;
+    }).join('');
+}
+
+function renderSprintSnapshot() {
+  const sprint = DATA.sprints.find(s => s.status === 'active') || DATA.sprints[0];
+  if (!sprint) { byId('sprintSnapshot').innerHTML = ''; return; }
+  byId('sprintSubtitle').textContent = `${sprint.name} · ${fmt.shortDate(sprint.start)} – ${fmt.shortDate(sprint.end)}`;
+  const tasks = DATA.tasks.filter(t => t.sprint === sprint.id);
+  const cols = DATA.task_columns.map(col => {
+    const count = tasks.filter(t => t.status === col.id).length;
+    const pct = tasks.length === 0 ? 0 : (count / tasks.length) * 100;
+    return `
+      <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px;">
+          <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 999px; background: ${col.color};"></span>${col.label}</span>
+          <span style="font-variant-numeric: tabular-nums; color: var(--text-muted);">${count}</span>
+        </div>
+        <div class="progress thin"><div class="progress-bar bar-grow" style="width: ${pct}%; background: ${col.color};"></div></div>
+      </div>`;
+  }).join('');
+  byId('sprintSnapshot').innerHTML = cols + `<div style="font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px;">${tasks.length} task${tasks.length !== 1 ? 's' : ''} total</div>`;
+}
+
+/* ===================== PROJECTS LIST ===================== */
+function renderProjects() {
+  const visible = visibleProjects();
+  const list = byId('projectList');
+  if (visible.length === 0) {
+    list.innerHTML = `<div class="empty-state">${iconSvg('inbox')}<div class="empty-state-title">No projects to show</div><div class="empty-state-sub">Try changing the status filter</div></div>`;
+    return;
+  }
+  list.innerHTML = visible.map((p, i) => {
+    const phases = DATA.phases[p.id] || [];
+    const team = p.team.map(id => findResource(id)).filter(Boolean);
+    const teamHtml = team.slice(0, 4).map(r => `<div class="avatar sm" style="background: ${r.color};">${r.initials}</div>`).join('') +
+      (team.length > 4 ? `<div class="avatar-more">+${team.length - 4}</div>` : '');
+    const projectTasks = DATA.tasks.filter(t => t.project === p.id);
+    const taskCounts = DATA.task_columns.reduce((acc, c) => {
+      acc[c.id] = { count: projectTasks.filter(t => t.status === c.id).length, color: c.color, label: c.label };
+      return acc;
+    }, {});
+    const phasesHtml = phases.length ? phases.map(ph => `
+      <div class="phase-item">
+        <span class="phase-marker" style="background: ${ph.color};"></span>
+        <div class="phase-name">${escapeHtml(ph.name)}</div>
+        <div class="phase-progress">
+          <div class="progress thin"><div class="progress-bar bar-grow" style="width: ${ph.progress}%; background: ${ph.color};"></div></div>
+          <div class="phase-progress-text">${ph.progress}%</div>
+        </div>
+        <div class="phase-dates">${fmt.shortDate(ph.start)} → ${fmt.shortDate(ph.end)}</div>
+      </div>`).join('') : '<div style="padding: 12px 0; font-size: 12px; color: var(--text-soft);">No phases defined</div>';
+    const taskSummaryHtml = projectTasks.length ? `
+      <div class="task-summary">
+        ${Object.values(taskCounts).map(c => `<span class="task-summary-item"><span class="task-summary-dot" style="background: ${c.color};"></span>${c.count} ${c.label.toLowerCase()}</span>`).join('')}
+      </div>` : '';
+    return `
+      <div class="project-row stagger-item" data-pid="${p.id}" style="animation-delay: ${i*60}ms;">
+        <div class="project-row-head">
+          <svg class="project-expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          <div class="project-name-block">
+            <div class="project-name">
+              ${escapeHtml(p.name)}
+              <span class="badge badge-${p.status}"><span class="badge-dot"></span>${STATUS_LABELS[p.status]}</span>
+              <span class="badge badge-priority-${p.priority}">${p.priority}</span>
+            </div>
+            <div class="project-code">${p.code} · ${phases.length} phase${phases.length !== 1 ? 's' : ''} · ${projectTasks.length} task${projectTasks.length !== 1 ? 's' : ''}</div>
+          </div>
+          <div class="avatar-stack">${teamHtml}</div>
+          <div class="project-meta">
+            ${currentRole === 'admin' ? `<div class="project-meta-item"><span class="project-meta-label">Budget</span><span class="project-meta-value tabular">${fmt.money(p.budget)}</span></div>` : ''}
+            <div class="project-meta-item"><span class="project-meta-label">Health</span><span class="project-health" style="color: ${p.health >= 80 ? '#16a34a' : p.health >= 60 ? '#d97706' : '#dc2626'};">${p.health}</span></div>
+          </div>
+        </div>
+        <div class="phases-container">${phasesHtml}${taskSummaryHtml}</div>
+      </div>`;
+  }).join('');
+  $$('.project-row').forEach(row => {
+    row.querySelector('.project-row-head').addEventListener('click', () => row.classList.toggle('expanded'));
+  });
+}
+
+/* ===================== GANTT ===================== */
+function renderGantt() {
+  const visible = visibleProjects().filter(p => DATA.phases[p.id]);
+  const allPhases = visible.flatMap(p => DATA.phases[p.id]);
+  if (allPhases.length === 0) {
+    byId('ganttSidebar').innerHTML = '';
+    byId('ganttCanvas').innerHTML = '';
+    return;
+  }
+  const allDates = allPhases.flatMap(ph => [new Date(ph.start), new Date(ph.end)]);
+  const minDate = new Date(Math.min(...allDates.map(d => d.getTime())));
+  const maxDate = new Date(Math.max(...allDates.map(d => d.getTime())));
+  minDate.setDate(1);
+  maxDate.setMonth(maxDate.getMonth() + 1, 1);
+
+  const months = [];
+  const cur = new Date(minDate);
+  while (cur <= maxDate) { months.push(new Date(cur)); cur.setMonth(cur.getMonth() + 1); }
+  byId('ganttMonths').innerHTML = months.map(m => `
+    <div class="gantt-month">
+      <div class="gantt-month-name">${m.toLocaleDateString('en-US', { month: 'short' })}</div>
+      <div class="gantt-month-sub">${m.getFullYear()}</div>
+    </div>`).join('');
+
+  const totalMs = maxDate.getTime() - minDate.getTime();
+  const sidebarRows = [];
+  const canvasRows = [];
+  let rowIdx = 0;
+
+  visible.forEach(p => {
+    const phases = DATA.phases[p.id];
+    const projStart = Math.min(...phases.map(ph => new Date(ph.start).getTime()));
+    const projEnd   = Math.max(...phases.map(ph => new Date(ph.end).getTime()));
+    const projLeft  = ((projStart - minDate.getTime()) / totalMs) * 100;
+    const projWidth = ((projEnd - projStart) / totalMs) * 100;
+    sidebarRows.push(`<div class="gantt-row project-row-gantt expanded" data-pid="${p.id}">
+      <svg class="gantt-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      <span class="gantt-row-name">${escapeHtml(p.name)}</span>
+      <span class="gantt-row-meta">${p.code}</span>
+    </div>`);
+    canvasRows.push(`<div class="gantt-grid-row"><div class="gantt-bar project-bar" style="left: ${projLeft}%; width: ${projWidth}%;"></div></div>`);
+    rowIdx++;
+    phases.forEach(ph => {
+      const phStart = new Date(ph.start).getTime();
+      const phEnd   = new Date(ph.end).getTime();
+      const left  = ((phStart - minDate.getTime()) / totalMs) * 100;
+      const width = ((phEnd - phStart) / totalMs) * 100;
+      sidebarRows.push(`<div class="gantt-row phase-row-gantt">
+        <span class="gantt-row-name">${escapeHtml(ph.name)}</span>
+        <span class="gantt-row-meta">${ph.progress}%</span>
+      </div>`);
+      canvasRows.push(`<div class="gantt-grid-row">
+        <div class="gantt-bar" data-phase="${ph.id}" data-pid="${p.id}" style="left: ${left}%; width: ${width}%; background: ${ph.color};">
+          <span>${escapeHtml(ph.name)}</span>
+        </div>
+      </div>`);
+      rowIdx++;
+    });
+  });
+
+  byId('ganttSidebar').innerHTML = sidebarRows.join('');
+  const canvas = byId('ganttCanvas');
+  const existingSvg = canvas.querySelector('.dependency-svg');
+  canvas.innerHTML = canvasRows.join('') + (existingSvg ? existingSvg.outerHTML : '');
+  canvas.style.setProperty('--gantt-canvas-height', (rowIdx * 36 + 40) + 'px');
+
+  const now = Date.now();
+  if (now >= minDate.getTime() && now <= maxDate.getTime()) {
+    const todayLeft = ((now - minDate.getTime()) / totalMs) * 100;
+    const todayDiv = document.createElement('div');
+    todayDiv.className = 'gantt-today';
+    todayDiv.style.left = todayLeft + '%';
+    canvas.appendChild(todayDiv);
+  }
+
+  $$('.gantt-bar[data-phase]').forEach(bar => {
+    const phaseId = bar.dataset.phase;
+    const phase = allPhases.find(ph => ph.id === phaseId);
+    const proj = visible.find(p => p.id === bar.dataset.pid);
+    if (!phase || !proj) return;
+    bar.addEventListener('mouseenter', e => showTooltip(e, {
+      title: phase.name,
+      badge: `<span class="badge" style="background: ${phase.color}; color: white;">${proj.code}</span>`,
+      rows: [['Progress', phase.progress + '%'], ['Start', fmt.shortDate(phase.start)], ['End', fmt.shortDate(phase.end)], ['Project', proj.name]],
+      progress: { value: phase.progress, color: phase.color }
+    }));
+    bar.addEventListener('mousemove', moveTooltip);
+    bar.addEventListener('mouseleave', hideTooltip);
+  });
+
+  byId('ganttProjCount').innerHTML = `<span class="badge-dot"></span>${visible.length} project${visible.length !== 1 ? 's' : ''}`;
+  byId('ganttPhaseCount').textContent = `${allPhases.length} phase${allPhases.length !== 1 ? 's' : ''}`;
+  const visibleDeps = DATA.dependencies.filter(d => allPhases.some(p => p.id === d.from) && allPhases.some(p => p.id === d.to));
+  byId('ganttDepCount').textContent = `${visibleDeps.length} dependenc${visibleDeps.length === 1 ? 'y' : 'ies'}`;
+
+  setTimeout(drawDependencies, 100);
+}
+
+function drawDependencies() {
+  const svg = byId('dependencySvg');
+  if (!svg) return;
+  const canvas = byId('ganttCanvas');
+  const canvasRect = canvas.getBoundingClientRect();
+  svg.setAttribute('width', canvasRect.width);
+  svg.setAttribute('height', canvasRect.height);
+  svg.querySelectorAll('path').forEach(p => p.remove());
+  DATA.dependencies.forEach(dep => {
+    const fromBar = document.querySelector(`.gantt-bar[data-phase="${dep.from}"]`);
+    const toBar   = document.querySelector(`.gantt-bar[data-phase="${dep.to}"]`);
+    if (!fromBar || !toBar) return;
+    const fromRect = fromBar.getBoundingClientRect();
+    const toRect = toBar.getBoundingClientRect();
+    const x1 = fromRect.right - canvasRect.left;
+    const y1 = fromRect.top + fromRect.height / 2 - canvasRect.top - 40;
+    const x2 = toRect.left - canvasRect.left;
+    const y2 = toRect.top + toRect.height / 2 - canvasRect.top - 40;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1}, ${x2 - 20} ${y2}, ${x2 - 4} ${y2}`);
+    path.setAttribute('class', 'dependency-path');
+    path.setAttribute('marker-end', 'url(#arrowhead)');
+    svg.appendChild(path);
+  });
+}
+
+/* ===================== ALLOCATION MATRIX ===================== */
+function renderMatrix() {
+  const visible = DATA.projects.filter(p => p.status !== 'completed').slice(0, 6);
+  const headerCells = visible.map(p => `
+    <th class="project-header">
+      <div class="project-code-sm">${p.code}</div>
+      <div class="project-name-sm">${escapeHtml(p.name)}</div>
+    </th>`).join('');
+
+  const rows = DATA.resources.map(r => {
+    const rowTotal = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
+    const pct = Math.round(rowTotal / r.cap * 100);
+    const cells = visible.map(p => {
+      const a = DATA.allocations.find(al => al.resource === r.id && al.project === p.id);
+      const hours = a ? a.hours : 0;
+      let cls = 'idle';
+      if (hours > 0) {
+        if (pct > 110) cls = 'over';
+        else if (pct > 95) cls = 'stretched';
+        else if (pct > 60) cls = 'healthy';
+        else cls = 'under';
+      }
+      return `<td class="alloc-cell"><div class="alloc-pill ${cls}" data-tooltip-alloc="${r.id}-${p.id}">${hours > 0 ? hours + 'h' : '—'}</div></td>`;
+    }).join('');
+    const totalCls = pct > 110 ? 'over' : pct > 95 ? 'stretched' : pct > 60 ? 'healthy' : pct > 0 ? 'under' : 'idle';
+    return `<tr>
+      <td class="resource-cell">
+        <div class="resource-info">
+          <div class="avatar sm" style="background: ${r.color};">${r.initials}</div>
+          <div>
+            <div class="resource-name">${escapeHtml(r.name)}</div>
+            <div class="resource-role">${escapeHtml(r.role)}</div>
+          </div>
+        </div>
+      </td>
+      ${cells}
+      <td class="total-cell"><span class="alloc-pill ${totalCls}" style="min-width: 60px;">${rowTotal}/${r.cap}h</span><div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">${pct}%</div></td>
+    </tr>`;
+  }).join('');
+
+  const projTotals = visible.map(p => {
+    const t = DATA.allocations.filter(a => a.project === p.id).reduce((s, a) => s + a.hours, 0);
+    return `<td class="total-cell">${t}h</td>`;
+  }).join('');
+  const grand = DATA.allocations.reduce((s, a) => s + a.hours, 0);
+
+  byId('allocationMatrix').innerHTML = `
+    <thead><tr>
+      <th class="resource-col">Resource</th>
+      ${headerCells}
+      <th>Total / Cap</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr>
+      <td class="resource-cell" style="font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Project totals</td>
+      ${projTotals}
+      <td class="total-cell" style="background: var(--surface-3);">${grand}h</td>
+    </tr></tfoot>`;
+
+  const over = DATA.resources.filter(r => {
+    const rt = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
+    return rt > r.cap * 1.1;
+  });
+  byId('overAllocCount').textContent = over.length > 0 ? `⚠ ${over.length} resource${over.length > 1 ? 's' : ''} over-allocated` : '';
+
+  $$('[data-tooltip-alloc]').forEach(el => {
+    const [rid, pid] = el.dataset.tooltipAlloc.split('-');
+    const r = findResource(rid);
+    const p = findProject(pid);
+    const a = DATA.allocations.find(al => al.resource === rid && al.project === pid);
+    const hours = a ? a.hours : 0;
+    if (!r || !p) return;
+    el.addEventListener('mouseenter', e => showTooltip(e, {
+      title: r.name,
+      badge: `<span class="badge" style="background: ${r.color}; color: white;">${r.initials}</span>`,
+      rows: [
+        ['Project', p.name],
+        ['Code', p.code],
+        ['Hours', hours + 'h / week'],
+        ['Role', r.role],
+        ...(currentRole === 'admin' ? [['Weekly cost', '$' + (hours * r.rate).toLocaleString()]] : [])
+      ]
+    }));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
+}
+
+/* ===================== KANBAN ===================== */
+function setupKanbanFilters() {
+  const projSel = byId('kanbanProjectFilter');
+  projSel.innerHTML = '<option value="all">All projects</option>' + DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
+  const asgSel = byId('kanbanAssigneeFilter');
+  asgSel.innerHTML = '<option value="all">All assignees</option>' + DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+  const sprintSel = byId('kanbanSprintFilter');
+  sprintSel.innerHTML = '<option value="all">All sprints</option>' + DATA.sprints.map(s => `<option value="${s.id}"${s.status === 'active' ? ' selected' : ''}>${escapeHtml(s.name)}</option>`).join('');
+  if (DATA.sprints.some(s => s.status === 'active')) kanbanFilters.sprint = DATA.sprints.find(s => s.status === 'active').id;
+
+  [['kanbanProjectFilter', 'project'], ['kanbanAssigneeFilter', 'assignee'], ['kanbanSprintFilter', 'sprint'], ['kanbanPriorityFilter', 'priority']].forEach(([id, key]) => {
+    byId(id).addEventListener('change', e => { kanbanFilters[key] = e.target.value; renderKanban(); });
+  });
+}
+
+function filteredTasks() {
+  return DATA.tasks.filter(t => {
+    if (kanbanFilters.project !== 'all' && t.project !== kanbanFilters.project) return false;
+    if (kanbanFilters.assignee !== 'all' && t.assignee !== kanbanFilters.assignee) return false;
+    if (kanbanFilters.sprint !== 'all' && t.sprint !== kanbanFilters.sprint) return false;
+    if (kanbanFilters.priority !== 'all' && t.priority !== kanbanFilters.priority) return false;
+    if (currentRole === 'member' && t.assignee !== DATA.meta.current_user) return false;
+    if (currentRole === 'pm') {
+      const p = findProject(t.project);
+      if (!p || (p.owner !== DATA.meta.current_user && !p.team.includes(DATA.meta.current_user))) return false;
+    }
+    return true;
+  });
+}
+
+function renderKanban() {
+  const board = byId('kanbanBoard');
+  const tasks = filteredTasks();
+  byId('kanbanTaskCount').textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
+  board.innerHTML = DATA.task_columns.map(col => {
+    const colTasks = tasks.filter(t => t.status === col.id);
+    const overWip = col.wip != null && colTasks.length > col.wip;
+    const cards = colTasks.map(t => renderTaskCard(t)).join('');
+    return `
+      <div class="kanban-col" data-status="${col.id}">
+        <div class="kanban-col-head">
+          <div class="kanban-col-title"><span class="kanban-col-dot" style="background: ${col.color};"></span>${col.label}</div>
+          <span class="kanban-col-count ${overWip ? 'over-wip' : ''}">${colTasks.length}${col.wip != null ? ' / ' + col.wip : ''}</span>
+        </div>
+        <div class="kanban-col-body" data-status="${col.id}">
+          ${cards || `<div style="font-size: 11px; color: var(--text-soft); text-align: center; padding: 20px 0;">Drop tasks here</div>`}
+          <button class="task-card-add" data-add-status="${col.id}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add task
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+  attachKanbanInteractions();
+}
+
+function renderTaskCard(t) {
+  const r = findResource(t.assignee);
+  const p = findProject(t.project);
+  const age = taskAge(t);
+  const tags = (t.tags || []).slice(0, 3).map(tag => `<span class="task-card-tag">${escapeHtml(tag)}</span>`).join('');
+  return `
+    <div class="task-card" draggable="true" data-task-id="${t.id}">
+      <div class="task-card-head">
+        <div class="task-card-title">${escapeHtml(t.title)}</div>
+        <span class="badge badge-priority-${t.priority}">${t.priority}</span>
+      </div>
+      <div class="task-card-meta">${tags}</div>
+      <div class="task-card-footer">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          ${r ? `<div class="avatar sm" style="background: ${r.color};" title="${escapeHtml(r.name)}">${r.initials}</div>` : ''}
+          <span class="task-card-proj">${p ? p.code : ''}</span>
+        </div>
+        <span class="task-card-due ${age.cls}">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${age.label}
+        </span>
+      </div>
+    </div>`;
+}
+
+function attachKanbanInteractions() {
+  $$('.task-card').forEach(card => {
+    card.addEventListener('click', () => openTaskModal(card.dataset.taskId));
+    card.addEventListener('dragstart', e => {
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', card.dataset.taskId);
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+  });
+  $$('.kanban-col').forEach(col => {
+    col.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; col.classList.add('drag-over'); });
+    col.addEventListener('dragleave', () => col.classList.remove('drag-over'));
+    col.addEventListener('drop', e => {
+      e.preventDefault();
+      col.classList.remove('drag-over');
+      const taskId = e.dataTransfer.getData('text/plain');
+      const newStatus = col.dataset.status;
+      const task = DATA.tasks.find(t => t.id === taskId);
+      if (task && task.status !== newStatus) {
+        task.status = newStatus;
+        renderKanban();
+        renderSprintSnapshot();
+        renderProjects();
+        const colDef = findColumn(newStatus);
+        showToast(`Moved "${task.title.slice(0, 32)}${task.title.length > 32 ? '…' : ''}" to ${colDef.label}`);
+      }
+    });
+  });
+  $$('[data-add-status]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openTaskModal(null, btn.dataset.addStatus);
+    });
+  });
+}
+
+/* ===================== TASK MODAL ===================== */
+function setupTaskModal() {
+  byId('taskProject').innerHTML = DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
+  byId('taskAssignee').innerHTML = '<option value="">Unassigned</option>' + DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+  byId('taskStatus').innerHTML = DATA.task_columns.map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
+  byId('taskSaveBtn').addEventListener('click', saveTask);
+  byId('taskDeleteBtn').addEventListener('click', deleteTask);
+  $$('[data-open-modal="task"]').forEach(b => b.addEventListener('click', () => openTaskModal(null)));
+  $$('[data-close-modal]').forEach(b => b.addEventListener('click', () => closeModal()));
+  byId('taskModal').addEventListener('click', e => { if (e.target.id === 'taskModal') closeModal(); });
+  byId('projectModal').addEventListener('click', e => { if (e.target.id === 'projectModal') closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+}
+
+function openTaskModal(taskId, presetStatus) {
+  editingTaskId = taskId;
+  const modal = byId('taskModal');
+  const task = taskId ? DATA.tasks.find(t => t.id === taskId) : null;
+  byId('taskModalTitle').textContent = task ? 'Edit task' : 'New task';
+  byId('taskDeleteBtn').style.display = task ? '' : 'none';
+  byId('taskTitle').value = task?.title ?? '';
+  byId('taskProject').value = task?.project ?? DATA.projects[0]?.id ?? '';
+  byId('taskAssignee').value = task?.assignee ?? '';
+  byId('taskStatus').value = task?.status ?? presetStatus ?? 'backlog';
+  byId('taskPriority').value = task?.priority ?? 'medium';
+  byId('taskDue').value = task?.due ? fmt.dateInput(task.due) : '';
+  byId('taskEstimate').value = task?.estimate ?? '';
+  byId('taskTags').value = (task?.tags ?? []).join(', ');
+  modal.classList.add('open');
+  setTimeout(() => byId('taskTitle').focus(), 50);
+}
+
+function saveTask() {
+  const title = byId('taskTitle').value.trim();
+  if (!title) { byId('taskTitle').focus(); return; }
+  const data = {
+    title,
+    project: byId('taskProject').value,
+    assignee: byId('taskAssignee').value || null,
+    status: byId('taskStatus').value,
+    priority: byId('taskPriority').value,
+    due: byId('taskDue').value || new Date().toISOString().slice(0, 10),
+    estimate: parseInt(byId('taskEstimate').value, 10) || 0,
+    logged: 0,
+    sprint: DATA.sprints.find(s => s.status === 'active')?.id || null,
+    tags: byId('taskTags').value.split(',').map(s => s.trim()).filter(Boolean)
+  };
+  if (editingTaskId) {
+    Object.assign(DATA.tasks.find(t => t.id === editingTaskId), data);
+    showToast('Task updated');
+  } else {
+    const id = 't' + (Math.max(0, ...DATA.tasks.map(t => parseInt(t.id.slice(1), 10) || 0)) + 1);
+    DATA.tasks.push({ id, ...data });
+    showToast('Task created');
+  }
+  closeModal();
+  renderKanban();
+  renderSprintSnapshot();
+  renderProjects();
+  renderMyTasks();
+}
+
+function deleteTask() {
+  if (!editingTaskId) return;
+  DATA.tasks = DATA.tasks.filter(t => t.id !== editingTaskId);
+  closeModal();
+  renderKanban();
+  renderSprintSnapshot();
+  renderProjects();
+  renderMyTasks();
+  showToast('Task deleted');
+}
+
+/* ===================== PROJECT MODAL ===================== */
+function setupProjectModal() {
+  byId('projOwner').innerHTML = DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+  $$('[data-open-modal="project"]').forEach(b => b.addEventListener('click', () => openProjectModal()));
+  byId('projSaveBtn').addEventListener('click', saveProject);
+}
+
+function openProjectModal() {
+  byId('projName').value = '';
+  byId('projCode').value = '';
+  byId('projOwner').value = DATA.meta.current_user;
+  byId('projStart').value = new Date().toISOString().slice(0, 10);
+  byId('projEnd').value = '';
+  byId('projStatus').value = 'active';
+  byId('projPriority').value = 'medium';
+  byId('projBudget').value = '';
+  byId('projFunding').value = '';
+  byId('projectModal').classList.add('open');
+  setTimeout(() => byId('projName').focus(), 50);
+}
+
+function saveProject() {
+  const name = byId('projName').value.trim();
+  const code = byId('projCode').value.trim();
+  if (!name || !code) { byId('projName').focus(); return; }
+  const id = 'p' + (Math.max(0, ...DATA.projects.map(p => parseInt(p.id.slice(1), 10) || 0)) + 1);
+  const proj = {
+    id, name, code,
+    status: byId('projStatus').value,
+    priority: byId('projPriority').value,
+    budget: parseInt(byId('projBudget').value, 10) || 0,
+    spent: 0,
+    funding: parseInt(byId('projFunding').value, 10) || 0,
+    health: 90,
+    start: byId('projStart').value,
+    end: byId('projEnd').value || byId('projStart').value,
+    owner: byId('projOwner').value,
+    team: [byId('projOwner').value],
+    category: 'Apps',
+    tags: []
+  };
+  DATA.projects.push(proj);
+  DATA.phases[id] = [];
+  closeModal();
+  renderAll();
+  showToast(`Created ${proj.code}`);
+}
+
+function closeModal() {
+  $$('.modal-backdrop').forEach(m => m.classList.remove('open'));
+  editingTaskId = null;
+}
+
+/* ===================== PLAYGROUND FORECAST ===================== */
+function renderForecast() {
+  const w = 980, h = 240, pad = { l: 40, r: 12, t: 20, b: 36 };
+  const weeks = 24;
+  const baselineSlope = 85;
+  const scenarioSlope = 110 * 0.92;
+  const targetWeek = 8;
+  const baselineEndWeek = 12;
+  const scenarioEndWeek = 8.5;
+  const max = 2200;
+  const x = i => pad.l + (i / weeks) * (w - pad.l - pad.r);
+  const y = v => pad.t + (1 - v / max) * (h - pad.t - pad.b);
+  const baselinePts = []; const scenarioPts = [];
+  for (let i = 0; i <= baselineEndWeek; i++) baselinePts.push([x(i), y(i * baselineSlope)]);
+  for (let i = 0; i <= scenarioEndWeek; i++) scenarioPts.push([x(i), y(i * scenarioSlope)]);
+  const targetX = x(targetWeek);
+  const yLabels = [0, max*0.25, max*0.5, max*0.75, max].map(v => `
+    <line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" stroke="#f5f5f4"/>
+    <text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end" font-size="10" fill="#a8a29e">${Math.round(v)}h</text>`).join('');
+  const xLabels = [];
+  for (let i = 0; i <= weeks; i += 4) xLabels.push(`<text x="${x(i)}" y="${h-12}" text-anchor="middle" font-size="10" fill="#78716c">W${i+20}</text>`);
+  byId('forecastChart').innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="font-family: 'Geist Mono', monospace;" role="img" aria-label="Effort forecast">
+      ${yLabels}
+      ${xLabels.join('')}
+      <path d="M ${baselinePts.map(p => p.join(',')).join(' L ')}" fill="none" stroke="#78716c" stroke-width="2" stroke-linecap="round"/>
+      <path d="M ${scenarioPts.map(p => p.join(',')).join(' L ')}" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M ${scenarioPts.map(p => p.join(',')).join(' L ')} L ${x(scenarioEndWeek)},${y(0)} L ${x(0)},${y(0)} Z" fill="#4f46e5" opacity="0.06"/>
+      <line x1="${targetX}" y1="${pad.t}" x2="${targetX}" y2="${h-pad.b}" stroke="#dc2626" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="${targetX}" y="${pad.t-5}" text-anchor="middle" font-size="10" fill="#dc2626" font-weight="600">Target Jun 30</text>
+      <circle cx="${baselinePts[baselinePts.length-1][0]}" cy="${baselinePts[baselinePts.length-1][1]}" r="5" fill="#78716c"/>
+      <text x="${baselinePts[baselinePts.length-1][0]+8}" y="${baselinePts[baselinePts.length-1][1]+4}" font-size="10" fill="#78716c">Aug 28</text>
+      <circle cx="${scenarioPts[scenarioPts.length-1][0]}" cy="${scenarioPts[scenarioPts.length-1][1]}" r="5" fill="#4f46e5"/>
+      <text x="${scenarioPts[scenarioPts.length-1][0]+8}" y="${scenarioPts[scenarioPts.length-1][1]+4}" font-size="10" fill="#4f46e5" font-weight="600">Aug 4</text>
+    </svg>`;
+}
+
+/* ===================== ME VIEW ===================== */
+function renderMe() {
+  const me = findResource(DATA.meta.current_user);
+  if (!me) return;
+  const myAllocs = DATA.allocations.filter(a => a.resource === me.id);
+  const hours = myAllocs.reduce((s, a) => s + a.hours, 0);
+  const pct = Math.round(hours / me.cap * 100);
+  const dash = 377; const offset = dash - (dash * Math.min(pct, 100) / 100);
+  byId('meHero').innerHTML = `
+    <div class="me-ring-container">
+      <svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Your utilization ${pct}%">
+        <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="10"/>
+        <circle cx="70" cy="70" r="60" fill="none" stroke="${pct > 100 ? '#ef4444' : pct > 95 ? '#f59e0b' : '#10b981'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${dash}" stroke-dashoffset="${offset}" transform="rotate(-90 70 70)" style="transition: stroke-dashoffset 1.2s var(--ease-out);"/>
+      </svg>
+      <div class="me-ring-text">
+        <div class="me-ring-value">${pct}<span style="font-size: 16px;">%</span></div>
+        <div class="me-ring-label">Utilized</div>
+      </div>
+    </div>
+    <div>
+      <h2>${escapeHtml(me.name)}</h2>
+      <p>${escapeHtml(me.role)} · ${escapeHtml(me.team)}</p>
+      <div class="me-stats">
+        <div class="me-stat">
+          <div class="me-stat-label">This week</div>
+          <div class="me-stat-value">${hours}h</div>
+          <div class="me-stat-sub">of ${me.cap}h capacity</div>
+        </div>
+        <div class="me-stat">
+          <div class="me-stat-label">${me.cap - hours >= 0 ? 'Available' : 'Over'}</div>
+          <div class="me-stat-value">${me.cap - hours >= 0 ? '+' : ''}${me.cap - hours}h</div>
+          <div class="me-stat-sub">Bandwidth</div>
+        </div>
+        <div class="me-stat">
+          <div class="me-stat-label">Active projects</div>
+          <div class="me-stat-value">${myAllocs.length}</div>
+          <div class="me-stat-sub">${myAllocs.map(a => findProject(a.project)?.code).filter(Boolean).join(', ')}</div>
+        </div>
+      </div>
+    </div>`;
+
+  byId('myAllocations').innerHTML = myAllocs.length === 0 ? `<div class="empty-state">${iconSvg('inbox')}<div class="empty-state-title">No active allocations</div></div>` :
+    myAllocs.map(a => {
+      const p = findProject(a.project);
+      const allocPct = Math.round(a.hours / me.cap * 100);
+      return `
+        <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">${escapeHtml(p?.name || 'Unknown')}</div>
+              <div style="font-size: 11px; color: var(--text-soft); font-family: 'Geist Mono', monospace;">${p?.code || ''}</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums;">${a.hours}h</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${allocPct}% of week</div>
+            </div>
+          </div>
+          <div class="progress" style="margin-top: 10px;"><div class="progress-bar bar-grow" style="width: ${allocPct}%; background: ${p?.id === 'p3' ? '#10b981' : '#4f46e5'};"></div></div>
+        </div>`;
+    }).join('');
+
+  renderMyTasks();
+
+  byId('mySkills').innerHTML = `
+    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;">
+      ${(me.skills || []).map(s => `<span class="badge" style="background: var(--surface-2); color: var(--text);">${escapeHtml(s)}</span>`).join('')}
+    </div>
+    <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">Plugged into</div>
+    ${myAllocs.map(a => {
+      const p = findProject(a.project);
+      return p ? `<div style="display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px;"><span>${escapeHtml(p.name)}</span><span class="badge badge-${p.status}"><span class="badge-dot"></span>${STATUS_LABELS[p.status]}</span></div>` : '';
+    }).join('')}`;
+
+  renderMyForecast();
+}
+
+function renderMyTasks() {
+  const me = findResource(DATA.meta.current_user);
+  if (!me) return;
+  const activeSprint = DATA.sprints.find(s => s.status === 'active');
+  byId('mySprintSub').textContent = activeSprint?.name || 'No active sprint';
+  const myTasks = DATA.tasks.filter(t => t.assignee === me.id && (!activeSprint || t.sprint === activeSprint.id));
+  const el = byId('myTasks');
+  if (!el) return;
+  el.innerHTML = myTasks.length === 0 ? `<div class="empty-state">${iconSvg('check')}<div class="empty-state-title">Nothing assigned this sprint</div></div>` :
+    myTasks.map(t => {
+      const p = findProject(t.project);
+      const col = findColumn(t.status);
+      const age = taskAge(t);
+      return `
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); cursor: pointer;" data-task-row="${t.id}">
+          <span style="width: 8px; height: 8px; border-radius: 999px; background: ${col?.color || '#a8a29e'}; flex-shrink: 0;"></span>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(t.title)}</div>
+            <div style="font-size: 11px; color: var(--text-muted);">${p?.code || ''} · ${col?.label || t.status}</div>
+          </div>
+          <span class="task-card-due ${age.cls}" style="font-size: 11px;">${age.label}</span>
+        </div>`;
+    }).join('');
+  $$('[data-task-row]').forEach(r => r.addEventListener('click', () => openTaskModal(r.dataset.taskRow)));
+}
+
+function renderMyForecast() {
+  const w = 460, h = 200, pad = { l: 32, r: 12, t: 16, b: 28 };
+  const me = findResource(DATA.meta.current_user);
+  const cap = me?.cap || 40;
+  const data = [];
+  const hours = DATA.allocations.filter(a => a.resource === me?.id).reduce((s, a) => s + a.hours, 0);
+  for (let i = 0; i < 8; i++) data.push(Math.max(0, hours + Math.round(Math.sin(i*1.1) * 5 + Math.cos(i*0.7) * 3)));
+  const max = 50;
+  const x = i => pad.l + (i / (data.length-1)) * (w - pad.l - pad.r);
+  const y = v => pad.t + (1 - v / max) * (h - pad.t - pad.b);
+  const pts = data.map((v, i) => `${x(i)},${y(v)}`).join(' L');
+  const capY = y(cap);
+  const yLabels = [0, 20, 40].map(v => `
+    <line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" stroke="#f5f5f4"/>
+    <text x="${pad.l-4}" y="${y(v)+3}" text-anchor="end" font-size="10" fill="#a8a29e">${v}h</text>`).join('');
+  byId('myForecastChart').innerHTML = `
+    <svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="font-family: 'Geist Mono', monospace;" role="img" aria-label="8-week outlook">
+      ${yLabels}
+      <line x1="${pad.l}" y1="${capY}" x2="${w-pad.r}" y2="${capY}" stroke="#a8a29e" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="${w-pad.r-4}" y="${capY-4}" text-anchor="end" font-size="9" fill="#78716c">Capacity ${cap}h</text>
+      <path d="M ${pts.split(' L ').join(' L ')}" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${data.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="white" stroke="#10b981" stroke-width="2"/>`).join('')}
+      ${data.map((v, i) => `<text x="${x(i)}" y="${h-10}" text-anchor="middle" font-size="10" fill="#78716c">W${i+19}</text>`).join('')}
+    </svg>`;
+}
+
+/* ===================== TOOLTIPS ===================== */
+const tooltip = byId('tooltip');
+function showTooltip(e, content) {
+  let html = `<div class="tooltip-header"><span>${escapeHtml(content.title)}</span>${content.badge || ''}</div>`;
+  if (content.progress !== undefined) {
+    html += `<div class="progress" style="margin: 6px 0;"><div class="progress-bar" style="width: ${content.progress.value}%; background: ${content.progress.color};"></div></div>`;
+  }
+  if (content.rows && content.rows.length) {
+    html += `<div class="tooltip-section">${content.rows.map(([l, v]) => `<div class="tooltip-row"><span class="tooltip-row-label">${escapeHtml(l)}</span><span class="tooltip-row-value">${escapeHtml(v)}</span></div>`).join('')}</div>`;
+  }
+  tooltip.innerHTML = html;
+  moveTooltip(e);
+  tooltip.classList.add('visible');
+}
+function moveTooltip(e) {
+  const rect = tooltip.getBoundingClientRect();
+  let x = e.clientX + 14;
+  let y = e.clientY + 14;
+  if (x + rect.width > window.innerWidth - 8) x = e.clientX - rect.width - 14;
+  if (y + rect.height > window.innerHeight - 8) y = e.clientY - rect.height - 14;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+function hideTooltip() { tooltip.classList.remove('visible'); }
+
+/* ===================== TOAST ===================== */
+let toastTimer;
+function showToast(msg) {
+  const t = byId('toast');
+  t.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(msg)}`;
+  t.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('visible'), 2400);
+}
+
+/* ===================== EXPORT ===================== */
+function exportSnapshot() {
+  const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `helix-snapshot-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast('Snapshot exported');
+}
+
+/* ===================== FILTERS ===================== */
+function setupFilters() {
+  byId('projectStatusFilter').addEventListener('change', e => {
+    projectStatusFilter = e.target.value;
+    renderProjects();
+  });
+  byId('exportBtn').addEventListener('click', exportSnapshot);
+}
+
+/* ===================== RENDER ALL ===================== */
+function renderAll() {
+  renderKpis();
+  renderBurnChart();
+  renderStatusDonut();
+  renderUtilChart();
+  renderRisks();
+  renderMilestones();
+  renderSprintSnapshot();
+  renderProjects();
+  renderGantt();
+  renderMatrix();
+  renderKanban();
+  renderForecast();
+  renderMe();
+}
+
+/* ===================== BOOT ===================== */
+(async function init() {
+  await loadData();
+  setupNav();
+  setupRoleSwitcher();
+  setupFilters();
+  setupKanbanFilters();
+  setupTaskModal();
+  setupProjectModal();
+  applyRoleVisibility();
+  renderAll();
+  window.addEventListener('resize', () => {
+    if (byId('gantt-page').classList.contains('active')) drawDependencies();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -37,3 +37,4 @@ yarn-error.log*
 
 # Optional: If you add node_modules later
 node_modules/
+.claude/*.*
