@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Helix · Dataverse Schema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --surface-2: #f5f5f4; --border: #e7e5e4; --border-strong: #d6d3d1;
+    --text: #0c0a09; --text-muted: #57534e; --text-soft: #a8a29e;
+    --primary: #4f46e5; --primary-bg: #eef2ff;
+    --success: #16a34a; --success-bg: #dcfce7;
+    --warning: #d97706; --warning-bg: #fef3c7;
+    --danger: #dc2626; --danger-bg: #fee2e2;
+    --info: #0284c7; --info-bg: #e0f2fe;
+    --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Geist', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  code, .mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+  a { color: inherit; text-decoration: none; }
+  code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+
+  /* HEADER */
+  .page-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .header-inner { max-width: 1500px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+  .brand-logo svg { width: 20px; height: 20px; stroke: white; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+  .brand-tag { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+  .cross-nav { display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: var(--radius-lg); }
+  .cross-nav a { padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all 180ms var(--ease); }
+  .cross-nav a:hover { color: var(--text); background: rgba(255,255,255,0.6); }
+  .cross-nav a.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+
+  /* LAYOUT */
+  .container { max-width: 1500px; margin: 0 auto; padding: 40px 24px 80px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: flex-start; }
+  @media (max-width: 980px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; max-height: none; } }
+
+  .sidebar { position: sticky; top: 88px; max-height: calc(100vh - 110px); overflow-y: auto; padding-right: 8px; }
+  .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 500; padding: 8px 12px; }
+  .sidebar a { display: block; padding: 7px 12px; border-radius: 6px; font-size: 13px; color: var(--text-muted); font-family: 'Geist Mono', monospace; font-size: 12px; transition: all 120ms var(--ease); }
+  .sidebar a:hover { background: var(--surface-2); color: var(--text); }
+  .sidebar a.active { background: var(--primary-bg); color: var(--primary); font-weight: 500; }
+  .sidebar-sect { margin-top: 12px; }
+
+  h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 48px 0 4px; scroll-margin-top: 88px; }
+  h3 { font-size: 14px; font-weight: 600; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+  .subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 32px; }
+  p { color: #292524; margin: 0 0 10px; }
+
+  /* TABLE BLOCK */
+  .table-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); margin-bottom: 24px; overflow: hidden; }
+  .table-head { padding: 20px 24px 18px; background: linear-gradient(to right, #0c0a09, #292524); color: white; }
+  .table-head-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+  .table-head .schema-name { font-family: 'Geist Mono', monospace; font-size: 18px; font-weight: 600; }
+  .table-head .display-name { color: rgba(255,255,255,0.7); font-size: 14px; }
+  .table-head .table-badge { font-size: 10px; padding: 3px 8px; background: rgba(255,255,255,0.15); border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; margin-left: auto; }
+  .table-head .table-desc { color: rgba(255,255,255,0.7); font-size: 13px; max-width: 720px; }
+  .table-body { padding: 20px 24px; }
+
+  /* FIELDS TABLE */
+  .fields { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .fields th { text-align: left; font-size: 10px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  .fields td { padding: 10px 12px 10px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .fields tr:last-child td { border-bottom: none; }
+  .fields .field-name { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; }
+  .fields .field-display { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+  .fields .field-type { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-soft); white-space: nowrap; }
+  .fields .field-desc { color: #44403c; font-size: 12.5px; }
+
+  .lock-icon { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; background: var(--danger-bg); color: var(--danger); border-radius: 4px; font-size: 10px; font-weight: 500; margin-right: 6px; }
+  .tag { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 500; margin-left: 4px; }
+  .tag-pk { background: #fef3c7; color: #92400e; }
+  .tag-fk { background: var(--info-bg); color: #075985; }
+  .tag-req { background: var(--surface-2); color: var(--text-muted); }
+  .tag-uq { background: #f3e8ff; color: #6b21a8; }
+  .tag-calc { background: #dcfce7; color: #166534; }
+
+  /* CHOICE OPTIONS */
+  .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; margin: 8px 0 12px; }
+  .choice-pill { display: flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--surface-2); border-radius: var(--radius); font-size: 11px; }
+  .choice-dot { width: 8px; height: 8px; border-radius: 999px; flex-shrink: 0; }
+  .choice-pill .choice-value { font-family: 'Geist Mono', monospace; color: var(--text-soft); font-size: 10px; margin-left: auto; }
+
+  /* CALLOUT */
+  .callout { padding: 12px 16px; border-radius: var(--radius); margin: 12px 0; font-size: 12.5px; border: 1px solid; display: flex; gap: 10px; align-items: flex-start; }
+  .callout-icon { font-size: 14px; flex-shrink: 0; }
+  .callout-warn { background: var(--warning-bg); border-color: rgba(217,119,6,0.2); color: #78350f; }
+  .callout-info { background: var(--info-bg); border-color: rgba(2,132,199,0.2); color: #0c4a6e; }
+  .callout-accent { background: var(--primary-bg); border-color: rgba(79,70,229,0.2); color: #312e81; }
+
+  /* RELATIONSHIP ROW */
+  .rels { background: var(--surface-2); padding: 12px 16px; border-radius: var(--radius); font-size: 12px; margin-top: 12px; }
+  .rels-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; font-weight: 500; }
+  .rels-item { font-family: 'Geist Mono', monospace; font-size: 11.5px; padding: 3px 0; color: #44403c; }
+
+  /* SECURITY SECTION */
+  .sec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 16px 0; }
+  .sec-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .sec-card h4 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+  .sec-card .sec-tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .sec-card p { font-size: 12px; color: var(--text-muted); margin: 0; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4c4 4 12 12 16 16M20 4c-4 4-12 12-16 16"/>
+          <line x1="4" y1="8" x2="20" y2="8"/>
+          <line x1="4" y1="16" x2="20" y2="16"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Helix</span>
+        <span class="brand-tag">IT Portfolio &amp; Resource OS</span>
+      </div>
+    </a>
+    <nav class="cross-nav">
+      <a href="index.html">App</a>
+      <a href="schema.html" class="active">Schema</a>
+      <a href="erd.html">ERD</a>
+      <a href="developer.html">Dev Setup</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <div class="sidebar-title">Tables</div>
+    <a href="#helix_resource">helix_resource</a>
+    <a href="#helix_project">helix_project</a>
+    <a href="#helix_phase">helix_phase</a>
+    <a href="#helix_dependency">helix_dependency</a>
+    <a href="#helix_allocation">helix_allocation</a>
+    <a href="#helix_scenario">helix_scenario</a>
+    <a href="#helix_scenarioallocation">helix_scenarioallocation</a>
+    <a href="#helix_timeentry">helix_timeentry</a>
+    <div class="sidebar-sect">
+      <div class="sidebar-title">Choices</div>
+      <a href="#choices">All choice sets</a>
+    </div>
+    <div class="sidebar-sect">
+      <div class="sidebar-title">Security</div>
+      <a href="#fls-profile">Field Security Profile</a>
+      <a href="#security-roles">Security Roles</a>
+    </div>
+  </aside>
+
+  <main>
+    <h1>Dataverse schema</h1>
+    <p class="subtitle">Complete column definitions, choice sets, and security configuration for the Helix data model. Publisher prefix <code>helix_</code>.</p>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">ⓘ</span>
+      <div><strong>Naming convention:</strong> Dataverse logical names appear lowercase with the publisher prefix (e.g. <code>helix_hourlyrate</code>). The JSON database uses camelCase equivalents (<code>hourlyRate</code>) for JavaScript ergonomics. Display names appear in the right column.</div>
+    </div>
+
+    <!-- ============= helix_resource ============= -->
+    <h2 id="helix_resource"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_resource</span>
+          <span class="display-name">· Resource</span>
+          <span class="table-badge">Master data</span>
+        </div>
+        <div class="table-desc">Extends systemuser with role, capacity, billable rate, and reporting relationships. One row per IT department staff member who can be allocated to projects.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_resourceid <span class="tag tag-pk">PK</span></td><td class="field-display">Resource ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_name <span class="tag tag-req">Req</span></td><td class="field-display">Name</td><td class="field-type">Text(160) · Primary</td><td class="field-desc">Display name; mirrors systemuser.fullname for readability</td></tr>
+            <tr><td class="field-name">helix_systemuser <span class="tag tag-fk">FK</span> <span class="tag tag-uq">UQ</span></td><td class="field-display">System User</td><td class="field-type">Lookup → systemuser</td><td class="field-desc">1:1 link to the Entra ID-backed Dataverse user. Unique constraint prevents duplicate resource records per user.</td></tr>
+            <tr><td class="field-name">helix_accesslevel</td><td class="field-display">Access Level</td><td class="field-type">Choice</td><td class="field-desc">Drives app UX: Admin / Manager / PM / Member. See <a href="#choice-accessLevel" style="color: var(--primary);">accessLevel choices</a>.</td></tr>
+            <tr><td class="field-name">helix_jobrole</td><td class="field-display">Job Role</td><td class="field-type">Choice</td><td class="field-desc">Functional role: Developer, QA, BA, PM, UX, DevOps, Data Engineer, Cloud Architect, Manager. <a href="#choice-jobRole" style="color: var(--primary);">jobRole choices</a>.</td></tr>
+            <tr><td class="field-name">helix_jobtitle</td><td class="field-display">Job Title</td><td class="field-type">Text(100)</td><td class="field-desc">Free-text title, e.g. "Senior Developer". Used in resource cards.</td></tr>
+            <tr><td class="field-name">helix_capacityhoursperweek</td><td class="field-display">Capacity (hrs/wk)</td><td class="field-type">Decimal(5,2)</td><td class="field-desc">Standard weekly capacity. Default 40. Part-time / contractors can be 20, 32, etc.</td></tr>
+            <tr><td class="field-name">helix_hourlyrate <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Hourly Rate</td><td class="field-type">Currency</td><td class="field-desc">Internal billing rate. <strong>Admin-only</strong> via Helix Finance Field Security Profile. Used in cost calculations.</td></tr>
+            <tr><td class="field-name">helix_billable</td><td class="field-display">Billable</td><td class="field-type">Yes/No</td><td class="field-desc">Toggle inclusion in cost rollups. Default Yes.</td></tr>
+            <tr><td class="field-name">helix_managedby <span class="tag tag-fk">FK</span></td><td class="field-display">Managed By</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Self-referential — defines reporting structure for Manager row-level scoping</td></tr>
+            <tr><td class="field-name">helix_department</td><td class="field-display">Department</td><td class="field-type">Choice</td><td class="field-desc">IT-Apps / IT-Infra / IT-Data / IT-Security</td></tr>
+            <tr><td class="field-name">helix_active</td><td class="field-display">Active</td><td class="field-type">Yes/No</td><td class="field-desc">Soft-delete flag. Inactive resources preserved for history.</td></tr>
+            <tr><td class="field-name">helix_avatarcolor</td><td class="field-display">Avatar Color</td><td class="field-type">Text(7)</td><td class="field-desc">Hex code for UI avatar gradient (e.g. <code>#6366f1</code>)</td></tr>
+            <tr><td class="field-name">helix_initials</td><td class="field-display">Initials</td><td class="field-type">Calculated text <span class="tag tag-calc">Calc</span></td><td class="field-desc">Derived from <code>helix_name</code> — first letter of first &amp; last word</td></tr>
+          </tbody>
+        </table>
+        <div class="rels">
+          <div class="rels-label">Relationships</div>
+          <div class="rels-item">→ 1:N <code>helix_allocation</code> (resource)</div>
+          <div class="rels-item">→ 1:N <code>helix_project</code> (projectManager, teamManager)</div>
+          <div class="rels-item">→ 1:N <code>helix_scenarioallocation</code> (resource)</div>
+          <div class="rels-item">→ 1:N <code>helix_resource</code> self (managedBy)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= helix_project ============= -->
+    <h2 id="helix_project"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_project</span>
+          <span class="display-name">· Project</span>
+          <span class="table-badge">Master data</span>
+        </div>
+        <div class="table-desc">Portfolio projects with budget, timeline, ownership, and health. Several columns are FLS-protected so non-Admin users see them as null.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_projectid <span class="tag tag-pk">PK</span></td><td class="field-display">Project ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_name <span class="tag tag-req">Req</span></td><td class="field-display">Project Name</td><td class="field-type">Text(200) · Primary</td><td class="field-desc">Human-readable project name</td></tr>
+            <tr><td class="field-name">helix_code <span class="tag tag-uq">UQ</span></td><td class="field-display">Code</td><td class="field-type">Text(20)</td><td class="field-desc">Short identifier, e.g. <code>ERP-2026</code>. Alternate key — unique across portfolio.</td></tr>
+            <tr><td class="field-name">helix_status</td><td class="field-display">Status</td><td class="field-type">Choice</td><td class="field-desc">Planning / Active / On hold / Completed / Cancelled</td></tr>
+            <tr><td class="field-name">helix_priority</td><td class="field-display">Priority</td><td class="field-type">Choice</td><td class="field-desc">Critical / High / Medium / Low</td></tr>
+            <tr><td class="field-name">helix_description</td><td class="field-display">Description</td><td class="field-type">Memo(4000)</td><td class="field-desc">Long-form description of project scope and intent</td></tr>
+            <tr><td class="field-name">helix_department</td><td class="field-display">Department</td><td class="field-type">Choice</td><td class="field-desc">Owning IT department</td></tr>
+            <tr><td class="field-name">helix_startdate</td><td class="field-display">Start Date</td><td class="field-type">Date</td><td class="field-desc">Planned start</td></tr>
+            <tr><td class="field-name">helix_enddate</td><td class="field-display">End Date</td><td class="field-type">Date</td><td class="field-desc">Planned end. Business rule: must be after start date.</td></tr>
+            <tr><td class="field-name">helix_estimatedhours</td><td class="field-display">Estimated Hours</td><td class="field-type">Decimal(8,2)</td><td class="field-desc">Total work estimate. Drives scenario engine math.</td></tr>
+            <tr><td class="field-name">helix_budget <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Budget</td><td class="field-type">Currency</td><td class="field-desc">Total approved budget. <strong>Admin only.</strong></td></tr>
+            <tr><td class="field-name">helix_funding <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Funding Secured</td><td class="field-type">Currency</td><td class="field-desc">Funding committed (may differ from budget if partially funded). <strong>Admin only.</strong></td></tr>
+            <tr><td class="field-name">helix_spent <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Spent to Date</td><td class="field-type">Currency · Rollup <span class="tag tag-calc">Calc</span></td><td class="field-desc">Sum of <code>(helix_timeentry.hours × resource.hourlyRate)</code>. Rollup runs hourly or via Power Automate.</td></tr>
+            <tr><td class="field-name">helix_fundinggap <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Funding Gap</td><td class="field-type">Calculated $ <span class="tag tag-calc">Calc</span></td><td class="field-desc"><code>budget − funding</code>. Positive values indicate unfunded portions.</td></tr>
+            <tr><td class="field-name">helix_projectmanager <span class="tag tag-fk">FK</span></td><td class="field-display">Project Manager</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Drives PM row-level scoping — they see this project</td></tr>
+            <tr><td class="field-name">helix_teammanager <span class="tag tag-fk">FK</span></td><td class="field-display">Team Manager</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Drives Manager row-level scoping — they see projects in their queue</td></tr>
+            <tr><td class="field-name">helix_healthscore</td><td class="field-display">Health Score</td><td class="field-type">Whole(0–100)</td><td class="field-desc">Computed or manually entered. Color bands: ≥80 green, 60–79 amber, &lt;60 red.</td></tr>
+            <tr><td class="field-name">helix_riskcommentary</td><td class="field-display">Risk Notes</td><td class="field-type">Memo(2000)</td><td class="field-desc">PM commentary on current risks and mitigations</td></tr>
+          </tbody>
+        </table>
+        <div class="rels">
+          <div class="rels-label">Relationships</div>
+          <div class="rels-item">→ 1:N <code>helix_phase</code> (project) · cascade delete</div>
+          <div class="rels-item">→ 1:N <code>helix_allocation</code> (project) · cascade delete</div>
+          <div class="rels-item">→ 1:N <code>helix_scenario</code> (project) · cascade delete</div>
+          <div class="rels-item">→ 1:N <code>helix_timeentry</code> (project) · restrict</div>
+          <div class="rels-item">← N:1 <code>helix_resource</code> (projectManager, teamManager) · restrict</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= helix_phase ============= -->
+    <h2 id="helix_phase"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_phase</span>
+          <span class="display-name">· Phase</span>
+          <span class="table-badge">Child of project</span>
+        </div>
+        <div class="table-desc">Phases break down projects into sequenced work stages — Discovery, Design, Build, Test, Deploy. Phases participate in dependency relationships on the Gantt.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_phaseid <span class="tag tag-pk">PK</span></td><td class="field-display">Phase ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_project <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Project</td><td class="field-type">Lookup → helix_project</td><td class="field-desc">Parent project. Cascade delete: removing project removes phases.</td></tr>
+            <tr><td class="field-name">helix_name <span class="tag tag-req">Req</span></td><td class="field-display">Phase Name</td><td class="field-type">Text(160) · Primary</td><td class="field-desc">e.g. "Discovery &amp; Requirements"</td></tr>
+            <tr><td class="field-name">helix_phasetype</td><td class="field-display">Phase Type</td><td class="field-type">Choice</td><td class="field-desc">Discovery / Design / Build / Test / Deploy. Drives color coding on Gantt.</td></tr>
+            <tr><td class="field-name">helix_startdate</td><td class="field-display">Start Date</td><td class="field-type">Date</td><td class="field-desc">Phase start</td></tr>
+            <tr><td class="field-name">helix_enddate</td><td class="field-display">End Date</td><td class="field-type">Date</td><td class="field-desc">Phase end. Business rule: must be after start.</td></tr>
+            <tr><td class="field-name">helix_progress</td><td class="field-display">Progress %</td><td class="field-type">Whole(0–100)</td><td class="field-desc">Manual entry by phase owner</td></tr>
+            <tr><td class="field-name">helix_owner <span class="tag tag-fk">FK</span></td><td class="field-display">Phase Owner</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Lead resource for the phase</td></tr>
+            <tr><td class="field-name">helix_estimatedhours</td><td class="field-display">Phase Estimate</td><td class="field-type">Decimal(8,2)</td><td class="field-desc">Optional — used for finer-grained scenario math</td></tr>
+          </tbody>
+        </table>
+        <div class="rels">
+          <div class="rels-label">Relationships</div>
+          <div class="rels-item">→ 1:N <code>helix_dependency</code> (fromPhase, toPhase) · cascade</div>
+          <div class="rels-item">← N:1 <code>helix_project</code> (parent) · cascade delete</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= helix_dependency ============= -->
+    <h2 id="helix_dependency"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_dependency</span>
+          <span class="display-name">· Dependency</span>
+          <span class="table-badge">Link table</span>
+        </div>
+        <div class="table-desc">Directed relationships between phases. Drives the dependency arrows on the Gantt chart and the critical path calculation.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_dependencyid <span class="tag tag-pk">PK</span></td><td class="field-display">Dependency ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_fromphase <span class="tag tag-fk">FK</span></td><td class="field-display">From Phase</td><td class="field-type">Lookup → helix_phase</td><td class="field-desc">Predecessor</td></tr>
+            <tr><td class="field-name">helix_tophase <span class="tag tag-fk">FK</span></td><td class="field-display">To Phase</td><td class="field-type">Lookup → helix_phase</td><td class="field-desc">Successor</td></tr>
+            <tr><td class="field-name">helix_type</td><td class="field-display">Dependency Type</td><td class="field-type">Choice</td><td class="field-desc">FS (Finish-to-Start, default), SS, FF, SF</td></tr>
+            <tr><td class="field-name">helix_lagdays</td><td class="field-display">Lag Days</td><td class="field-type">Whole</td><td class="field-desc">Optional offset (positive = lag, negative = lead)</td></tr>
+            <tr><td class="field-name">helix_name</td><td class="field-display">Name</td><td class="field-type">Calculated text <span class="tag tag-calc">Calc</span></td><td class="field-desc">Auto-generated: <code>{from.name} → {to.name}</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠</span>
+          <div><strong>Cycle prevention:</strong> Implement a plugin or Power Automate flow to reject dependencies that would create a cycle. Dataverse itself doesn't enforce DAG (directed acyclic graph) semantics.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= helix_allocation ============= -->
+    <h2 id="helix_allocation"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_allocation</span>
+          <span class="display-name">· Allocation</span>
+          <span class="table-badge">Transactional</span>
+        </div>
+        <div class="table-desc">Time-phased commitments — one row per resource × project × week. Drives the allocation matrix, utilization calculations, and the playground baseline.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_allocationid <span class="tag tag-pk">PK</span></td><td class="field-display">Allocation ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_project <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Project</td><td class="field-type">Lookup → helix_project</td><td class="field-desc">Cascade delete</td></tr>
+            <tr><td class="field-name">helix_resource <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Resource</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Cascade restrict — protects history</td></tr>
+            <tr><td class="field-name">helix_weekstartdate <span class="tag tag-req">Req</span></td><td class="field-display">Week Starting</td><td class="field-type">Date</td><td class="field-desc">Monday of the ISO week. Part of alternate key.</td></tr>
+            <tr><td class="field-name">helix_hoursperweek</td><td class="field-display">Hours / Week</td><td class="field-type">Decimal(5,2)</td><td class="field-desc">0 ≤ x ≤ 80. Validation rule warns if &gt; resource capacity.</td></tr>
+            <tr><td class="field-name">helix_roleonproject</td><td class="field-display">Role on Project</td><td class="field-type">Text(80)</td><td class="field-desc">e.g. "Tech Lead", "QA Analyst" — may differ from job role</td></tr>
+            <tr><td class="field-name">helix_committed</td><td class="field-display">Committed</td><td class="field-type">Yes/No</td><td class="field-desc">Tentative (forecast) vs locked (plan). Default No.</td></tr>
+            <tr><td class="field-name">helix_notes</td><td class="field-display">Notes</td><td class="field-type">Memo(500)</td><td class="field-desc">Optional context</td></tr>
+            <tr><td class="field-name">helix_name</td><td class="field-display">Name</td><td class="field-type">Calculated text <span class="tag tag-calc">Calc</span></td><td class="field-desc"><code>{resource.name} on {project.code} · {weekStart}</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-accent">
+          <span class="callout-icon">🔑</span>
+          <div><strong>Alternate key:</strong> Composite key on <code>(helix_project, helix_resource, helix_weekstartdate)</code> prevents duplicate weekly allocations. <strong>Create this via PAC CLI or Maker portal</strong> — the maker UI sometimes drops it on export.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= helix_scenario ============= -->
+    <h2 id="helix_scenario"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_scenario</span>
+          <span class="display-name">· Scenario</span>
+          <span class="table-badge">Playground</span>
+        </div>
+        <div class="table-desc">What-if scenarios — parent record for proposed allocation changes against a project's baseline.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_scenarioid <span class="tag tag-pk">PK</span></td><td class="field-display">Scenario ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_name <span class="tag tag-req">Req</span></td><td class="field-display">Name</td><td class="field-type">Text(200) · Primary</td><td class="field-desc">e.g. "ERP fast-track with +2 devs"</td></tr>
+            <tr><td class="field-name">helix_project <span class="tag tag-fk">FK</span></td><td class="field-display">Project</td><td class="field-type">Lookup → helix_project</td><td class="field-desc">The project being modeled</td></tr>
+            <tr><td class="field-name">helix_description</td><td class="field-display">Description</td><td class="field-type">Memo(1000)</td><td class="field-desc">What the scenario tests</td></tr>
+            <tr><td class="field-name">helix_status</td><td class="field-display">Status</td><td class="field-type">Choice</td><td class="field-desc">Draft / Proposed / Approved / Rejected / Applied</td></tr>
+            <tr><td class="field-name">helix_baselineenddate</td><td class="field-display">Baseline End</td><td class="field-type">Date</td><td class="field-desc">Snapshot of project end at scenario creation</td></tr>
+            <tr><td class="field-name">helix_proposedenddate</td><td class="field-display">Proposed End</td><td class="field-type">Date</td><td class="field-desc">Engine-calculated end if scenario applied</td></tr>
+            <tr><td class="field-name">helix_timelinedeltadays</td><td class="field-display">Timeline Δ (days)</td><td class="field-type">Whole</td><td class="field-desc">Negative = faster, positive = slower</td></tr>
+            <tr><td class="field-name">helix_baselinebudget <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Baseline Budget</td><td class="field-type">Currency</td><td class="field-desc">Snapshot of project budget at creation. <strong>Admin only.</strong></td></tr>
+            <tr><td class="field-name">helix_estimatedcostdelta <span class="lock-icon">🔒 FLS</span></td><td class="field-display">Cost Δ</td><td class="field-type">Currency</td><td class="field-desc">Engine-calculated cost impact. <strong>Admin only.</strong></td></tr>
+            <tr><td class="field-name">helix_efficiencycoefficient</td><td class="field-display">Efficiency Factor</td><td class="field-type">Decimal(3,2)</td><td class="field-desc">0.7–1.0. Brooks's Law penalty applied when team grows past 1.5× baseline.</td></tr>
+            <tr><td class="field-name">helix_owner <span class="tag tag-fk">FK</span></td><td class="field-display">Owner</td><td class="field-type">Lookup → systemuser</td><td class="field-desc">Standard ownership for row-level security</td></tr>
+            <tr><td class="field-name">helix_notes</td><td class="field-display">Notes</td><td class="field-type">Memo(2000)</td><td class="field-desc">Approval discussion, risks, caveats</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============= helix_scenarioallocation ============= -->
+    <h2 id="helix_scenarioallocation"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_scenarioallocation</span>
+          <span class="display-name">· Scenario Allocation</span>
+          <span class="table-badge">Playground</span>
+        </div>
+        <div class="table-desc">Proposed deltas vs current allocations within a scenario. Engine sums these against baseline to compute impact.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_scenarioallocationid <span class="tag tag-pk">PK</span></td><td class="field-display">ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_scenario <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Scenario</td><td class="field-type">Lookup → helix_scenario</td><td class="field-desc">Cascade delete</td></tr>
+            <tr><td class="field-name">helix_resource <span class="tag tag-fk">FK</span></td><td class="field-display">Resource</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Who's being added / removed / modified</td></tr>
+            <tr><td class="field-name">helix_action</td><td class="field-display">Action</td><td class="field-type">Choice</td><td class="field-desc">Add / Remove / Modify</td></tr>
+            <tr><td class="field-name">helix_weekstartdate</td><td class="field-display">Week Starting</td><td class="field-type">Date</td><td class="field-desc">Week the change applies to</td></tr>
+            <tr><td class="field-name">helix_baselinehours</td><td class="field-display">Baseline Hours</td><td class="field-type">Decimal(5,2)</td><td class="field-desc">Existing allocation snapshot; 0 for Add</td></tr>
+            <tr><td class="field-name">helix_proposedhours</td><td class="field-display">Proposed Hours</td><td class="field-type">Decimal(5,2)</td><td class="field-desc">New allocation; 0 for Remove</td></tr>
+            <tr><td class="field-name">helix_hoursdelta</td><td class="field-display">Hours Δ</td><td class="field-type">Calculated <span class="tag tag-calc">Calc</span></td><td class="field-desc"><code>proposedHours − baselineHours</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============= helix_timeentry ============= -->
+    <h2 id="helix_timeentry"></h2>
+    <div class="table-block">
+      <div class="table-head">
+        <div class="table-head-row">
+          <span class="schema-name">helix_timeentry</span>
+          <span class="display-name">· Time Entry</span>
+          <span class="table-badge">Phase 2</span>
+        </div>
+        <div class="table-desc">Actual logged hours — drives the <code>helix_project.spent</code> rollup and forecast accuracy. Not required for MVP — add when actuals tracking is needed.</div>
+      </div>
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Logical name</th><th>Display</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_timeentryid <span class="tag tag-pk">PK</span></td><td class="field-display">Time Entry ID</td><td class="field-type">Uniqueidentifier</td><td class="field-desc">Auto-generated primary key</td></tr>
+            <tr><td class="field-name">helix_project <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Project</td><td class="field-type">Lookup → helix_project</td><td class="field-desc">Project the work was performed on</td></tr>
+            <tr><td class="field-name">helix_resource <span class="tag tag-fk">FK</span> <span class="tag tag-req">Req</span></td><td class="field-display">Resource</td><td class="field-type">Lookup → helix_resource</td><td class="field-desc">Person who logged the time</td></tr>
+            <tr><td class="field-name">helix_entrydate</td><td class="field-display">Entry Date</td><td class="field-type">Date</td><td class="field-desc">Day the work was performed</td></tr>
+            <tr><td class="field-name">helix_hours</td><td class="field-display">Hours</td><td class="field-type">Decimal(4,2)</td><td class="field-desc">0 &lt; x ≤ 24. Validation rule.</td></tr>
+            <tr><td class="field-name">helix_description</td><td class="field-display">Description</td><td class="field-type">Text(500)</td><td class="field-desc">What was done</td></tr>
+            <tr><td class="field-name">helix_approved</td><td class="field-display">Approved</td><td class="field-type">Yes/No</td><td class="field-desc">PM-approved for billing rollup</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============= CHOICES ============= -->
+    <h2 id="choices">Choice column values</h2>
+    <p class="section-sub">Global choice sets used by the tables above. Create as <strong>global choices</strong> in your solution to reuse across multiple tables and avoid drift.</p>
+
+    <div class="table-block">
+      <div class="table-body">
+        <h3 id="choice-accessLevel">accessLevel</h3>
+        <p>Drives Helix app UX. <strong>Not</strong> a Dataverse security role — those are separate. See <a href="#security-roles" style="color: var(--primary);">Security Roles</a>.</p>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #4f46e5;"></span>Admin<span class="choice-value">100</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #0284c7;"></span>Manager<span class="choice-value">200</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #8b5cf6;"></span>Project Manager<span class="choice-value">300</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #a8a29e;"></span>Team Member<span class="choice-value">400</span></div>
+        </div>
+
+        <h3 id="choice-jobRole">jobRole</h3>
+        <p>Functional job classification. Used in resource cards and filters; doesn't affect access.</p>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #6366f1;"></span>Developer<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #eab308;"></span>QA Engineer<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #10b981;"></span>Business Analyst<span class="choice-value">3</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #ec4899;"></span>Project Manager<span class="choice-value">4</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #f43f5e;"></span>UX Designer<span class="choice-value">5</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #14b8a6;"></span>DevOps<span class="choice-value">6</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #f97316;"></span>Data Engineer<span class="choice-value">7</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #0ea5e9;"></span>Cloud Architect<span class="choice-value">8</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #7c3aed;"></span>Manager<span class="choice-value">9</span></div>
+        </div>
+
+        <h3>projectStatus</h3>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #0284c7;"></span>Planning<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #10b981;"></span>Active<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #d97706;"></span>On hold<span class="choice-value">3</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #a8a29e;"></span>Completed<span class="choice-value">4</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #dc2626;"></span>Cancelled<span class="choice-value">5</span></div>
+        </div>
+
+        <h3>projectPriority</h3>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #dc2626;"></span>Critical<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #d97706;"></span>High<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #0284c7;"></span>Medium<span class="choice-value">3</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #a8a29e;"></span>Low<span class="choice-value">4</span></div>
+        </div>
+
+        <h3>department</h3>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #4f46e5;"></span>IT — Apps<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #14b8a6;"></span>IT — Infrastructure<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #f97316;"></span>IT — Data &amp; Analytics<span class="choice-value">3</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #dc2626;"></span>IT — Security<span class="choice-value">4</span></div>
+        </div>
+
+        <h3>phaseType</h3>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #4f46e5;"></span>Discovery<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #8b5cf6;"></span>Design<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #10b981;"></span>Build<span class="choice-value">3</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #f59e0b;"></span>Test<span class="choice-value">4</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #06b6d4;"></span>Deploy<span class="choice-value">5</span></div>
+        </div>
+
+        <h3>dependencyType</h3>
+        <div class="choices">
+          <div class="choice-pill">Finish-to-Start<span class="choice-value">FS · 1</span></div>
+          <div class="choice-pill">Start-to-Start<span class="choice-value">SS · 2</span></div>
+          <div class="choice-pill">Finish-to-Finish<span class="choice-value">FF · 3</span></div>
+          <div class="choice-pill">Start-to-Finish<span class="choice-value">SF · 4</span></div>
+        </div>
+
+        <h3>scenarioAction</h3>
+        <div class="choices">
+          <div class="choice-pill"><span class="choice-dot" style="background: #10b981;"></span>Add resource<span class="choice-value">1</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #dc2626;"></span>Remove resource<span class="choice-value">2</span></div>
+          <div class="choice-pill"><span class="choice-dot" style="background: #0284c7;"></span>Modify hours<span class="choice-value">3</span></div>
+        </div>
+
+        <h3>scenarioStatus</h3>
+        <div class="choices">
+          <div class="choice-pill">Draft<span class="choice-value">1</span></div>
+          <div class="choice-pill">Proposed<span class="choice-value">2</span></div>
+          <div class="choice-pill">Approved<span class="choice-value">3</span></div>
+          <div class="choice-pill">Rejected<span class="choice-value">4</span></div>
+          <div class="choice-pill">Applied<span class="choice-value">5</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= SECURITY ============= -->
+    <h2 id="fls-profile">Field Security Profile — "Helix Finance"</h2>
+    <p class="section-sub">Hard enforcement of financial-field access at the Dataverse layer. Non-members of this profile receive <code>null</code> from the WebAPI for these fields.</p>
+
+    <div class="table-block">
+      <div class="table-body">
+        <table class="fields">
+          <thead><tr><th>Table</th><th>Field</th><th>Default access</th><th>Admin access</th></tr></thead>
+          <tbody>
+            <tr><td class="field-name">helix_resource</td><td class="field-name">helix_hourlyrate</td><td>None</td><td>Read</td></tr>
+            <tr><td class="field-name">helix_project</td><td class="field-name">helix_budget</td><td>None</td><td>Read · Update</td></tr>
+            <tr><td class="field-name">helix_project</td><td class="field-name">helix_funding</td><td>None</td><td>Read · Update</td></tr>
+            <tr><td class="field-name">helix_project</td><td class="field-name">helix_spent</td><td>None</td><td>Read</td></tr>
+            <tr><td class="field-name">helix_project</td><td class="field-name">helix_fundinggap</td><td>None</td><td>Read</td></tr>
+            <tr><td class="field-name">helix_scenario</td><td class="field-name">helix_baselinebudget</td><td>None</td><td>Read</td></tr>
+            <tr><td class="field-name">helix_scenario</td><td class="field-name">helix_estimatedcostdelta</td><td>None</td><td>Read</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-info" style="margin-top: 16px;">
+          <span class="callout-icon">ⓘ</span>
+          <div><strong>Why field-level security and not just app logic:</strong> Anyone querying Dataverse directly (Power BI, Excel Online, Power Automate, custom WebAPI calls) is bound by FLS. App-only hiding can be bypassed by anyone with access through other clients. FLS is the only enforcement that travels with the data.</div>
+        </div>
+      </div>
+    </div>
+
+    <h2 id="security-roles">Security Roles</h2>
+    <p class="section-sub">Four Dataverse security roles map 1:1 to Helix access levels. Row-level scoping uses business unit and user-ownership.</p>
+
+    <div class="sec-grid">
+      <div class="sec-card">
+        <span class="sec-tag" style="background: var(--primary-bg); color: var(--primary);">Helix Admin</span>
+        <h4>Full portfolio access</h4>
+        <p>Read &amp; Write at <strong>Organization</strong> level on all helix_* tables. Member of Helix Finance FLS profile.</p>
+      </div>
+      <div class="sec-card">
+        <span class="sec-tag" style="background: var(--info-bg); color: var(--info);">Helix Manager</span>
+        <h4>Team queue</h4>
+        <p>Read at <strong>Business Unit</strong> level. Write on allocations within BU. <strong>Not</strong> a member of FLS profile.</p>
+      </div>
+      <div class="sec-card">
+        <span class="sec-tag" style="background: #f3e8ff; color: #6b21a8;">Helix PM</span>
+        <h4>Assigned projects</h4>
+        <p>Read at <strong>User</strong> level (own &amp; owned-by-team). Write on projects where they are <code>projectManager</code>.</p>
+      </div>
+      <div class="sec-card">
+        <span class="sec-tag" style="background: var(--surface-2); color: var(--text-muted);">Helix Member</span>
+        <h4>Self only</h4>
+        <p>Read at <strong>User</strong> level on own resource record &amp; allocations. No write. Read-only access to allocated projects.</p>
+      </div>
+    </div>
+
+    <div class="callout callout-accent" style="margin-top: 32px;">
+      <span class="callout-icon">→</span>
+      <div><strong>Next step:</strong> See <a href="developer.html" style="font-weight: 600;">developer.html</a> for the step-by-step setup of the publisher, tables, choice columns, FLS profile, and security roles in Power Platform.</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Highlight active sidebar link on scroll
+  const links = document.querySelectorAll('.sidebar a[href^="#"]');
+  const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  function updateActive() {
+    let active = sections[0];
+    for (const s of sections) {
+      if (s.getBoundingClientRect().top < 120) active = s;
+    }
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + active.id));
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>

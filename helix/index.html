@@ -11,11 +11,16 @@
 /* ===================== DESIGN TOKENS ===================== */
 :root {
   --bg: #fafaf9;
-  --surface: #ffffff;
-  --surface-2: #f5f5f4;
-  --surface-3: #e7e5e4;
-  --border: #e7e5e4;
-  --border-strong: #d6d3d1;
+  --bg-gradient: linear-gradient(135deg, #bae6fd 0%, #bae6fd 35%, #bbf7d0 70%, #ddd6fe 100%);
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-strong: rgba(255, 255, 255, 0.86);
+  --glass-soft: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-2: rgba(245, 245, 244, 0.7);
+  --surface-3: rgba(231, 229, 228, 0.8);
+  --border: rgba(212, 212, 216, 0.55);
+  --border-strong: rgba(168, 162, 158, 0.6);
   --text: #0c0a09;
   --text-muted: #57534e;
   --text-soft: #a8a29e;
@@ -59,12 +64,26 @@
 html, body { margin: 0; padding: 0; height: 100%; }
 body {
   font-family: 'Geist', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  background: var(--bg-gradient);
+  background-attachment: fixed;
   color: var(--text);
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+/* Subtle ambient orbs add depth behind glass */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(56,189,248,0.30) 0%, transparent 50%),
+    radial-gradient(circle at 80% 68%, rgba(34,197,94,0.20) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, rgba(139,92,246,0.16) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
 input, select, textarea { font-family: inherit; font-size: inherit; }
@@ -76,20 +95,51 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255,255,255,0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset;
 }
-.header-inner {
+.header-row1 {
   max-width: 1600px;
   margin: 0 auto;
-  padding: 14px 24px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.header-row2 {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
 }
+.cross-nav { display: flex; gap: 2px; padding: 4px; background: rgba(255,255,255,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); }
+.cross-nav a { padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--text-muted); transition: all 180ms var(--ease); display: flex; align-items: center; gap: 5px; text-decoration: none; }
+.cross-nav a:hover { color: var(--text); background: rgba(255,255,255,0.6); }
+.cross-nav a.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+.cross-nav a svg { width: 12px; height: 12px; }
+
+.loading-screen { position: fixed; inset: 0; background: var(--bg-gradient); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 500; transition: opacity 220ms var(--ease-out); }
+.loading-screen.hidden { opacity: 0; pointer-events: none; }
+.loading-spinner { width: 36px; height: 36px; border: 3px solid var(--surface-2); border-top-color: var(--primary); border-radius: 999px; animation: spin 700ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+
+.toast-container { position: fixed; top: 20px; right: 20px; z-index: 400; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast-container .toast { position: static; transform: none !important; background: var(--text); color: white; padding: 10px 14px; border-radius: var(--radius); font-size: 13px; font-weight: 500; box-shadow: var(--shadow-xl); display: flex; align-items: center; gap: 8px; pointer-events: auto; opacity: 1; animation: toastIn 220ms var(--ease-out); }
+.toast-container .toast.exiting { animation: toastOut 200ms var(--ease) forwards; }
+.toast-container .toast.success { background: var(--success); }
+.toast-container .toast.error   { background: var(--danger); }
+.toast-container .toast.warning { background: var(--warning); }
+@keyframes toastIn  { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { to   { opacity: 0; transform: translateX(20px); } }
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand-logo {
   width: 36px; height: 36px;
@@ -103,7 +153,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
 .brand-tag { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
 
-.main-nav { display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: var(--radius-lg); overflow-x: auto; max-width: 100%; }
+.main-nav { display: flex; gap: 2px; padding: 4px; background: rgba(255,255,255,0.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); overflow-x: auto; max-width: 100%; }
 .nav-btn {
   padding: 7px 12px;
   border-radius: 7px;
@@ -123,12 +173,15 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .role-pill {
   display: flex; align-items: center; gap: 8px;
   padding: 6px 12px 6px 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
   transition: all 150ms var(--ease);
 }
 .role-pill:hover { border-color: var(--border-strong); }
@@ -152,10 +205,12 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass-strong);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 20px 40px rgba(15,15,30,0.15);
   padding: 6px;
   min-width: 240px;
   display: none;
@@ -210,9 +265,12 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   border-radius: var(--radius);
   font-size: 13px;
   font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: var(--text);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset;
   transition: all 150ms var(--ease);
 }
 .btn:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow); }
@@ -227,12 +285,16 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 /* ===================== CARDS & KPIs ===================== */
 .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  transition: border-color 180ms var(--ease);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
+  transition: all 200ms var(--ease);
 }
+.card:hover { box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 12px 32px rgba(31,41,55,0.08); }
 .card-tight { padding: 16px; }
 .card-title {
   font-size: 13px; font-weight: 600;
@@ -255,16 +317,19 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 
 .kpi {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 18px 20px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
   transition: all 200ms var(--ease);
   cursor: pointer;
 }
-.kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--border-strong); }
+.kpi:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 14px 36px rgba(31,41,55,0.10); border-color: var(--glass-border); }
 .kpi-head {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px;
@@ -315,9 +380,10 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .badge-planning .badge-dot { background: var(--info); }
 .badge-onhold .badge-dot { background: var(--warning); }
 .badge-completed .badge-dot { background: var(--text-soft); }
-.badge-priority-high { background: var(--danger-bg); color: #991b1b; }
-.badge-priority-medium { background: var(--warning-bg); color: #92400e; }
-.badge-priority-low { background: var(--surface-2); color: var(--text-muted); }
+.badge-priority-critical { background: #fee2e2; color: #991b1b; box-shadow: inset 0 0 0 1px rgba(220,38,38,0.35); }
+.badge-priority-high { background: #fed7aa; color: #9a3412; box-shadow: inset 0 0 0 1px rgba(234,88,12,0.25); }
+.badge-priority-medium { background: #fef3c7; color: #92400e; box-shadow: inset 0 0 0 1px rgba(217,119,6,0.20); }
+.badge-priority-low { background: rgba(231,229,228,0.85); color: var(--text-muted); box-shadow: inset 0 0 0 1px rgba(168,162,158,0.30); }
 
 /* ===================== AVATARS ===================== */
 .avatar {
@@ -373,13 +439,17 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 /* ===================== PROJECT CARDS ===================== */
 .project-row {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(212,212,216,0.7);
   border-radius: var(--radius-lg);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 4px 14px rgba(31,41,55,0.06);
   transition: all 200ms var(--ease);
 }
+.project-row:hover { background: rgba(255,255,255,0.94); border-color: rgba(168,162,158,0.55); }
 .project-row:hover { border-color: var(--border-strong); }
 .project-row-head {
   padding: 14px 18px;
@@ -394,19 +464,21 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .project-row.expanded .project-expand-icon { transform: rotate(90deg); }
 .project-row.expanded { box-shadow: var(--shadow-lg); }
 .project-name-block { flex: 1; min-width: 0; }
-.project-name { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.project-code { font-size: 11px; color: var(--text-soft); font-family: 'Geist Mono', monospace; margin-top: 2px; }
+.project-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; color: var(--text); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.project-code { font-size: 11.5px; color: var(--text-muted); font-family: 'Geist Mono', monospace; margin-top: 3px; font-weight: 500; }
+.project-code .project-code-token { color: var(--text); font-weight: 600; }
 .project-meta {
   display: flex; align-items: center; gap: 24px;
   font-size: 12px;
 }
 .project-meta-item { display: flex; flex-direction: column; align-items: flex-end; }
-.project-meta-label { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; }
-.project-meta-value { font-weight: 500; }
+.project-meta-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.project-meta-value { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 .project-health {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 .phases-container {
@@ -457,10 +529,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 /* ===================== GANTT ===================== */
 .gantt {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
 }
 .gantt-toolbar {
   padding: 12px 18px;
@@ -612,10 +687,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 /* ===================== ALLOCATION MATRIX ===================== */
 .matrix-wrap {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
 }
 .matrix-toolbar {
   padding: 12px 18px;
@@ -730,10 +808,18 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 6px 10px;
+  padding: 6px 28px 6px 12px;
   font-size: 12px;
   color: var(--text);
-  transition: border-color 150ms var(--ease);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2357534e' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
 }
 .select:hover { border-color: var(--border-strong); }
 .select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
@@ -748,12 +834,15 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 @media (max-width: 640px) { .kanban-board { grid-template-columns: 1fr; } }
 
 .kanban-col {
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   display: flex; flex-direction: column;
   min-height: 200px;
-  transition: background 150ms var(--ease), border-color 150ms var(--ease);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.4) inset, 0 4px 14px rgba(31,41,55,0.04);
+  transition: all 150ms var(--ease);
 }
 .kanban-col.drag-over { background: var(--primary-bg); border-color: var(--primary); }
 .kanban-col-head {
@@ -779,11 +868,14 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 }
 
 .task-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: 12px;
   cursor: grab;
+  box-shadow: 0 2px 6px rgba(31,41,55,0.06);
   transition: all 180ms var(--ease);
   position: relative;
 }
@@ -836,8 +928,9 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 /* ===================== MODAL ===================== */
 .modal-backdrop {
   position: fixed; inset: 0;
-  background: rgba(12,10,9,0.4);
-  backdrop-filter: blur(4px);
+  background: rgba(31,27,55,0.32);
+  backdrop-filter: blur(8px) saturate(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.2);
   z-index: 200;
   display: none;
   align-items: center; justify-content: center;
@@ -847,9 +940,12 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .modal-backdrop.open { display: flex; }
 @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
 .modal {
-  background: var(--surface);
+  background: var(--glass-strong);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.7) inset, 0 30px 60px rgba(15,15,30,0.20);
   width: 100%;
   max-width: 520px;
   max-height: 90vh;
@@ -860,24 +956,60 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.modal-head { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
-.modal-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; }
-.modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
-.modal-foot { padding: 14px 20px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border); background: var(--surface-2); border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+.modal-head {
+  padding: 18px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.modal-foot {
+  padding: 14px 24px;
+  display: flex; justify-content: flex-end; gap: 8px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
 
 .field { display: flex; flex-direction: column; gap: 6px; }
-.field-label { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.field-label {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+}
 .field-control {
   border: 1px solid var(--border);
   background: var(--surface);
   border-radius: var(--radius);
-  padding: 8px 10px;
+  padding: 9px 12px;
   font-size: 13px;
   color: var(--text);
-  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease);
+  font-family: inherit;
+  line-height: 1.4;
+  width: 100%;
+  transition: border-color 150ms var(--ease), box-shadow 150ms var(--ease), background 150ms var(--ease);
 }
-.field-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-ring); }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.field-control::placeholder { color: var(--text-soft); }
+.field-control:hover { border-color: var(--border-strong); }
+.field-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-ring);
+}
+select.field-control {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2357534e' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+textarea.field-control { resize: vertical; min-height: 72px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field-help { font-size: 11px; color: var(--text-muted); margin-top: -2px; }
 
 /* ===================== PLAYGROUND ===================== */
 .playground-grid {
@@ -890,10 +1022,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   .playground-grid { grid-template-columns: 1fr; }
 }
 .scenario-builder {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 18px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
 }
 .scenario-action {
   display: flex; align-items: center; gap: 10px;
@@ -938,21 +1073,26 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .impact-stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
 .forecast-chart {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--glass);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 18px;
   margin-bottom: 16px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 8px 24px rgba(31,41,55,0.06);
 }
 
 /* ===================== TOOLTIP ===================== */
 .tooltip {
   position: fixed;
   z-index: 300;
-  background: white;
-  border: 1px solid var(--border);
+  background: var(--glass-strong);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 16px 36px rgba(15,15,30,0.15);
   padding: 12px;
   min-width: 220px;
   max-width: 320px;
@@ -1011,6 +1151,39 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .me-stat-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
 .me-stat-value { font-size: 22px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
 .me-stat-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+/* ===================== MY VIEW ===================== */
+.my-alloc-card {
+  padding: 14px 16px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.55);
+  margin-bottom: 10px;
+  transition: all 180ms var(--ease);
+}
+.my-alloc-card:hover { background: rgba(255,255,255,0.7); box-shadow: 0 4px 14px rgba(31,41,55,0.06); }
+.my-alloc-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.my-alloc-info { flex: 1; min-width: 0; }
+.my-alloc-title {
+  font-weight: 600; font-size: 14px;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.my-alloc-sub { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 11px; color: var(--text-muted); }
+.my-alloc-sub .mono { font-family: 'Geist Mono', monospace; font-weight: 500; color: var(--text-muted); }
+.my-alloc-role {
+  font-size: 11px;
+  color: var(--primary);
+  background: var(--primary-bg);
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+.my-alloc-hours { text-align: right; flex-shrink: 0; }
+.my-alloc-hours-value { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1; color: var(--text); }
+.my-alloc-hours-unit { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-left: 1px; }
+.my-alloc-hours-pct { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
 
 /* ===================== MILESTONES ===================== */
 .milestone-row {
@@ -1132,9 +1305,15 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 </head>
 <body>
 
+<!-- ===================== LOADING ===================== -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Loading Helix…</div>
+</div>
+
 <!-- ===================== HEADER ===================== -->
 <header class="header">
-  <div class="header-inner">
+  <div class="header-row1">
     <div class="brand">
       <div class="brand-logo">
         <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1148,7 +1327,15 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
         <span class="brand-tag" id="brandTag">IT Portfolio &amp; Resource OS</span>
       </div>
     </div>
+    <nav class="cross-nav" aria-label="Project documentation">
+      <a href="index.html" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>App</a>
+      <a href="schema.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>Schema</a>
+      <a href="erd.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="6" y1="9" x2="12" y2="15"/><line x1="18" y1="9" x2="12" y2="15"/></svg>ERD</a>
+      <a href="developer.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>Dev Setup</a>
+    </nav>
+  </div>
 
+  <div class="header-row2">
     <nav class="main-nav" id="mainNav">
       <button class="nav-btn active" data-section="dashboard">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
@@ -1222,6 +1409,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     </div>
   </div>
 </header>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <main class="container">
 
@@ -1734,15 +1923,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
           <input class="field-control" id="phaseProgress" type="number" min="0" max="100" step="5" />
         </div>
         <div class="field">
-          <label class="field-label" for="phaseColor">Color</label>
-          <select class="field-control" id="phaseColor">
-            <option value="#4f46e5">Discovery (indigo)</option>
-            <option value="#8b5cf6">Design (violet)</option>
-            <option value="#10b981">Build (green)</option>
-            <option value="#f59e0b">Test (amber)</option>
-            <option value="#06b6d4">Deploy (cyan)</option>
-            <option value="#ec4899">Other (pink)</option>
-          </select>
+          <label class="field-label" for="phaseColor">Phase type</label>
+          <select class="field-control" id="phaseColor"></select>
         </div>
       </div>
     </div>
@@ -1820,7 +2002,6 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 </div>
 
 <div class="tooltip" id="tooltip"></div>
-<div class="toast" id="toast"></div>
 
 <script>
 /* ========================================================================
@@ -1829,27 +2010,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
    ======================================================================== */
 
 /* ===================== EMBEDDED FALLBACK ===================== */
-const FALLBACK_DATA = {
-  meta: { app_name: 'Helix', tagline: 'IT Portfolio & Resource OS', current_user: 'r3', week_of: '2026-05-11' },
-  resources: [
-    { id: 'r1', name: 'Alex Chen',       role: 'Sr. Developer',    team: 'Apps',   initials: 'AC', color: '#6366f1', cap: 40, rate: 95,  skills: ['React', 'Node'] },
-    { id: 'r2', name: 'Priya Patel',     role: 'Project Manager',  team: 'PMO',    initials: 'PP', color: '#ec4899', cap: 40, rate: 110, skills: ['Scrum'] },
-    { id: 'r3', name: 'Marcus Johnson',  role: 'Cloud Architect',  team: 'Infra',  initials: 'MJ', color: '#0ea5e9', cap: 40, rate: 145, skills: ['AWS', 'K8s'] },
-    { id: 'r4', name: 'Sarah Williams',  role: 'Business Analyst', team: 'Apps',   initials: 'SW', color: '#10b981', cap: 40, rate: 85,  skills: ['SQL'] },
-    { id: 'r5', name: 'David Kim',       role: 'Data Engineer',    team: 'Data',   initials: 'DK', color: '#f97316', cap: 40, rate: 105, skills: ['Spark'] },
-    { id: 'r6', name: 'Elena Rodriguez', role: 'UX Designer',      team: 'Design', initials: 'ER', color: '#f43f5e', cap: 32, rate: 90,  skills: ['Figma'] },
-    { id: 'r7', name: "James O'Brien",   role: 'DevOps Engineer',  team: 'Infra',  initials: 'JO', color: '#14b8a6', cap: 40, rate: 115, skills: ['CI/CD'] },
-    { id: 'r8', name: 'Aisha Khan',      role: 'QA Lead',          team: 'Apps',   initials: 'AK', color: '#eab308', cap: 40, rate: 90,  skills: ['Cypress'] }
-  ],
-  projects: [], phases: {}, dependencies: [], allocations: [], milestones: [], sprints: [], tasks: [],
-  task_columns: [
-    { id: 'backlog', label: 'Backlog', color: '#a8a29e', wip: null },
-    { id: 'in_progress', label: 'In progress', color: '#4f46e5', wip: 6 },
-    { id: 'review', label: 'Review', color: '#f59e0b', wip: 4 },
-    { id: 'done', label: 'Done', color: '#10b981', wip: null }
-  ],
-  burn_chart: []
-};
+const FALLBACK_DATA = {"_comment": "Helix seed database — loaded by index.html via fetch(). Field names mirror Dataverse logical names in camelCase. See schema.html for the full Dataverse mapping.", "metadata": {"appName": "Helix", "version": "0.2.0", "description": "IT Portfolio & Resource Management", "publisherPrefix": "helix", "lastUpdated": "2026-05-13", "todayOverride": "2026-05-13", "currentUserId": "u1"}, "choices": {"projectStatus": [{"value": "planning", "label": "Planning", "color": "#0284c7"}, {"value": "active", "label": "Active", "color": "#10b981"}, {"value": "onhold", "label": "On hold", "color": "#d97706"}, {"value": "completed", "label": "Completed", "color": "#a8a29e"}, {"value": "cancelled", "label": "Cancelled", "color": "#dc2626"}], "projectPriority": [{"value": "critical", "label": "Critical"}, {"value": "high", "label": "High"}, {"value": "medium", "label": "Medium"}, {"value": "low", "label": "Low"}], "department": [{"value": "it-apps", "label": "IT — Apps"}, {"value": "it-infra", "label": "IT — Infrastructure"}, {"value": "it-data", "label": "IT — Data & Analytics"}, {"value": "it-security", "label": "IT — Security"}], "accessLevel": [{"value": "admin", "label": "Admin", "desc": "Full access including financials"}, {"value": "manager", "label": "Manager", "desc": "Team queue, no financials"}, {"value": "pm", "label": "Project Manager", "desc": "Own projects only, no financials"}, {"value": "member", "label": "Team Member", "desc": "Own bandwidth and allocations"}], "jobRole": [{"value": "developer", "label": "Developer"}, {"value": "qa", "label": "QA Engineer"}, {"value": "ba", "label": "Business Analyst"}, {"value": "pm", "label": "Project Manager"}, {"value": "ux", "label": "UX Designer"}, {"value": "devops", "label": "DevOps Engineer"}, {"value": "data-engineer", "label": "Data Engineer"}, {"value": "cloud-architect", "label": "Cloud Architect"}, {"value": "manager", "label": "Manager"}], "phaseType": [{"value": "discovery", "label": "Discovery", "color": "#4f46e5"}, {"value": "design", "label": "Design", "color": "#8b5cf6"}, {"value": "build", "label": "Build", "color": "#10b981"}, {"value": "test", "label": "Test", "color": "#f59e0b"}, {"value": "deploy", "label": "Deploy", "color": "#06b6d4"}], "dependencyType": [{"value": "fs", "label": "Finish-to-Start", "desc": "Predecessor must finish before successor can start"}, {"value": "ss", "label": "Start-to-Start", "desc": "Both phases start at the same time"}, {"value": "ff", "label": "Finish-to-Finish", "desc": "Both phases finish at the same time"}, {"value": "sf", "label": "Start-to-Finish", "desc": "Rare — predecessor must start before successor finishes"}], "scenarioAction": [{"value": "add", "label": "Add resource", "color": "#10b981"}, {"value": "remove", "label": "Remove resource", "color": "#dc2626"}, {"value": "modify", "label": "Modify hours", "color": "#0284c7"}], "scenarioStatus": [{"value": "draft", "label": "Draft"}, {"value": "proposed", "label": "Proposed"}, {"value": "approved", "label": "Approved"}, {"value": "rejected", "label": "Rejected"}, {"value": "applied", "label": "Applied"}], "taskStatus": [{"value": "backlog", "label": "Backlog", "color": "#a8a29e"}, {"value": "in_progress", "label": "In progress", "color": "#4f46e5"}, {"value": "review", "label": "Review", "color": "#f59e0b"}, {"value": "done", "label": "Done", "color": "#10b981"}], "milestoneStatus": [{"value": "upcoming", "label": "Upcoming"}, {"value": "at_risk", "label": "At risk"}, {"value": "done", "label": "Done"}, {"value": "missed", "label": "Missed"}], "sprintStatus": [{"value": "planned", "label": "Planned"}, {"value": "active", "label": "Active"}, {"value": "completed", "label": "Completed"}]}, "users": [{"id": "u1", "entraId": "kpatel@huntoil.com", "displayName": "Krupesh Patel", "resourceId": "r10"}], "resources": [{"id": "r1", "name": "Alex Chen", "jobTitle": "Senior Developer", "jobRole": "developer", "accessLevel": "member", "initials": "AC", "avatarColor": "#6366f1", "capacityHoursPerWeek": 40, "hourlyRate": 95, "billable": true, "active": true, "managedBy": "r2", "department": "it-apps", "email": "alex.chen@huntoil.com"}, {"id": "r2", "name": "Priya Patel", "jobTitle": "Project Manager", "jobRole": "pm", "accessLevel": "pm", "initials": "PP", "avatarColor": "#ec4899", "capacityHoursPerWeek": 40, "hourlyRate": 110, "billable": true, "active": true, "managedBy": "r9", "department": "it-apps", "email": "priya.patel@huntoil.com"}, {"id": "r3", "name": "Marcus Johnson", "jobTitle": "Cloud Architect", "jobRole": "cloud-architect", "accessLevel": "member", "initials": "MJ", "avatarColor": "#0ea5e9", "capacityHoursPerWeek": 40, "hourlyRate": 145, "billable": true, "active": true, "managedBy": "r9", "department": "it-infra", "email": "marcus.johnson@huntoil.com"}, {"id": "r4", "name": "Sarah Williams", "jobTitle": "Business Analyst", "jobRole": "ba", "accessLevel": "member", "initials": "SW", "avatarColor": "#10b981", "capacityHoursPerWeek": 40, "hourlyRate": 85, "billable": true, "active": true, "managedBy": "r2", "department": "it-apps", "email": "sarah.williams@huntoil.com"}, {"id": "r5", "name": "David Kim", "jobTitle": "Senior Data Engineer", "jobRole": "data-engineer", "accessLevel": "member", "initials": "DK", "avatarColor": "#f97316", "capacityHoursPerWeek": 40, "hourlyRate": 105, "billable": true, "active": true, "managedBy": "r9", "department": "it-data", "email": "david.kim@huntoil.com"}, {"id": "r6", "name": "Elena Rodriguez", "jobTitle": "UX Designer", "jobRole": "ux", "accessLevel": "member", "initials": "ER", "avatarColor": "#f43f5e", "capacityHoursPerWeek": 32, "hourlyRate": 90, "billable": true, "active": true, "managedBy": "r2", "department": "it-apps", "email": "elena.rodriguez@huntoil.com"}, {"id": "r7", "name": "James O'Brien", "jobTitle": "DevOps Engineer", "jobRole": "devops", "accessLevel": "member", "initials": "JO", "avatarColor": "#14b8a6", "capacityHoursPerWeek": 40, "hourlyRate": 115, "billable": true, "active": true, "managedBy": "r9", "department": "it-infra", "email": "james.obrien@huntoil.com"}, {"id": "r8", "name": "Aisha Khan", "jobTitle": "QA Lead", "jobRole": "qa", "accessLevel": "member", "initials": "AK", "avatarColor": "#eab308", "capacityHoursPerWeek": 40, "hourlyRate": 90, "billable": true, "active": true, "managedBy": "r2", "department": "it-apps", "email": "aisha.khan@huntoil.com"}, {"id": "r9", "name": "Rachel Foster", "jobTitle": "IT Director", "jobRole": "manager", "accessLevel": "manager", "initials": "RF", "avatarColor": "#7c3aed", "capacityHoursPerWeek": 40, "hourlyRate": 175, "billable": false, "active": true, "managedBy": null, "department": "it-apps", "email": "rachel.foster@huntoil.com"}, {"id": "r10", "name": "Krupesh Patel", "jobTitle": "Platform Architect", "jobRole": "cloud-architect", "accessLevel": "admin", "initials": "KP", "avatarColor": "#f97316", "capacityHoursPerWeek": 40, "hourlyRate": 165, "billable": true, "active": true, "managedBy": "r9", "department": "it-apps", "email": "kpatel@huntoil.com"}], "projects": [{"id": "p1", "name": "ERP Modernization", "code": "ERP-2026", "status": "active", "priority": "critical", "department": "it-apps", "description": "Migrate from legacy ERP to modern cloud platform with Dataverse integration", "budget": 850000, "spent": 425000, "funding": 850000, "estimatedHours": 6800, "health": 85, "startDate": "2026-01-15", "endDate": "2026-12-31", "projectManager": "r2", "teamManager": "r9", "riskCommentary": "Tracking on plan. Integration testing phase identified as highest risk window."}, {"id": "p2", "name": "Asset Management Portal", "code": "AMP-26", "status": "active", "priority": "high", "department": "it-apps", "description": "Self-service portal for tracking IT assets across all business units", "budget": 320000, "spent": 198000, "funding": 320000, "estimatedHours": 2400, "health": 72, "startDate": "2026-02-01", "endDate": "2026-08-31", "projectManager": "r2", "teamManager": "r9", "riskCommentary": "UX revisions extended design phase by 2 weeks."}, {"id": "p3", "name": "Data Lake Migration", "code": "DL-MIG", "status": "active", "priority": "high", "department": "it-data", "description": "Consolidate legacy data warehouses into Azure Data Lake Gen2 with Synapse", "budget": 540000, "spent": 612000, "funding": 540000, "estimatedHours": 4200, "health": 42, "startDate": "2025-11-01", "endDate": "2026-06-30", "projectManager": "r5", "teamManager": "r9", "riskCommentary": "Over budget. Source mapping took longer than estimated; pipeline complexity higher than scoped."}, {"id": "p4", "name": "Mobile Field App", "code": "MFA-V2", "status": "planning", "priority": "medium", "department": "it-apps", "description": "iOS/Android app for field engineers — work order management and time entry", "budget": 275000, "spent": 12000, "funding": 200000, "estimatedHours": 2000, "health": 90, "startDate": "2026-06-01", "endDate": "2026-12-15", "projectManager": "r2", "teamManager": "r9", "riskCommentary": "Funding gap of $75k — awaiting approval to proceed past discovery."}, {"id": "p5", "name": "Security Hardening", "code": "SEC-26", "status": "active", "priority": "critical", "department": "it-security", "description": "Implement zero-trust controls and remediate findings from Q4 audit", "budget": 180000, "spent": 95000, "funding": 180000, "estimatedHours": 1400, "health": 88, "startDate": "2026-03-01", "endDate": "2026-09-30", "projectManager": "r7", "teamManager": "r9", "riskCommentary": "Penetration test scheduled for August."}, {"id": "p6", "name": "Customer Portal Redesign", "code": "CPR-26", "status": "onhold", "priority": "low", "department": "it-apps", "description": "Refresh of customer-facing portal — paused pending stakeholder alignment", "budget": 240000, "spent": 78000, "funding": 240000, "estimatedHours": 1800, "health": 50, "startDate": "2026-01-01", "endDate": "2026-07-31", "projectManager": "r2", "teamManager": "r9", "riskCommentary": "Awaiting business sponsor decision on scope."}], "phases": [{"id": "p1f1", "projectId": "p1", "name": "Discovery & Requirements", "phaseType": "discovery", "startDate": "2026-01-15", "endDate": "2026-02-28", "progress": 100, "owner": "r4"}, {"id": "p1f2", "projectId": "p1", "name": "Architecture & Design", "phaseType": "design", "startDate": "2026-03-01", "endDate": "2026-04-15", "progress": 100, "owner": "r3"}, {"id": "p1f3", "projectId": "p1", "name": "Core Build — Phase 1", "phaseType": "build", "startDate": "2026-04-16", "endDate": "2026-08-15", "progress": 60, "owner": "r1"}, {"id": "p1f4", "projectId": "p1", "name": "Integration Testing", "phaseType": "test", "startDate": "2026-08-01", "endDate": "2026-10-31", "progress": 0, "owner": "r8"}, {"id": "p1f5", "projectId": "p1", "name": "UAT & Deploy", "phaseType": "deploy", "startDate": "2026-11-01", "endDate": "2026-12-31", "progress": 0, "owner": "r2"}, {"id": "p2f1", "projectId": "p2", "name": "Requirements", "phaseType": "discovery", "startDate": "2026-02-01", "endDate": "2026-03-01", "progress": 100, "owner": "r4"}, {"id": "p2f2", "projectId": "p2", "name": "UX Design", "phaseType": "design", "startDate": "2026-03-01", "endDate": "2026-04-15", "progress": 100, "owner": "r6"}, {"id": "p2f3", "projectId": "p2", "name": "Build", "phaseType": "build", "startDate": "2026-04-15", "endDate": "2026-07-15", "progress": 70, "owner": "r1"}, {"id": "p2f4", "projectId": "p2", "name": "QA & Launch", "phaseType": "test", "startDate": "2026-07-15", "endDate": "2026-08-31", "progress": 10, "owner": "r8"}, {"id": "p3f1", "projectId": "p3", "name": "Discovery", "phaseType": "discovery", "startDate": "2025-11-01", "endDate": "2025-12-15", "progress": 100, "owner": "r5"}, {"id": "p3f2", "projectId": "p3", "name": "Source Mapping", "phaseType": "design", "startDate": "2025-12-15", "endDate": "2026-02-01", "progress": 100, "owner": "r5"}, {"id": "p3f3", "projectId": "p3", "name": "Pipeline Build", "phaseType": "build", "startDate": "2026-02-01", "endDate": "2026-05-31", "progress": 85, "owner": "r5"}, {"id": "p3f4", "projectId": "p3", "name": "Validation & Cutover", "phaseType": "test", "startDate": "2026-05-15", "endDate": "2026-08-28", "progress": 15, "owner": "r3"}, {"id": "p4f1", "projectId": "p4", "name": "Discovery", "phaseType": "discovery", "startDate": "2026-06-01", "endDate": "2026-07-15", "progress": 5, "owner": "r6"}, {"id": "p4f2", "projectId": "p4", "name": "UX Design", "phaseType": "design", "startDate": "2026-07-01", "endDate": "2026-08-30", "progress": 0, "owner": "r6"}, {"id": "p4f3", "projectId": "p4", "name": "Build", "phaseType": "build", "startDate": "2026-09-01", "endDate": "2026-11-30", "progress": 0, "owner": "r1"}, {"id": "p4f4", "projectId": "p4", "name": "Pilot", "phaseType": "test", "startDate": "2026-12-01", "endDate": "2026-12-15", "progress": 0, "owner": "r8"}, {"id": "p5f1", "projectId": "p5", "name": "Audit", "phaseType": "discovery", "startDate": "2026-03-01", "endDate": "2026-04-15", "progress": 100, "owner": "r7"}, {"id": "p5f2", "projectId": "p5", "name": "Remediation Plan", "phaseType": "design", "startDate": "2026-04-15", "endDate": "2026-05-15", "progress": 80, "owner": "r7"}, {"id": "p5f3", "projectId": "p5", "name": "Implementation", "phaseType": "build", "startDate": "2026-05-15", "endDate": "2026-08-31", "progress": 30, "owner": "r7"}, {"id": "p5f4", "projectId": "p5", "name": "Penetration Test", "phaseType": "test", "startDate": "2026-08-15", "endDate": "2026-09-30", "progress": 0, "owner": "r7"}, {"id": "p6f1", "projectId": "p6", "name": "Discovery", "phaseType": "discovery", "startDate": "2026-01-01", "endDate": "2026-02-15", "progress": 100, "owner": "r4"}, {"id": "p6f2", "projectId": "p6", "name": "UX Research", "phaseType": "design", "startDate": "2026-02-15", "endDate": "2026-03-31", "progress": 60, "owner": "r6"}, {"id": "p6f3", "projectId": "p6", "name": "Build", "phaseType": "build", "startDate": "2026-04-01", "endDate": "2026-07-15", "progress": 0, "owner": "r1"}], "dependencies": [{"id": "d1", "fromPhaseId": "p1f1", "toPhaseId": "p1f2", "type": "fs"}, {"id": "d2", "fromPhaseId": "p1f2", "toPhaseId": "p1f3", "type": "fs"}, {"id": "d3", "fromPhaseId": "p1f3", "toPhaseId": "p1f4", "type": "fs"}, {"id": "d4", "fromPhaseId": "p1f4", "toPhaseId": "p1f5", "type": "fs"}, {"id": "d5", "fromPhaseId": "p2f2", "toPhaseId": "p2f3", "type": "fs"}, {"id": "d6", "fromPhaseId": "p3f2", "toPhaseId": "p3f3", "type": "fs"}, {"id": "d7", "fromPhaseId": "p3f3", "toPhaseId": "p3f4", "type": "fs"}, {"id": "d8", "fromPhaseId": "p5f2", "toPhaseId": "p5f3", "type": "fs"}, {"id": "d9", "fromPhaseId": "p5f3", "toPhaseId": "p5f4", "type": "fs"}], "allocations": [{"id": "a1", "projectId": "p1", "resourceId": "r1", "hoursPerWeek": 25, "weekStartDate": "2026-05-11", "roleOnProject": "Tech Lead", "committed": true}, {"id": "a2", "projectId": "p1", "resourceId": "r2", "hoursPerWeek": 15, "weekStartDate": "2026-05-11", "roleOnProject": "Project Manager", "committed": true}, {"id": "a3", "projectId": "p1", "resourceId": "r4", "hoursPerWeek": 30, "weekStartDate": "2026-05-11", "roleOnProject": "Lead BA", "committed": true}, {"id": "a4", "projectId": "p1", "resourceId": "r8", "hoursPerWeek": 20, "weekStartDate": "2026-05-11", "roleOnProject": "QA Lead", "committed": true}, {"id": "a5", "projectId": "p2", "resourceId": "r1", "hoursPerWeek": 15, "weekStartDate": "2026-05-11", "roleOnProject": "Developer", "committed": true}, {"id": "a6", "projectId": "p2", "resourceId": "r6", "hoursPerWeek": 25, "weekStartDate": "2026-05-11", "roleOnProject": "UX Lead", "committed": true}, {"id": "a7", "projectId": "p2", "resourceId": "r2", "hoursPerWeek": 10, "weekStartDate": "2026-05-11", "roleOnProject": "Project Manager", "committed": true}, {"id": "a8", "projectId": "p3", "resourceId": "r3", "hoursPerWeek": 30, "weekStartDate": "2026-05-11", "roleOnProject": "Solution Architect", "committed": true}, {"id": "a9", "projectId": "p3", "resourceId": "r5", "hoursPerWeek": 35, "weekStartDate": "2026-05-11", "roleOnProject": "Data Lead", "committed": true}, {"id": "a10", "projectId": "p3", "resourceId": "r7", "hoursPerWeek": 20, "weekStartDate": "2026-05-11", "roleOnProject": "DevOps", "committed": true}, {"id": "a11", "projectId": "p4", "resourceId": "r6", "hoursPerWeek": 10, "weekStartDate": "2026-05-11", "roleOnProject": "UX Designer", "committed": false}, {"id": "a12", "projectId": "p5", "resourceId": "r7", "hoursPerWeek": 20, "weekStartDate": "2026-05-11", "roleOnProject": "Security Lead", "committed": true}, {"id": "a13", "projectId": "p5", "resourceId": "r3", "hoursPerWeek": 10, "weekStartDate": "2026-05-11", "roleOnProject": "Cloud Architect", "committed": true}, {"id": "a14", "projectId": "p3", "resourceId": "r10", "hoursPerWeek": 12, "weekStartDate": "2026-05-11", "roleOnProject": "Platform Architect", "committed": true}, {"id": "a15", "projectId": "p4", "resourceId": "r10", "hoursPerWeek": 15, "weekStartDate": "2026-05-11", "roleOnProject": "Architecture Lead", "committed": true}, {"id": "a16", "projectId": "p5", "resourceId": "r10", "hoursPerWeek": 18, "weekStartDate": "2026-05-11", "roleOnProject": "Security Architect", "committed": true}], "scenarios": [{"id": "s1", "name": "DL-MIG Fast Track", "description": "Accelerate Data Lake Migration delivery by 8 weeks with two added resources", "projectId": "p3", "status": "proposed", "baselineEndDate": "2026-08-28", "proposedEndDate": "2026-08-04", "timelineDeltaDays": -24, "baselineBudget": 540000, "estimatedCostDelta": 48210, "efficiencyCoefficient": 0.92, "owner": "u1", "notes": "Stretches Alex Chen to 105% utilization for 6 weeks. Aisha brought in from QA pool."}, {"id": "s2", "name": "ERP Sustainability Pass", "description": "Reduce ERP team burn rate after Phase 1 GA", "projectId": "p1", "status": "draft", "baselineEndDate": "2026-12-31", "proposedEndDate": "2027-01-30", "timelineDeltaDays": 30, "baselineBudget": 850000, "estimatedCostDelta": -32000, "efficiencyCoefficient": 1.0, "owner": "u1", "notes": "Drop one developer post-GA; extend by one month."}], "scenarioAllocations": [{"id": "sa1", "scenarioId": "s1", "resourceId": "r8", "action": "add", "weekStartDate": "2026-05-18", "baselineHours": 0, "proposedHours": 25}, {"id": "sa2", "scenarioId": "s1", "resourceId": "r1", "action": "add", "weekStartDate": "2026-05-25", "baselineHours": 0, "proposedHours": 20}, {"id": "sa3", "scenarioId": "s1", "resourceId": "r7", "action": "modify", "weekStartDate": "2026-05-18", "baselineHours": 20, "proposedHours": 10}, {"id": "sa4", "scenarioId": "s2", "resourceId": "r1", "action": "remove", "weekStartDate": "2026-12-01", "baselineHours": 25, "proposedHours": 0}], "sprints": [{"id": "sp1", "name": "Sprint 19", "startDate": "2026-05-04", "endDate": "2026-05-17", "status": "active"}, {"id": "sp2", "name": "Sprint 20", "startDate": "2026-05-18", "endDate": "2026-05-31", "status": "planned"}, {"id": "sp3", "name": "Sprint 21", "startDate": "2026-06-01", "endDate": "2026-06-14", "status": "planned"}], "tasks": [{"id": "t1", "title": "Map legacy GL chart of accounts", "projectId": "p1", "phaseId": "p1f3", "assigneeId": "r4", "status": "done", "priority": "high", "dueDate": "2026-05-09", "tags": ["finance", "schema"], "estimateHours": 12, "loggedHours": 14, "sprintId": "sp1"}, {"id": "t2", "title": "Build vendor master sync API", "projectId": "p1", "phaseId": "p1f3", "assigneeId": "r1", "status": "in_progress", "priority": "high", "dueDate": "2026-05-23", "tags": ["api", "backend"], "estimateHours": 24, "loggedHours": 11, "sprintId": "sp1"}, {"id": "t3", "title": "Draft change-management plan", "projectId": "p1", "phaseId": "p1f3", "assigneeId": "r2", "status": "review", "priority": "medium", "dueDate": "2026-05-15", "tags": ["change-mgmt"], "estimateHours": 8, "loggedHours": 7, "sprintId": "sp1"}, {"id": "t4", "title": "Write E2E suite for AR module", "projectId": "p1", "phaseId": "p1f3", "assigneeId": "r8", "status": "backlog", "priority": "medium", "dueDate": "2026-06-12", "tags": ["test", "cypress"], "estimateHours": 16, "loggedHours": 0, "sprintId": "sp2"}, {"id": "t5", "title": "Wireframes for inventory dashboard", "projectId": "p2", "phaseId": "p2f3", "assigneeId": "r6", "status": "in_progress", "priority": "medium", "dueDate": "2026-05-20", "tags": ["design", "ux"], "estimateHours": 12, "loggedHours": 6, "sprintId": "sp1"}, {"id": "t6", "title": "Implement asset tagging UI", "projectId": "p2", "phaseId": "p2f3", "assigneeId": "r1", "status": "backlog", "priority": "medium", "dueDate": "2026-06-05", "tags": ["frontend"], "estimateHours": 16, "loggedHours": 0, "sprintId": "sp2"}, {"id": "t7", "title": "QA test plan for portal", "projectId": "p2", "phaseId": "p2f4", "assigneeId": "r8", "status": "backlog", "priority": "low", "dueDate": "2026-07-01", "tags": ["test"], "estimateHours": 10, "loggedHours": 0, "sprintId": "sp3"}, {"id": "t8", "title": "Tune Snowflake warehouse sizes", "projectId": "p3", "phaseId": "p3f3", "assigneeId": "r5", "status": "in_progress", "priority": "high", "dueDate": "2026-05-16", "tags": ["snowflake", "perf"], "estimateHours": 8, "loggedHours": 5, "sprintId": "sp1"}, {"id": "t9", "title": "Build CDC pipeline for orders", "projectId": "p3", "phaseId": "p3f3", "assigneeId": "r5", "status": "in_progress", "priority": "high", "dueDate": "2026-05-30", "tags": ["pipeline", "cdc"], "estimateHours": 32, "loggedHours": 18, "sprintId": "sp1"}, {"id": "t10", "title": "Data validation harness", "projectId": "p3", "phaseId": "p3f4", "assigneeId": "r7", "status": "review", "priority": "high", "dueDate": "2026-05-14", "tags": ["validation"], "estimateHours": 12, "loggedHours": 12, "sprintId": "sp1"}, {"id": "t11", "title": "Decom plan for legacy warehouse", "projectId": "p3", "phaseId": "p3f4", "assigneeId": "r3", "status": "backlog", "priority": "medium", "dueDate": "2026-07-15", "tags": ["infra"], "estimateHours": 8, "loggedHours": 0, "sprintId": "sp3"}, {"id": "t12", "title": "Field app — login & SSO", "projectId": "p4", "phaseId": "p4f1", "assigneeId": "r6", "status": "backlog", "priority": "low", "dueDate": "2026-07-10", "tags": ["mobile", "auth"], "estimateHours": 10, "loggedHours": 0, "sprintId": "sp3"}, {"id": "t13", "title": "MFA rollout for VPN", "projectId": "p5", "phaseId": "p5f3", "assigneeId": "r7", "status": "in_progress", "priority": "high", "dueDate": "2026-05-22", "tags": ["security", "mfa"], "estimateHours": 14, "loggedHours": 6, "sprintId": "sp1"}, {"id": "t14", "title": "Patch baseline servers", "projectId": "p5", "phaseId": "p5f3", "assigneeId": "r7", "status": "done", "priority": "medium", "dueDate": "2026-05-05", "tags": ["security", "patch"], "estimateHours": 8, "loggedHours": 9, "sprintId": "sp1"}, {"id": "t15", "title": "Pen-test scope review", "projectId": "p5", "phaseId": "p5f4", "assigneeId": "r3", "status": "review", "priority": "medium", "dueDate": "2026-05-13", "tags": ["security"], "estimateHours": 4, "loggedHours": 4, "sprintId": "sp1"}, {"id": "t16", "title": "User research — service technicians", "projectId": "p4", "phaseId": "p4f1", "assigneeId": "r6", "status": "backlog", "priority": "medium", "dueDate": "2026-06-25", "tags": ["research"], "estimateHours": 16, "loggedHours": 0, "sprintId": "sp3"}, {"id": "t17", "title": "Ops runbook for cutover", "projectId": "p3", "phaseId": "p3f4", "assigneeId": "r3", "status": "backlog", "priority": "high", "dueDate": "2026-06-10", "tags": ["runbook"], "estimateHours": 12, "loggedHours": 0, "sprintId": "sp2"}, {"id": "t18", "title": "Refactor auth middleware", "projectId": "p1", "phaseId": "p1f3", "assigneeId": "r1", "status": "review", "priority": "medium", "dueDate": "2026-05-12", "tags": ["backend", "auth"], "estimateHours": 10, "loggedHours": 11, "sprintId": "sp1"}, {"id": "t19", "title": "Review Synapse cluster sizing", "projectId": "p3", "phaseId": "p3f4", "assigneeId": "r10", "status": "in_progress", "priority": "high", "dueDate": "2026-05-19", "tags": ["architecture", "azure"], "estimateHours": 6, "loggedHours": 3, "sprintId": "sp1"}, {"id": "t20", "title": "Field app architecture brief", "projectId": "p4", "phaseId": "p4f1", "assigneeId": "r10", "status": "in_progress", "priority": "high", "dueDate": "2026-05-21", "tags": ["architecture", "mobile"], "estimateHours": 10, "loggedHours": 4, "sprintId": "sp1"}, {"id": "t21", "title": "Zero-trust reference architecture", "projectId": "p5", "phaseId": "p5f3", "assigneeId": "r10", "status": "review", "priority": "high", "dueDate": "2026-05-15", "tags": ["security", "architecture"], "estimateHours": 12, "loggedHours": 12, "sprintId": "sp1"}, {"id": "t22", "title": "Approve cutover runbook draft", "projectId": "p3", "phaseId": "p3f4", "assigneeId": "r10", "status": "backlog", "priority": "medium", "dueDate": "2026-06-08", "tags": ["runbook"], "estimateHours": 3, "loggedHours": 0, "sprintId": "sp2"}], "milestones": [{"id": "m1", "projectId": "p1", "name": "Architecture sign-off", "milestoneDate": "2026-04-15", "status": "done"}, {"id": "m2", "projectId": "p1", "name": "Phase 1 GA", "milestoneDate": "2026-08-15", "status": "upcoming"}, {"id": "m3", "projectId": "p3", "name": "Source mapping complete", "milestoneDate": "2026-02-01", "status": "done"}, {"id": "m4", "projectId": "p3", "name": "Production cutover", "milestoneDate": "2026-08-15", "status": "at_risk"}, {"id": "m5", "projectId": "p5", "name": "SOC 2 audit submission", "milestoneDate": "2026-09-30", "status": "upcoming"}, {"id": "m6", "projectId": "p2", "name": "Portal launch", "milestoneDate": "2026-08-31", "status": "upcoming"}], "burnChart": [{"month": "Nov", "planned": 165, "actual": 178}, {"month": "Dec", "planned": 180, "actual": 195}, {"month": "Jan", "planned": 195, "actual": 210}, {"month": "Feb", "planned": 220, "actual": 245}, {"month": "Mar", "planned": 240, "actual": 235}, {"month": "Apr", "planned": 235, "actual": 252}, {"month": "May", "planned": 250, "actual": 268}]};
 
 /* ===================== STATE ===================== */
 let DATA = FALLBACK_DATA;
@@ -1871,7 +2032,9 @@ let scenario = {
     { id: 'sc3', type: 'reduce', resource: 'r7', hours: 20, hoursTo: 10 }
   ]
 };
-const STORAGE_KEY = 'helix.data.v1';
+const STORAGE_KEY = 'helix.data.v2';
+// Old key from v1 — purge so stale shape doesn't crash the new loader.
+try { localStorage.removeItem('helix.data.v1'); } catch {}
 
 const STATUS_LABELS = { active: 'Active', planning: 'Planning', onhold: 'On hold', completed: 'Completed' };
 const ROLE_LABELS = { admin: 'Admin', manager: 'Manager', pm: 'Project Manager', member: 'Team Member' };
@@ -1890,24 +2053,41 @@ const $$ = sel => document.querySelectorAll(sel);
 const escapeHtml = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const findResource = id => DATA.resources.find(r => r.id === id);
 const findProject = id => DATA.projects.find(p => p.id === id);
-const findColumn = id => DATA.task_columns.find(c => c.id === id);
+const findPhase = id => DATA.phases.find(p => p.id === id);
+const findUser = id => DATA.users.find(u => u.id === id);
+const findColumn = value => (DATA.choices.taskStatus || []).find(c => c.value === value);
+const choice = (tax, value) => (DATA.choices[tax] || []).find(c => c.value === value);
+const choiceLabel = (tax, value) => choice(tax, value)?.label || value || '';
+const choiceColor = (tax, value) => choice(tax, value)?.color || '#a8a29e';
+
+const phasesForProject = pid => DATA.phases.filter(p => p.projectId === pid);
+const phaseColor = phase => choiceColor('phaseType', phase?.phaseType);
+const teamForProject = pid => {
+  const ids = new Set();
+  DATA.allocations.filter(a => a.projectId === pid).forEach(a => ids.add(a.resourceId));
+  const p = findProject(pid);
+  if (p?.projectManager) ids.add(p.projectManager);
+  return Array.from(ids);
+};
+const todayDate = () => DATA.metadata?.todayOverride ? new Date(DATA.metadata.todayOverride) : new Date();
 
 const visibleProjects = () => {
   let list = DATA.projects;
-  if (currentRole === 'pm') list = list.filter(p => p.owner === DATA.meta.current_user || p.team.includes(DATA.meta.current_user));
-  else if (currentRole === 'member') list = list.filter(p => p.team.includes(DATA.meta.current_user));
+  const meRid = DATA.metadata._currentResourceId;
+  if (currentRole === 'pm')      list = list.filter(p => p.projectManager === meRid || teamForProject(p.id).includes(meRid));
+  else if (currentRole === 'member') list = list.filter(p => teamForProject(p.id).includes(meRid));
   if (projectStatusFilter !== 'all') list = list.filter(p => p.status === projectStatusFilter);
   return list;
 };
 
 const taskAge = task => {
-  const today = new Date();
-  const due = new Date(task.due);
+  const today = todayDate();
+  const due = new Date(task.dueDate);
   const daysToDue = Math.round((due - today) / 86400000);
-  if (task.status === 'done') return { label: fmt.shortDate(task.due), cls: '' };
+  if (task.status === 'done') return { label: fmt.shortDate(task.dueDate), cls: '' };
   if (daysToDue < 0) return { label: 'Overdue', cls: 'overdue' };
-  if (daysToDue <= 3) return { label: fmt.shortDate(task.due), cls: 'soon' };
-  return { label: fmt.shortDate(task.due), cls: '' };
+  if (daysToDue <= 3) return { label: fmt.shortDate(task.dueDate), cls: 'soon' };
+  return { label: fmt.shortDate(task.dueDate), cls: '' };
 };
 
 /* ===================== ICONS ===================== */
@@ -1934,16 +2114,100 @@ async function loadData() {
   }
   if (!cached) {
     try {
-      const res = await fetch('./data.json');
+      const res = await fetch('./database.json');
       if (res.ok) DATA = await res.json();
-      else console.warn('data.json not reachable, using embedded fallback');
+      else console.warn('database.json not reachable, using embedded fallback');
     } catch (e) {
       console.warn('Loading via file:// — using embedded fallback. Serve over http for full data.', e);
     }
   }
-  document.title = DATA.meta.app_name + ' · IT Portfolio & Resource Management';
-  byId('brandName').textContent = DATA.meta.app_name;
-  byId('brandTag').textContent = DATA.meta.tagline;
+  normalizeData();
+  document.title = (DATA.metadata?.appName || 'Helix') + ' · IT Portfolio & Resource Management';
+  byId('brandName').textContent = DATA.metadata?.appName || 'Helix';
+  byId('brandTag').textContent = 'IT Portfolio & Resource OS';
+}
+
+/* Normalize loaded DATA: ensure arrays exist, set WIP limits on choices, set current user. */
+function normalizeData() {
+  DATA.metadata    = DATA.metadata    || {};
+  DATA.choices     = DATA.choices     || FALLBACK_DATA.choices;
+  DATA.users       = DATA.users       || [];
+  DATA.resources   = DATA.resources   || [];
+  DATA.projects    = DATA.projects    || [];
+  DATA.phases      = DATA.phases      || [];
+  DATA.dependencies= DATA.dependencies|| [];
+  DATA.allocations = DATA.allocations || [];
+  DATA.scenarios   = DATA.scenarios   || [];
+  DATA.scenarioAllocations = DATA.scenarioAllocations || [];
+  DATA.sprints     = DATA.sprints     || [];
+  DATA.tasks       = DATA.tasks       || [];
+  DATA.milestones  = DATA.milestones  || [];
+  DATA.burnChart   = DATA.burnChart   || [];
+  // Alias .value → .id on every choice item so renderers can use either form
+  Object.values(DATA.choices).forEach(arr => {
+    if (Array.isArray(arr)) arr.forEach(c => { if (c.id === undefined) c.id = c.value; });
+  });
+  // Kanban WIP defaults
+  const taskStatus = DATA.choices.taskStatus || [];
+  const wipMap = { backlog: null, in_progress: 6, review: 4, done: null };
+  taskStatus.forEach(c => { if (c.wip === undefined) c.wip = wipMap[c.value] ?? null; });
+  // Resolve currentUser → resource
+  const user = DATA.users.find(u => u.id === DATA.metadata.currentUserId) || DATA.users[0];
+  DATA.metadata._currentResourceId = user?.resourceId || DATA.resources[0]?.id || null;
+  syncAliases();
+}
+
+/* Add legacy-name aliases so renderers can use either old or new field names.
+   Must be called after any in-memory modification. */
+function syncAliases() {
+  // Phases: build {projectId: phase[]} map + alias start/end/color
+  DATA._phasesByProject = {};
+  DATA.phases.forEach(ph => {
+    ph.start = ph.startDate;
+    ph.end   = ph.endDate;
+    ph.color = choiceColor('phaseType', ph.phaseType) || ph.color || '#4f46e5';
+    (DATA._phasesByProject[ph.projectId] = DATA._phasesByProject[ph.projectId] || []).push(ph);
+  });
+  // Projects: alias start/end, owner→projectManager, team→derived
+  DATA.projects.forEach(p => {
+    p.start = p.startDate;
+    p.end   = p.endDate;
+    p.owner = p.projectManager;
+    p.team  = teamForProject(p.id);
+  });
+  // Resources: alias role (legacy) — display label
+  DATA.resources.forEach(r => {
+    r.role = r.jobTitle;
+    r.color = r.avatarColor;
+    r.cap   = r.capacityHoursPerWeek;
+    r.rate  = r.hourlyRate;
+  });
+  // Tasks: aliases for legacy field names
+  DATA.tasks.forEach(t => {
+    t.project  = t.projectId;
+    t.phase    = t.phaseId;
+    t.assignee = t.assigneeId;
+    t.sprint   = t.sprintId;
+    t.due      = t.dueDate;
+    t.estimate = t.estimateHours;
+    t.logged   = t.loggedHours;
+  });
+  // Milestones: alias date and project
+  DATA.milestones.forEach(m => {
+    m.date    = m.milestoneDate;
+    m.project = m.projectId;
+  });
+  // Sprints: alias dates
+  DATA.sprints.forEach(s => {
+    s.start = s.startDate;
+    s.end   = s.endDate;
+  });
+  // Allocations: alias for legacy field names
+  DATA.allocations.forEach(a => {
+    a.hours    = a.hoursPerWeek;
+    a.project  = a.projectId;
+    a.resource = a.resourceId;
+  });
 }
 
 function persist() {
@@ -2026,8 +2290,8 @@ function renderKpis() {
   const budget = visible.reduce((s, p) => s + p.budget, 0);
   const spent  = visible.reduce((s, p) => s + p.spent, 0);
   const atRisk = visible.filter(p => p.spent > p.budget || p.health < 60).length;
-  const totalHours = DATA.allocations.reduce((s, a) => s + a.hours, 0);
-  const totalCap   = DATA.resources.reduce((s, r) => s + r.cap, 0);
+  const totalHours = DATA.allocations.reduce((s, a) => s + a.hoursPerWeek, 0);
+  const totalCap   = DATA.resources.reduce((s, r) => s + r.capacityHoursPerWeek, 0);
   const util       = totalCap === 0 ? 0 : Math.round(totalHours / totalCap * 100);
 
   const items = [
@@ -2095,31 +2359,60 @@ function animateCounters() {
 
 /* ===================== CHARTS ===================== */
 function renderBurnChart() {
-  const data = DATA.burn_chart;
-  if (!data || !data.length) { byId('burnChart').innerHTML = ''; return; }
-  const w = 620, h = 220, pad = { l: 36, r: 12, t: 12, b: 28 };
-  const max = Math.max(...data.flatMap(d => [d.planned, d.actual])) * 1.1;
+  const data = DATA.burnChart;
+  const target = byId('burnChart');
+  if (!target) return;
+  if (!data || !data.length) { target.innerHTML = ''; return; }
+  const w = 620, h = 220, pad = { l: 40, r: 12, t: 16, b: 28 };
+  const max = Math.max(...data.flatMap(d => [d.planned, d.actual])) * 1.15;
   const x = i => pad.l + (i / (data.length - 1)) * (w - pad.l - pad.r);
   const y = v => pad.t + (1 - v / max) * (h - pad.t - pad.b);
-  const line = (key, color) => {
-    const pts = data.map((d, i) => `${x(i)},${y(d[key])}`).join(' L');
-    const area = `M${x(0)},${h - pad.b} L${pts.split(' ').map(p => 'L' + p).join(' ').slice(1)} L${x(data.length - 1)},${h - pad.b} Z`;
-    return `
-      <path d="${area}" fill="${color}" opacity="0.08"/>
-      <path d="M${pts.split(' ').map(p => 'L' + p).join(' ').slice(1)}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      ${data.map((d, i) => `<circle cx="${x(i)}" cy="${y(d[key])}" r="3" fill="white" stroke="${color}" stroke-width="2"/>`).join('')}
-    `;
-  };
+  const linePath = key => data.map((d, i) => (i === 0 ? 'M' : 'L') + x(i).toFixed(1) + ',' + y(d[key]).toFixed(1)).join(' ');
+  const areaPath = key => linePath(key) + ` L${x(data.length-1).toFixed(1)},${(h-pad.b).toFixed(1)} L${x(0).toFixed(1)},${(h-pad.b).toFixed(1)} Z`;
+
+  const series = (key, color) => `
+    <path d="${areaPath(key)}" fill="${color}" opacity="0.08"/>
+    <path d="${linePath(key)}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    ${data.map((d, i) => `<circle cx="${x(i)}" cy="${y(d[key])}" r="3.5" fill="white" stroke="${color}" stroke-width="2"/>`).join('')}`;
+
   const yLabels = [0, max*0.25, max*0.5, max*0.75, max].map(v => `
-    <line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" stroke="#f5f5f4" stroke-width="1"/>
-    <text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end" font-size="10" fill="#a8a29e">$${Math.round(v)}k</text>`).join('');
-  byId('burnChart').innerHTML = `
+    <line x1="${pad.l}" y1="${y(v)}" x2="${w-pad.r}" y2="${y(v)}" stroke="rgba(231,229,228,0.6)" stroke-width="1"/>
+    <text x="${pad.l-6}" y="${y(v)+3}" text-anchor="end" font-size="10" fill="#57534e">$${Math.round(v)}k</text>`).join('');
+
+  // Hover zones — invisible rects per month catching pointer events
+  const hoverZones = data.map((d, i) => {
+    const cx = x(i);
+    const xLeft  = i === 0 ? pad.l : (x(i - 1) + cx) / 2;
+    const xRight = i === data.length - 1 ? w - pad.r : (x(i + 1) + cx) / 2;
+    const variance = d.actual - d.planned;
+    const pct = d.planned ? Math.round((variance / d.planned) * 100) : 0;
+    const tooltipData = JSON.stringify({
+      title: `${d.month} burn`,
+      rows: [
+        ['Planned', '$' + d.planned + 'k'],
+        ['Actual',  '$' + d.actual  + 'k'],
+        ['Variance', (variance >= 0 ? '+' : '') + '$' + variance + 'k (' + (pct >= 0 ? '+' : '') + pct + '%)']
+      ]
+    }).replace(/'/g, '&#39;');
+    return `<rect class="burn-hover" data-tt='${tooltipData}' x="${xLeft.toFixed(1)}" y="${pad.t}" width="${(xRight-xLeft).toFixed(1)}" height="${(h-pad.t-pad.b).toFixed(1)}" fill="transparent" style="cursor: crosshair"/>`;
+  }).join('');
+
+  target.innerHTML = `
     <svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="font-family: 'Geist Mono', monospace;" role="img" aria-label="Portfolio burn chart">
       ${yLabels}
-      ${line('planned', '#4f46e5')}
-      ${line('actual', '#10b981')}
-      ${data.map((d, i) => `<text x="${x(i)}" y="${h-8}" text-anchor="middle" font-size="10" fill="#78716c">${d.m}</text>`).join('')}
+      ${series('planned', '#4f46e5')}
+      ${series('actual',  '#10b981')}
+      ${data.map((d, i) => `<text x="${x(i)}" y="${h-8}" text-anchor="middle" font-size="10" fill="#57534e">${d.month}</text>`).join('')}
+      ${hoverZones}
     </svg>`;
+
+  target.querySelectorAll('.burn-hover').forEach(el => {
+    let content;
+    try { content = JSON.parse(el.dataset.tt.replace(/&#39;/g, "'")); } catch { return; }
+    el.addEventListener('mouseenter', e => showTooltip(e, content));
+    el.addEventListener('mousemove', moveTooltip);
+    el.addEventListener('mouseleave', hideTooltip);
+  });
 }
 
 function renderStatusDonut() {
@@ -2153,23 +2446,34 @@ function renderStatusDonut() {
 }
 
 function renderUtilChart() {
-  const w = 560, h = 220, pad = { l: 32, r: 12, t: 20, b: 36 };
+  const w = 560, h = 240, pad = { l: 32, r: 12, t: 28, b: 36 };
   const barW = (w - pad.l - pad.r) / DATA.resources.length - 8;
-  const max = 50;
+  // Dynamic max — accommodate over-allocations + a little headroom for the percent label
+  const allHours = DATA.resources.map(r => DATA.allocations.filter(a => a.resourceId === r.id).reduce((s, a) => s + a.hoursPerWeek, 0));
+  const maxCap   = Math.max(...DATA.resources.map(r => r.capacityHoursPerWeek), 0);
+  const dataMax  = Math.max(...allHours, maxCap);
+  const max      = Math.ceil((dataMax * 1.15) / 10) * 10 || 50;
+  const capLineColor = '#a8a29e';
+
+  // Capacity reference line + label
+  const capY = (h - pad.b) - (40 / max) * (h - pad.t - pad.b); // 40h reference
   const html = DATA.resources.map((r, i) => {
-    const hours = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
-    const pct = Math.round(hours / r.cap * 100);
+    const hours = allHours[i];
+    const pct = Math.round(hours / r.capacityHoursPerWeek * 100);
     const x = pad.l + i * ((w - pad.l - pad.r) / DATA.resources.length) + 4;
     const barH = (hours / max) * (h - pad.t - pad.b);
-    const capH = (r.cap / max) * (h - pad.t - pad.b);
+    const capH = (r.capacityHoursPerWeek / max) * (h - pad.t - pad.b);
     const color = pct > 100 ? '#ef4444' : pct > 95 ? '#f59e0b' : pct > 60 ? '#10b981' : '#0ea5e9';
     return `
-      <rect x="${x}" y="${h - pad.b - capH}" width="${barW}" height="${capH}" fill="#f5f5f4" rx="3"/>
+      <rect x="${x}" y="${h - pad.b - capH}" width="${barW}" height="${capH}" fill="rgba(245,245,244,0.6)" rx="3"/>
       <rect x="${x}" y="${h - pad.b - barH}" width="${barW}" height="${barH}" fill="${color}" rx="3" class="bar-grow" style="transform-origin: ${x + barW/2}px ${h - pad.b}px;"/>
-      <text x="${x + barW/2}" y="${h - 18}" text-anchor="middle" font-size="10" fill="#78716c" style="font-family: 'Geist Mono', monospace;">${r.initials}</text>
-      <text x="${x + barW/2}" y="${h - pad.b - barH - 5}" text-anchor="middle" font-size="10" fill="${color}" font-weight="600">${pct}%</text>`;
+      <text x="${x + barW/2}" y="${h - 18}" text-anchor="middle" font-size="10" fill="#57534e" style="font-family: 'Geist Mono', monospace;">${r.initials}</text>
+      <text x="${x + barW/2}" y="${Math.max(pad.t + 8, h - pad.b - barH - 5)}" text-anchor="middle" font-size="10" fill="${color}" font-weight="600">${pct}%</text>`;
   }).join('');
-  byId('utilChart').innerHTML = `<svg viewBox="0 0 ${w} ${h}" class="chart-svg" role="img" aria-label="Resource utilization">${html}</svg>`;
+  const capLine = `
+    <line x1="${pad.l}" y1="${capY}" x2="${w - pad.r}" y2="${capY}" stroke="${capLineColor}" stroke-width="1" stroke-dasharray="3 3"/>
+    <text x="${w - pad.r - 4}" y="${capY - 4}" text-anchor="end" font-size="9" fill="${capLineColor}">40h capacity</text>`;
+  byId('utilChart').innerHTML = `<svg viewBox="0 0 ${w} ${h}" class="chart-svg" role="img" aria-label="Resource utilization">${capLine}${html}</svg>`;
 }
 
 function renderRisks() {
@@ -2218,8 +2522,8 @@ function renderSprintSnapshot() {
   const sprint = DATA.sprints.find(s => s.status === 'active') || DATA.sprints[0];
   if (!sprint) { byId('sprintSnapshot').innerHTML = ''; return; }
   byId('sprintSubtitle').textContent = `${sprint.name} · ${fmt.shortDate(sprint.start)} – ${fmt.shortDate(sprint.end)}`;
-  const tasks = DATA.tasks.filter(t => t.sprint === sprint.id);
-  const cols = DATA.task_columns.map(col => {
+  const tasks = DATA.tasks.filter(t => t.sprintId === sprint.id);
+  const cols = (DATA.choices.taskStatus || []).map(col => {
     const count = tasks.filter(t => t.status === col.id).length;
     const pct = tasks.length === 0 ? 0 : (count / tasks.length) * 100;
     return `
@@ -2243,12 +2547,12 @@ function renderProjects() {
     return;
   }
   list.innerHTML = visible.map((p, i) => {
-    const phases = DATA.phases[p.id] || [];
+    const phases = phasesForProject(p.id) || [];
     const team = p.team.map(id => findResource(id)).filter(Boolean);
-    const teamHtml = team.slice(0, 4).map(r => `<div class="avatar sm" style="background: ${r.color};">${r.initials}</div>`).join('') +
+    const teamHtml = team.slice(0, 4).map(r => `<div class="avatar sm" style="background: ${r.avatarColor};">${r.initials}</div>`).join('') +
       (team.length > 4 ? `<div class="avatar-more">+${team.length - 4}</div>` : '');
-    const projectTasks = DATA.tasks.filter(t => t.project === p.id);
-    const taskCounts = DATA.task_columns.reduce((acc, c) => {
+    const projectTasks = DATA.tasks.filter(t => t.projectId === p.id);
+    const taskCounts = (DATA.choices.taskStatus || []).reduce((acc, c) => {
       acc[c.id] = { count: projectTasks.filter(t => t.status === c.id).length, color: c.color, label: c.label };
       return acc;
     }, {});
@@ -2276,7 +2580,7 @@ function renderProjects() {
               <span class="badge badge-${p.status}"><span class="badge-dot"></span>${STATUS_LABELS[p.status]}</span>
               <span class="badge badge-priority-${p.priority}">${p.priority}</span>
             </div>
-            <div class="project-code">${p.code} · ${phases.length} phase${phases.length !== 1 ? 's' : ''} · ${projectTasks.length} task${projectTasks.length !== 1 ? 's' : ''}</div>
+            <div class="project-code"><span class="project-code-token">${escapeHtml(p.code)}</span> · ${phases.length} phase${phases.length !== 1 ? 's' : ''} · ${projectTasks.length} task${projectTasks.length !== 1 ? 's' : ''}</div>
           </div>
           <div class="avatar-stack">${teamHtml}</div>
           <div class="project-meta">
@@ -2294,8 +2598,8 @@ function renderProjects() {
 
 /* ===================== GANTT ===================== */
 function renderGantt() {
-  const visible = visibleProjects().filter(p => DATA.phases[p.id]);
-  const allPhases = visible.flatMap(p => DATA.phases[p.id]);
+  const visible = visibleProjects().filter(p => phasesForProject(p.id).length > 0);
+  const allPhases = visible.flatMap(p => phasesForProject(p.id));
   if (allPhases.length === 0) {
     byId('ganttSidebar').innerHTML = '';
     byId('ganttCanvas').innerHTML = '';
@@ -2323,7 +2627,7 @@ function renderGantt() {
   let rowIdx = 0;
 
   visible.forEach(p => {
-    const phases = DATA.phases[p.id];
+    const phases = phasesForProject(p.id);
     const projStart = Math.min(...phases.map(ph => new Date(ph.start).getTime()));
     const projEnd   = Math.max(...phases.map(ph => new Date(ph.end).getTime()));
     const projLeft  = ((projStart - minDate.getTime()) / totalMs) * 100;
@@ -2388,7 +2692,7 @@ function renderGantt() {
 
   byId('ganttProjCount').innerHTML = `<span class="badge-dot"></span>${visible.length} project${visible.length !== 1 ? 's' : ''}`;
   byId('ganttPhaseCount').textContent = `${allPhases.length} phase${allPhases.length !== 1 ? 's' : ''}`;
-  const visibleDeps = DATA.dependencies.filter(d => allPhases.some(p => p.id === d.from) && allPhases.some(p => p.id === d.to));
+  const visibleDeps = DATA.dependencies.filter(d => allPhases.some(p => p.id === d.fromPhaseId) && allPhases.some(p => p.id === d.toPhaseId));
   byId('ganttDepCount').textContent = `${visibleDeps.length} dependenc${visibleDeps.length === 1 ? 'y' : 'ies'}`;
 
   setTimeout(drawDependencies, 100);
@@ -2403,8 +2707,8 @@ function drawDependencies() {
   svg.setAttribute('height', canvasRect.height);
   svg.querySelectorAll('path').forEach(p => p.remove());
   DATA.dependencies.forEach((dep, idx) => {
-    const fromBar = document.querySelector(`.gantt-bar[data-phase="${dep.from}"]`);
-    const toBar   = document.querySelector(`.gantt-bar[data-phase="${dep.to}"]`);
+    const fromBar = document.querySelector(`.gantt-bar[data-phase="${dep.fromPhaseId}"]`);
+    const toBar   = document.querySelector(`.gantt-bar[data-phase="${dep.toPhaseId}"]`);
     if (!fromBar || !toBar) return;
     const fromRect = fromBar.getBoundingClientRect();
     const toRect = toBar.getBoundingClientRect();
@@ -2431,11 +2735,11 @@ function renderMatrix() {
     </th>`).join('');
 
   const rows = DATA.resources.map(r => {
-    const rowTotal = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
-    const pct = Math.round(rowTotal / r.cap * 100);
+    const rowTotal = DATA.allocations.filter(a => a.resourceId === r.id).reduce((s, a) => s + a.hoursPerWeek, 0);
+    const pct = Math.round(rowTotal / r.capacityHoursPerWeek * 100);
     const cells = visible.map(p => {
-      const a = DATA.allocations.find(al => al.resource === r.id && al.project === p.id);
-      const hours = a ? a.hours : 0;
+      const a = DATA.allocations.find(al => al.resourceId === r.id && al.projectId === p.id);
+      const hours = a ? a.hoursPerWeek : 0;
       let cls = 'idle';
       if (hours > 0) {
         if (pct > 110) cls = 'over';
@@ -2449,23 +2753,23 @@ function renderMatrix() {
     return `<tr>
       <td class="resource-cell">
         <div class="resource-info">
-          <div class="avatar sm" style="background: ${r.color};">${r.initials}</div>
+          <div class="avatar sm" style="background: ${r.avatarColor};">${r.initials}</div>
           <div>
             <div class="resource-name">${escapeHtml(r.name)}</div>
-            <div class="resource-role">${escapeHtml(r.role)}</div>
+            <div class="resource-role">${escapeHtml(r.jobTitle)}</div>
           </div>
         </div>
       </td>
       ${cells}
-      <td class="total-cell"><span class="alloc-pill ${totalCls}" style="min-width: 60px;">${rowTotal}/${r.cap}h</span><div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">${pct}%</div></td>
+      <td class="total-cell"><span class="alloc-pill ${totalCls}" style="min-width: 60px;">${rowTotal}/${r.capacityHoursPerWeek}h</span><div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">${pct}%</div></td>
     </tr>`;
   }).join('');
 
   const projTotals = visible.map(p => {
-    const t = DATA.allocations.filter(a => a.project === p.id).reduce((s, a) => s + a.hours, 0);
+    const t = DATA.allocations.filter(a => a.projectId === p.id).reduce((s, a) => s + a.hoursPerWeek, 0);
     return `<td class="total-cell">${t}h</td>`;
   }).join('');
-  const grand = DATA.allocations.reduce((s, a) => s + a.hours, 0);
+  const grand = DATA.allocations.reduce((s, a) => s + a.hoursPerWeek, 0);
 
   byId('allocationMatrix').innerHTML = `
     <thead><tr>
@@ -2481,8 +2785,8 @@ function renderMatrix() {
     </tr></tfoot>`;
 
   const over = DATA.resources.filter(r => {
-    const rt = DATA.allocations.filter(a => a.resource === r.id).reduce((s, a) => s + a.hours, 0);
-    return rt > r.cap * 1.1;
+    const rt = DATA.allocations.filter(a => a.resourceId === r.id).reduce((s, a) => s + a.hoursPerWeek, 0);
+    return rt > r.capacityHoursPerWeek * 1.1;
   });
   byId('overAllocCount').textContent = over.length > 0 ? `⚠ ${over.length} resource${over.length > 1 ? 's' : ''} over-allocated` : '';
 
@@ -2490,18 +2794,18 @@ function renderMatrix() {
     const [rid, pid] = el.dataset.tooltipAlloc.split('-');
     const r = findResource(rid);
     const p = findProject(pid);
-    const a = DATA.allocations.find(al => al.resource === rid && al.project === pid);
-    const hours = a ? a.hours : 0;
+    const a = DATA.allocations.find(al => al.resourceId === rid && al.projectId === pid);
+    const hours = a ? a.hoursPerWeek : 0;
     if (!r || !p) return;
     el.addEventListener('mouseenter', e => showTooltip(e, {
       title: r.name,
-      badge: `<span class="badge" style="background: ${r.color}; color: white;">${r.initials}</span>`,
+      badge: `<span class="badge" style="background: ${r.avatarColor}; color: white;">${r.initials}</span>`,
       rows: [
         ['Project', p.name],
         ['Code', p.code],
         ['Hours', hours + 'h / week'],
-        ['Role', r.role],
-        ...(currentRole === 'admin' ? [['Weekly cost', '$' + (hours * r.rate).toLocaleString()]] : [])
+        ['Role', r.jobTitle],
+        ...(currentRole === 'admin' ? [['Weekly cost', '$' + (hours * r.hourlyRate).toLocaleString()]] : [])
       ]
     }));
     el.addEventListener('mousemove', moveTooltip);
@@ -2573,12 +2877,13 @@ function attachGanttBarInteractions(bar, phase, proj) {
     document.removeEventListener('mouseup', onDragEnd);
     bar.classList.remove('dragging');
     if (moved && phase._dragStart && phase._dragEnd) {
-      phase.start = new Date(phase._dragStart).toISOString().slice(0, 10);
-      phase.end   = new Date(phase._dragEnd).toISOString().slice(0, 10);
+      phase.startDate = new Date(phase._dragStart).toISOString().slice(0, 10);
+      phase.endDate   = new Date(phase._dragEnd).toISOString().slice(0, 10);
       delete phase._dragStart; delete phase._dragEnd;
+      syncAliases();
       persist();
       drawDependencies();
-      showToast(`${phase.name} → ${fmt.shortDate(phase.start)} – ${fmt.shortDate(phase.end)}`);
+      showToast(`${phase.name} → ${fmt.shortDate(phase.startDate)} – ${fmt.shortDate(phase.endDate)}`);
     } else if (!moved) {
       if (depMode) handleDepClick(bar, phase);
       else openPhaseModal(phase.id);
@@ -2595,7 +2900,7 @@ function handleDepClick(bar, phase) {
     bar.classList.remove('dep-source');
     depSource = null;
   } else {
-    const exists = DATA.dependencies.some(d => d.from === depSource.id && d.to === phase.id);
+    const exists = DATA.dependencies.some(d => d.fromPhaseId === depSource.id && d.toPhaseId === phase.id);
     if (exists) {
       showToast('Dependency already exists');
     } else {
@@ -2651,14 +2956,14 @@ function setupKanbanFilters() {
 
 function filteredTasks() {
   return DATA.tasks.filter(t => {
-    if (kanbanFilters.project !== 'all' && t.project !== kanbanFilters.project) return false;
-    if (kanbanFilters.assignee !== 'all' && t.assignee !== kanbanFilters.assignee) return false;
-    if (kanbanFilters.sprint !== 'all' && t.sprint !== kanbanFilters.sprint) return false;
+    if (kanbanFilters.project !== 'all' && t.projectId !== kanbanFilters.project) return false;
+    if (kanbanFilters.assignee !== 'all' && t.assigneeId !== kanbanFilters.assignee) return false;
+    if (kanbanFilters.sprint !== 'all' && t.sprintId !== kanbanFilters.sprint) return false;
     if (kanbanFilters.priority !== 'all' && t.priority !== kanbanFilters.priority) return false;
-    if (currentRole === 'member' && t.assignee !== DATA.meta.current_user) return false;
+    if (currentRole === 'member' && t.assigneeId !== DATA.metadata._currentResourceId) return false;
     if (currentRole === 'pm') {
-      const p = findProject(t.project);
-      if (!p || (p.owner !== DATA.meta.current_user && !p.team.includes(DATA.meta.current_user))) return false;
+      const p = findProject(t.projectId);
+      if (!p || (p.owner !== DATA.metadata._currentResourceId && !p.team.includes(DATA.metadata._currentResourceId))) return false;
     }
     return true;
   });
@@ -2668,7 +2973,7 @@ function renderKanban() {
   const board = byId('kanbanBoard');
   const tasks = filteredTasks();
   byId('kanbanTaskCount').textContent = `${tasks.length} task${tasks.length !== 1 ? 's' : ''}`;
-  board.innerHTML = DATA.task_columns.map(col => {
+  board.innerHTML = (DATA.choices.taskStatus || []).map(col => {
     const colTasks = tasks.filter(t => t.status === col.id);
     const overWip = col.wip != null && colTasks.length > col.wip;
     const cards = colTasks.map(t => renderTaskCard(t)).join('');
@@ -2691,8 +2996,8 @@ function renderKanban() {
 }
 
 function renderTaskCard(t) {
-  const r = findResource(t.assignee);
-  const p = findProject(t.project);
+  const r = findResource(t.assigneeId);
+  const p = findProject(t.projectId);
   const age = taskAge(t);
   const tags = (t.tags || []).slice(0, 3).map(tag => `<span class="task-card-tag">${escapeHtml(tag)}</span>`).join('');
   return `
@@ -2704,7 +3009,7 @@ function renderTaskCard(t) {
       <div class="task-card-meta">${tags}</div>
       <div class="task-card-footer">
         <div style="display: flex; align-items: center; gap: 8px;">
-          ${r ? `<div class="avatar sm" style="background: ${r.color};" title="${escapeHtml(r.name)}">${r.initials}</div>` : ''}
+          ${r ? `<div class="avatar sm" style="background: ${r.avatarColor};" title="${escapeHtml(r.name)}">${r.initials}</div>` : ''}
           <span class="task-card-proj">${p ? p.code : ''}</span>
         </div>
         <span class="task-card-due ${age.cls}">
@@ -2758,7 +3063,7 @@ function attachKanbanInteractions() {
 function setupTaskModal() {
   byId('taskProject').innerHTML = DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
   byId('taskAssignee').innerHTML = '<option value="">Unassigned</option>' + DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
-  byId('taskStatus').innerHTML = DATA.task_columns.map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
+  byId('taskStatus').innerHTML = (DATA.choices.taskStatus || []).map(c => `<option value="${c.id}">${escapeHtml(c.label)}</option>`).join('');
   byId('taskSaveBtn').addEventListener('click', saveTask);
   byId('taskDeleteBtn').addEventListener('click', deleteTask);
   $$('[data-open-modal="task"]').forEach(b => b.addEventListener('click', () => openTaskModal(null)));
@@ -2779,8 +3084,8 @@ function openTaskModal(taskId, presetStatus) {
   byId('taskAssignee').value = task?.assignee ?? '';
   byId('taskStatus').value = task?.status ?? presetStatus ?? 'backlog';
   byId('taskPriority').value = task?.priority ?? 'medium';
-  byId('taskDue').value = task?.due ? fmt.dateInput(task.due) : '';
-  byId('taskEstimate').value = task?.estimate ?? '';
+  byId('taskDue').value = task?.dueDate ? fmt.dateInput(task.dueDate) : '';
+  byId('taskEstimate').value = task?.estimateHours ?? '';
   byId('taskTags').value = (task?.tags ?? []).join(', ');
   modal.classList.add('open');
   setTimeout(() => byId('taskTitle').focus(), 50);
@@ -2791,14 +3096,14 @@ function saveTask() {
   if (!title) { byId('taskTitle').focus(); return; }
   const data = {
     title,
-    project: byId('taskProject').value,
-    assignee: byId('taskAssignee').value || null,
+    projectId: byId('taskProject').value,
+    assigneeId: byId('taskAssignee').value || null,
     status: byId('taskStatus').value,
     priority: byId('taskPriority').value,
-    due: byId('taskDue').value || new Date().toISOString().slice(0, 10),
-    estimate: parseInt(byId('taskEstimate').value, 10) || 0,
-    logged: 0,
-    sprint: DATA.sprints.find(s => s.status === 'active')?.id || null,
+    dueDate: byId('taskDue').value || new Date().toISOString().slice(0, 10),
+    estimateHours: parseInt(byId('taskEstimate').value, 10) || 0,
+    loggedHours: 0,
+    sprintId: DATA.sprints.find(s => s.status === 'active')?.id || null,
     tags: byId('taskTags').value.split(',').map(s => s.trim()).filter(Boolean)
   };
   if (editingTaskId) {
@@ -2841,7 +3146,7 @@ function setupProjectModal() {
 function openProjectModal() {
   byId('projName').value = '';
   byId('projCode').value = '';
-  byId('projOwner').value = DATA.meta.current_user;
+  byId('projOwner').value = DATA.metadata._currentResourceId;
   byId('projStart').value = new Date().toISOString().slice(0, 10);
   byId('projEnd').value = '';
   byId('projStatus').value = 'active';
@@ -2873,7 +3178,7 @@ function saveProject() {
     tags: []
   };
   DATA.projects.push(proj);
-  DATA.phases[id] = [];
+  /* phases entries created via Edit Phase modal */
   persist();
   closeModal();
   renderAll();
@@ -2891,48 +3196,39 @@ function closeModal() {
 /* ===================== PHASE MODAL ===================== */
 function setupPhaseModal() {
   byId('phaseProject').innerHTML = DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
+  byId('phaseColor').innerHTML = (DATA.choices.phaseType || []).map(c =>
+    `<option value="${c.value}" data-color="${c.color}">${escapeHtml(c.label)}</option>`
+  ).join('');
   byId('phaseSaveBtn').addEventListener('click', savePhase);
   byId('phaseDeleteBtn').addEventListener('click', deletePhase);
   byId('phaseModal').addEventListener('click', e => { if (e.target.id === 'phaseModal') closeModal(); });
 }
 
 function openPhaseModal(phaseId) {
-  let phase = null, projId = null;
-  for (const [pid, list] of Object.entries(DATA.phases)) {
-    const found = list.find(p => p.id === phaseId);
-    if (found) { phase = found; projId = pid; break; }
-  }
+  const phase = findPhase(phaseId);
   if (!phase) return;
   editingPhaseId = phaseId;
   byId('phaseModalTitle').textContent = 'Edit phase';
   byId('phaseName').value = phase.name;
-  byId('phaseProject').value = projId;
-  byId('phaseStart').value = fmt.dateInput(phase.start);
-  byId('phaseEnd').value = fmt.dateInput(phase.end);
+  byId('phaseProject').value = phase.projectId;
+  byId('phaseStart').value = fmt.dateInput(phase.startDate);
+  byId('phaseEnd').value = fmt.dateInput(phase.endDate);
   byId('phaseProgress').value = phase.progress;
-  byId('phaseColor').value = phase.color;
+  byId('phaseColor').value = phase.phaseType || 'build';
   byId('phaseModal').classList.add('open');
 }
 
 function savePhase() {
   if (!editingPhaseId) return;
-  let phase = null, oldProj = null;
-  for (const [pid, list] of Object.entries(DATA.phases)) {
-    const found = list.find(p => p.id === editingPhaseId);
-    if (found) { phase = found; oldProj = pid; break; }
-  }
+  const phase = findPhase(editingPhaseId);
   if (!phase) return;
-  const newProj = byId('phaseProject').value;
   phase.name = byId('phaseName').value.trim() || phase.name;
-  phase.start = byId('phaseStart').value;
-  phase.end = byId('phaseEnd').value;
-  phase.progress = Math.max(0, Math.min(100, parseInt(byId('phaseProgress').value, 10) || 0));
-  phase.color = byId('phaseColor').value;
-  if (newProj !== oldProj) {
-    DATA.phases[oldProj] = DATA.phases[oldProj].filter(p => p.id !== phase.id);
-    if (!DATA.phases[newProj]) DATA.phases[newProj] = [];
-    DATA.phases[newProj].push(phase);
-  }
+  phase.projectId = byId('phaseProject').value;
+  phase.startDate = byId('phaseStart').value;
+  phase.endDate   = byId('phaseEnd').value;
+  phase.progress  = Math.max(0, Math.min(100, parseInt(byId('phaseProgress').value, 10) || 0));
+  phase.phaseType = byId('phaseColor').value;
+  syncAliases();
   persist();
   closeModal();
   renderGantt();
@@ -2943,10 +3239,9 @@ function savePhase() {
 function deletePhase() {
   if (!editingPhaseId) return;
   if (!confirm('Delete this phase? Dependencies referencing it will also be removed.')) return;
-  for (const pid of Object.keys(DATA.phases)) {
-    DATA.phases[pid] = DATA.phases[pid].filter(p => p.id !== editingPhaseId);
-  }
-  DATA.dependencies = DATA.dependencies.filter(d => d.from !== editingPhaseId && d.to !== editingPhaseId);
+  DATA.phases = DATA.phases.filter(p => p.id !== editingPhaseId);
+  DATA.dependencies = DATA.dependencies.filter(d => d.fromPhaseId !== editingPhaseId && d.toPhaseId !== editingPhaseId);
+  syncAliases();
   persist();
   closeModal();
   renderGantt();
@@ -2966,20 +3261,20 @@ function openAllocModal(rid, pid) {
   const p = findProject(pid);
   if (!r || !p) return;
   editingAlloc = { rid, pid };
-  const existing = DATA.allocations.find(a => a.resource === rid && a.project === pid);
+  const existing = DATA.allocations.find(a => a.resourceId === rid && a.projectId === pid);
   byId('allocContext').innerHTML = `
     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-      <div class="avatar" style="background: ${r.color};">${r.initials}</div>
+      <div class="avatar" style="background: ${r.avatarColor};">${r.initials}</div>
       <div>
         <div style="font-weight: 600;">${escapeHtml(r.name)}</div>
-        <div style="font-size: 11px; color: var(--text-soft);">${escapeHtml(r.role)} · capacity ${r.cap}h/wk</div>
+        <div style="font-size: 11px; color: var(--text-soft);">${escapeHtml(r.jobTitle)} · capacity ${r.capacityHoursPerWeek}h/wk</div>
       </div>
     </div>
     <div style="font-size: 12px; color: var(--text-muted);">Project: <strong>${escapeHtml(p.name)}</strong> <span class="mono">${p.code}</span></div>`;
   byId('allocHours').value = existing ? existing.hours : 0;
   byId('allocDeleteBtn').style.display = existing ? '' : 'none';
-  const otherHours = DATA.allocations.filter(a => a.resource === rid && a.project !== pid).reduce((s, a) => s + a.hours, 0);
-  byId('allocHelper').textContent = `${otherHours}h already allocated to other projects this week. Cap ${r.cap}h.`;
+  const otherHours = DATA.allocations.filter(a => a.resourceId === rid && a.project !== pid).reduce((s, a) => s + a.hoursPerWeek, 0);
+  byId('allocHelper').textContent = `${otherHours}h already allocated to other projects this week. Cap ${r.capacityHoursPerWeek}h.`;
   byId('allocModal').classList.add('open');
   setTimeout(() => byId('allocHours').focus(), 50);
 }
@@ -2988,13 +3283,13 @@ function saveAlloc() {
   if (!editingAlloc) return;
   const { rid, pid } = editingAlloc;
   const hours = Math.max(0, parseInt(byId('allocHours').value, 10) || 0);
-  const existing = DATA.allocations.find(a => a.resource === rid && a.project === pid);
+  const existing = DATA.allocations.find(a => a.resourceId === rid && a.projectId === pid);
   if (hours === 0) {
-    DATA.allocations = DATA.allocations.filter(a => !(a.resource === rid && a.project === pid));
+    DATA.allocations = DATA.allocations.filter(a => !(a.resourceId === rid && a.projectId === pid));
   } else if (existing) {
     existing.hours = hours;
   } else {
-    DATA.allocations.push({ project: pid, resource: rid, hours });
+    DATA.allocations.push({ id: 'a' + Date.now(), projectId: pid, resourceId: rid, hoursPerWeek: hours, weekStartDate: DATA.metadata?.todayOverride || new Date().toISOString().slice(0,10), roleOnProject: '', committed: true });
   }
   persist();
   closeModal();
@@ -3008,7 +3303,7 @@ function saveAlloc() {
 function deleteAlloc() {
   if (!editingAlloc) return;
   const { rid, pid } = editingAlloc;
-  DATA.allocations = DATA.allocations.filter(a => !(a.resource === rid && a.project === pid));
+  DATA.allocations = DATA.allocations.filter(a => !(a.resourceId === rid && a.projectId === pid));
   persist();
   closeModal();
   renderMatrix();
@@ -3030,7 +3325,7 @@ function setupScenarioBuilder() {
   byId('scenarioSaveBtn').addEventListener('click', saveScenarioChange);
   byId('scenarioModal').addEventListener('click', e => { if (e.target.id === 'scenarioModal') closeModal(); });
 
-  byId('scResource').innerHTML = DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${escapeHtml(r.role)})</option>`).join('');
+  byId('scResource').innerHTML = DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${escapeHtml(r.jobTitle)})</option>`).join('');
 }
 
 function updateScenarioModalFields() {
@@ -3095,7 +3390,7 @@ function renderScenario() {
     if (!r) return '';
     const cls = c.type === 'add' ? 'add' : 'remove';
     const icon = c.type === 'add' ? '+' : '−';
-    const title = c.type === 'add' ? `Add ${r.name} (${r.role})` : c.type === 'reduce' ? `Reduce ${r.name} (${r.role})` : `Remove ${r.name} (${r.role})`;
+    const title = c.type === 'add' ? `Add ${r.name} (${r.jobTitle})` : c.type === 'reduce' ? `Reduce ${r.name} (${r.jobTitle})` : `Remove ${r.name} (${r.jobTitle})`;
     const meta = c.type === 'add' ? `${c.hours}h/week` : c.type === 'reduce' ? `${c.hours}h → ${c.hoursTo}h/week` : `Was ${c.hours}h/week`;
     return `
       <div class="scenario-action ${cls}" data-sc-id="${c.id}">
@@ -3125,20 +3420,20 @@ function renderScenarioImpact() {
   const target = byId('scenarioImpact');
   if (!target) return;
   const proj = findProject(scenario.projectId);
-  const baseAllocs = DATA.allocations.filter(a => a.project === scenario.projectId);
-  const baseHours  = baseAllocs.reduce((s, a) => s + a.hours, 0);
-  const baseCost   = baseAllocs.reduce((s, a) => { const r = findResource(a.resource); return s + (r ? a.hours * r.rate : 0); }, 0);
+  const baseAllocs = DATA.allocations.filter(a => a.projectId === scenario.projectId);
+  const baseHours  = baseAllocs.reduce((s, a) => s + a.hoursPerWeek, 0);
+  const baseCost   = baseAllocs.reduce((s, a) => { const r = findResource(a.resource); return s + (r ? a.hoursPerWeek * r.hourlyRate : 0); }, 0);
   const baseTeam   = baseAllocs.length;
 
   let scenHours = baseHours, scenCost = baseCost, scenTeam = baseTeam;
   scenario.changes.forEach(c => {
     const r = findResource(c.resource);
     if (!r) return;
-    const existing = baseAllocs.find(a => a.resource === c.resource);
-    if (c.type === 'add' && !existing) { scenHours += c.hours; scenCost += c.hours * r.rate; scenTeam += 1; }
-    else if (c.type === 'add' && existing) { scenHours += c.hours; scenCost += c.hours * r.rate; }
-    else if (c.type === 'reduce' && existing) { const d = existing.hours - c.hoursTo; scenHours -= d; scenCost -= d * r.rate; }
-    else if (c.type === 'remove' && existing) { scenHours -= existing.hours; scenCost -= existing.hours * r.rate; scenTeam -= 1; }
+    const existing = baseAllocs.find(a => a.resourceId === c.resource);
+    if (c.type === 'add' && !existing) { scenHours += c.hours; scenCost += c.hours * r.hourlyRate; scenTeam += 1; }
+    else if (c.type === 'add' && existing) { scenHours += c.hours; scenCost += c.hours * r.hourlyRate; }
+    else if (c.type === 'reduce' && existing) { const d = existing.hours - c.hoursTo; scenHours -= d; scenCost -= d * r.hourlyRate; }
+    else if (c.type === 'remove' && existing) { scenHours -= existing.hours; scenCost -= existing.hours * r.hourlyRate; scenTeam -= 1; }
   });
 
   const brooks = scenTeam > baseTeam ? Math.max(0.7, 1 - (scenTeam - baseTeam) * 0.04) : 1;
@@ -3152,9 +3447,9 @@ function renderScenarioImpact() {
   const overAllocated = [];
   scenario.changes.forEach(c => {
     const r = findResource(c.resource); if (!r) return;
-    const otherHours = DATA.allocations.filter(a => a.resource === c.resource && a.project !== scenario.projectId).reduce((s, a) => s + a.hours, 0);
+    const otherHours = DATA.allocations.filter(a => a.resourceId === c.resource && a.project !== scenario.projectId).reduce((s, a) => s + a.hoursPerWeek, 0);
     const newHours = c.type === 'add' ? otherHours + c.hours : c.type === 'reduce' ? otherHours + c.hoursTo : otherHours;
-    const pct = Math.round(newHours / r.cap * 100);
+    const pct = Math.round(newHours / r.capacityHoursPerWeek * 100);
     if (pct > 95) overAllocated.push(`${r.name} at ${pct}%`);
   });
 
@@ -3232,10 +3527,10 @@ function renderForecast() {
 
 /* ===================== ME VIEW ===================== */
 function renderMe() {
-  const me = findResource(DATA.meta.current_user);
+  const me = findResource(DATA.metadata._currentResourceId);
   if (!me) return;
-  const myAllocs = DATA.allocations.filter(a => a.resource === me.id);
-  const hours = myAllocs.reduce((s, a) => s + a.hours, 0);
+  const myAllocs = DATA.allocations.filter(a => a.resourceId === me.id);
+  const hours = myAllocs.reduce((s, a) => s + a.hoursPerWeek, 0);
   const pct = Math.round(hours / me.cap * 100);
   const dash = 377; const offset = dash - (dash * Math.min(pct, 100) / 100);
   byId('meHero').innerHTML = `
@@ -3251,7 +3546,7 @@ function renderMe() {
     </div>
     <div>
       <h2>${escapeHtml(me.name)}</h2>
-      <p>${escapeHtml(me.role)} · ${escapeHtml(me.team)}</p>
+      <p>${escapeHtml(me.jobTitle)} · ${escapeHtml(choiceLabel('department', me.department))}</p>
       <div class="me-stats">
         <div class="me-stat">
           <div class="me-stat-label">This week</div>
@@ -3266,7 +3561,7 @@ function renderMe() {
         <div class="me-stat">
           <div class="me-stat-label">Active projects</div>
           <div class="me-stat-value">${myAllocs.length}</div>
-          <div class="me-stat-sub">${myAllocs.map(a => findProject(a.project)?.code).filter(Boolean).join(', ')}</div>
+          <div class="me-stat-sub">${myAllocs.map(a => { const p = findProject(a.project); return p ? escapeHtml(p.code) : null; }).filter(Boolean).join(' · ')}</div>
         </div>
       </div>
     </div>`;
@@ -3274,20 +3569,26 @@ function renderMe() {
   byId('myAllocations').innerHTML = myAllocs.length === 0 ? `<div class="empty-state">${iconSvg('inbox')}<div class="empty-state-title">No active allocations</div></div>` :
     myAllocs.map(a => {
       const p = findProject(a.project);
-      const allocPct = Math.round(a.hours / me.cap * 100);
+      const allocPct = Math.round(a.hoursPerWeek / me.cap * 100);
+      const projColor = p ? choiceColor('projectStatus', p.status) : '#4f46e5';
       return `
-        <div style="padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="font-weight: 600; font-size: 14px;">${escapeHtml(p?.name || 'Unknown')}</div>
-              <div style="font-size: 11px; color: var(--text-soft); font-family: 'Geist Mono', monospace;">${p?.code || ''}</div>
+        <div class="my-alloc-card">
+          <div class="my-alloc-row">
+            <div class="my-alloc-info">
+              <div class="my-alloc-title">${escapeHtml(p?.name || 'Unknown project')}</div>
+              <div class="my-alloc-sub">
+                <span class="mono">${p?.code || ''}</span>
+                ${a.roleOnProject ? `<span class="my-alloc-role">${escapeHtml(a.roleOnProject)}</span>` : ''}
+                ${a.committed === false ? `<span class="badge badge-planning"><span class="badge-dot"></span>Tentative</span>` : ''}
+                ${p?.status ? `<span class="badge badge-${p.status}"><span class="badge-dot"></span>${choiceLabel('projectStatus', p.status)}</span>` : ''}
+              </div>
             </div>
-            <div style="text-align: right;">
-              <div style="font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums;">${a.hours}h</div>
-              <div style="font-size: 11px; color: var(--text-muted);">${allocPct}% of week</div>
+            <div class="my-alloc-hours">
+              <div class="my-alloc-hours-value">${a.hoursPerWeek}<span class="my-alloc-hours-unit">h</span></div>
+              <div class="my-alloc-hours-pct">${allocPct}% of week</div>
             </div>
           </div>
-          <div class="progress" style="margin-top: 10px;"><div class="progress-bar bar-grow" style="width: ${allocPct}%; background: ${p?.id === 'p3' ? '#10b981' : '#4f46e5'};"></div></div>
+          <div class="progress" style="margin-top: 10px;"><div class="progress-bar bar-grow" style="width: ${Math.min(100, allocPct)}%; background: ${projColor};"></div></div>
         </div>`;
     }).join('');
 
@@ -3307,16 +3608,16 @@ function renderMe() {
 }
 
 function renderMyTasks() {
-  const me = findResource(DATA.meta.current_user);
+  const me = findResource(DATA.metadata._currentResourceId);
   if (!me) return;
   const activeSprint = DATA.sprints.find(s => s.status === 'active');
   byId('mySprintSub').textContent = activeSprint?.name || 'No active sprint';
-  const myTasks = DATA.tasks.filter(t => t.assignee === me.id && (!activeSprint || t.sprint === activeSprint.id));
+  const myTasks = DATA.tasks.filter(t => t.assigneeId === me.id && (!activeSprint || t.sprintId === activeSprint.id));
   const el = byId('myTasks');
   if (!el) return;
   el.innerHTML = myTasks.length === 0 ? `<div class="empty-state">${iconSvg('check')}<div class="empty-state-title">Nothing assigned this sprint</div></div>` :
     myTasks.map(t => {
-      const p = findProject(t.project);
+      const p = findProject(t.projectId);
       const col = findColumn(t.status);
       const age = taskAge(t);
       return `
@@ -3334,10 +3635,10 @@ function renderMyTasks() {
 
 function renderMyForecast() {
   const w = 460, h = 200, pad = { l: 32, r: 12, t: 16, b: 28 };
-  const me = findResource(DATA.meta.current_user);
+  const me = findResource(DATA.metadata._currentResourceId);
   const cap = me?.cap || 40;
   const data = [];
-  const hours = DATA.allocations.filter(a => a.resource === me?.id).reduce((s, a) => s + a.hours, 0);
+  const hours = DATA.allocations.filter(a => a.resourceId === me?.id).reduce((s, a) => s + a.hoursPerWeek, 0);
   for (let i = 0; i < 8; i++) data.push(Math.max(0, hours + Math.round(Math.sin(i*1.1) * 5 + Math.cos(i*0.7) * 3)));
   const max = 50;
   const x = i => pad.l + (i / (data.length-1)) * (w - pad.l - pad.r);
@@ -3384,13 +3685,23 @@ function moveTooltip(e) {
 function hideTooltip() { tooltip.classList.remove('visible'); }
 
 /* ===================== TOAST ===================== */
-let toastTimer;
-function showToast(msg) {
-  const t = byId('toast');
-  t.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>${escapeHtml(msg)}`;
-  t.classList.add('visible');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('visible'), 2400);
+function showToast(msg, kind) {
+  const container = byId('toastContainer');
+  if (!container) return;
+  const t = document.createElement('div');
+  t.className = 'toast' + (kind ? ' ' + kind : ' success');
+  const iconMap = {
+    success: '<polyline points="20 6 9 17 4 12"/>',
+    error:   '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+    warning: '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/>'
+  };
+  const icon = iconMap[kind || 'success'] || iconMap.success;
+  t.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${icon}</svg>${escapeHtml(msg)}`;
+  container.appendChild(t);
+  setTimeout(() => {
+    t.classList.add('exiting');
+    setTimeout(() => t.remove(), 220);
+  }, 2400);
 }
 
 /* ===================== EXPORT ===================== */
@@ -3448,22 +3759,33 @@ function updateSavedIndicator() {
 
 /* ===================== BOOT ===================== */
 (async function init() {
-  await loadData();
-  setupNav();
-  setupRoleSwitcher();
-  setupFilters();
-  setupKanbanFilters();
-  setupTaskModal();
-  setupProjectModal();
-  setupPhaseModal();
-  setupAllocModal();
-  setupScenarioBuilder();
-  setupGanttToolbar();
-  applyRoleVisibility();
-  renderAll();
-  window.addEventListener('resize', () => {
-    if (byId('gantt-page').classList.contains('active')) drawDependencies();
-  });
+  try {
+    await loadData();
+    setupNav();
+    setupRoleSwitcher();
+    setupFilters();
+    setupKanbanFilters();
+    setupTaskModal();
+    setupProjectModal();
+    setupPhaseModal();
+    setupAllocModal();
+    setupScenarioBuilder();
+    setupGanttToolbar();
+    applyRoleVisibility();
+    renderAll();
+    window.addEventListener('resize', () => {
+      if (byId('gantt-page').classList.contains('active')) drawDependencies();
+    });
+  } catch (err) {
+    console.error('Helix boot failed:', err);
+    showToast('Failed to load: ' + (err.message || err), 'error');
+  } finally {
+    const ls = byId('loadingScreen');
+    if (ls) {
+      ls.classList.add('hidden');
+      setTimeout(() => ls.remove(), 300);
+    }
+  }
 })();
 </script>
 

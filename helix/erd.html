@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Helix · Entity Relationship Diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --surface-2: #f5f5f4; --border: #e7e5e4; --border-strong: #d6d3d1;
+    --text: #0c0a09; --text-muted: #57534e; --text-soft: #a8a29e;
+    --primary: #4f46e5; --primary-bg: #eef2ff;
+    --success: #16a34a; --success-bg: #dcfce7;
+    --warning: #d97706; --warning-bg: #fef3c7;
+    --danger: #dc2626; --danger-bg: #fee2e2;
+    --info: #0284c7; --info-bg: #e0f2fe;
+    --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08), 0 4px 10px rgba(0,0,0,0.04);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Geist', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  code, .mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+  a { color: inherit; text-decoration: none; }
+
+  /* === CROSS-PAGE HEADER === */
+  .page-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .header-inner { max-width: 1400px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+  .brand-logo svg { width: 20px; height: 20px; stroke: white; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+  .brand-tag { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+  .cross-nav { display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: var(--radius-lg); }
+  .cross-nav a { padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all 180ms var(--ease); }
+  .cross-nav a:hover { color: var(--text); background: rgba(255,255,255,0.6); }
+  .cross-nav a.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+
+  /* === LAYOUT === */
+  .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 48px 0 4px; }
+  h3 { font-size: 16px; font-weight: 600; margin: 0; }
+  .subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 32px; }
+  .section-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+
+  /* === ERD CARD === */
+  .erd-canvas {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+  }
+  .mermaid { font-family: 'Geist', sans-serif !important; min-width: 800px; }
+  /* Mermaid styling overrides */
+  .mermaid .er.entityBox { fill: var(--surface) !important; stroke: var(--primary) !important; stroke-width: 1.5px !important; }
+  .mermaid .er.entityLabel { font-family: 'Geist Mono', monospace !important; font-size: 13px !important; font-weight: 600 !important; }
+  .mermaid .er.attributeBoxOdd, .mermaid .er.attributeBoxEven { fill: var(--surface-2) !important; stroke: var(--border) !important; }
+  .mermaid .er.relationshipLabelBox { fill: var(--bg) !important; stroke: var(--border) !important; }
+  .mermaid .er.relationshipLine { stroke: var(--text-muted) !important; }
+
+  /* === ENTITY CARDS === */
+  .entity-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; }
+  .entity-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 200ms var(--ease); }
+  .entity-card:hover { box-shadow: var(--shadow-lg); border-color: var(--border-strong); transform: translateY(-2px); }
+  .entity-card-head { padding: 14px 18px; background: linear-gradient(to right, #0c0a09, #292524); color: white; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .entity-card-head .entity-name { font-family: 'Geist Mono', monospace; font-size: 14px; font-weight: 600; }
+  .entity-card-head .entity-display { font-size: 11px; color: rgba(255,255,255,0.6); }
+  .entity-card-head .entity-badge { font-size: 10px; padding: 3px 8px; background: rgba(255,255,255,0.15); border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 500; }
+  .entity-card-body { padding: 0; }
+  .field-row { display: flex; align-items: flex-start; padding: 10px 18px; border-bottom: 1px solid var(--border); font-size: 12px; gap: 8px; }
+  .field-row:last-child { border-bottom: none; }
+  .field-row:hover { background: var(--surface-2); }
+  .field-icon { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .field-icon-pk { color: #f59e0b; }
+  .field-icon-fk { color: var(--info); }
+  .field-info { flex: 1; min-width: 0; }
+  .field-name { font-family: 'Geist Mono', monospace; font-size: 12px; font-weight: 500; color: var(--text); }
+  .field-type { font-family: 'Geist Mono', monospace; font-size: 10px; color: var(--text-soft); margin-top: 1px; }
+  .field-tag { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+  .field-tag-pk { background: #fef3c7; color: #92400e; }
+  .field-tag-fk { background: var(--info-bg); color: #075985; }
+  .field-tag-fls { background: var(--danger-bg); color: #991b1b; }
+  .field-tag-unique { background: #f3e8ff; color: #6b21a8; }
+
+  /* === LEGEND === */
+  .legend { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 24px; }
+  .legend-items { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--text-muted); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-item .field-tag { font-size: 9px; }
+
+  /* === CALLOUT === */
+  .callout { padding: 14px 18px; border-radius: var(--radius-lg); margin: 16px 0; font-size: 13.5px; border: 1px solid; display: flex; gap: 12px; align-items: flex-start; }
+  .callout-icon { font-size: 16px; flex-shrink: 0; line-height: 1.2; }
+  .callout-info { background: var(--info-bg); border-color: rgba(2,132,199,0.2); color: #0c4a6e; }
+  .callout-accent { background: var(--primary-bg); border-color: rgba(79,70,229,0.2); color: #312e81; }
+
+  /* === RELATIONSHIP TABLE === */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  th { background: var(--surface-2); font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:last-child td { border-bottom: none; }
+  td.mono { font-family: 'Geist Mono', monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4c4 4 12 12 16 16M20 4c-4 4-12 12-16 16"/>
+          <line x1="4" y1="8" x2="20" y2="8"/>
+          <line x1="4" y1="16" x2="20" y2="16"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Helix</span>
+        <span class="brand-tag">IT Portfolio &amp; Resource OS</span>
+      </div>
+    </a>
+    <nav class="cross-nav">
+      <a href="index.html">App</a>
+      <a href="schema.html">Schema</a>
+      <a href="erd.html" class="active">ERD</a>
+      <a href="developer.html">Dev Setup</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+
+  <h1>Entity Relationship Diagram</h1>
+  <p class="subtitle">Visual map of Helix's Dataverse data model — six core tables plus supporting choice sets and security profiles.</p>
+
+  <div class="legend">
+    <div class="legend-items">
+      <div class="legend-item"><span class="field-tag field-tag-pk">PK</span> Primary key</div>
+      <div class="legend-item"><span class="field-tag field-tag-fk">FK</span> Foreign key / lookup</div>
+      <div class="legend-item"><span class="field-tag field-tag-unique">UQ</span> Unique / alternate key</div>
+      <div class="legend-item"><span class="field-tag field-tag-fls">FLS</span> Field-level security (Admin only)</div>
+    </div>
+  </div>
+
+  <h2>Relationship diagram</h2>
+  <p class="section-sub">Mermaid-rendered ER diagram. Scroll horizontally if needed.</p>
+
+  <div class="erd-canvas">
+    <pre class="mermaid">
+erDiagram
+    SYSTEMUSER ||--o| HELIX_RESOURCE : "1:1"
+    HELIX_RESOURCE ||--o{ HELIX_RESOURCE : "managedBy (self-ref)"
+    HELIX_RESOURCE ||--o{ HELIX_ALLOCATION : "resource"
+    HELIX_RESOURCE ||--o{ HELIX_SCENARIO_ALLOCATION : "resource"
+    HELIX_RESOURCE }|--|| HELIX_PROJECT : "projectManager / teamManager"
+
+    HELIX_PROJECT ||--o{ HELIX_PHASE : "contains"
+    HELIX_PROJECT ||--o{ HELIX_ALLOCATION : "project"
+    HELIX_PROJECT ||--o{ HELIX_SCENARIO : "modeled by"
+    HELIX_PROJECT ||--o{ HELIX_TIME_ENTRY : "project"
+
+    HELIX_PHASE ||--o{ HELIX_DEPENDENCY : "from"
+    HELIX_PHASE ||--o{ HELIX_DEPENDENCY : "to"
+
+    HELIX_SCENARIO ||--o{ HELIX_SCENARIO_ALLOCATION : "contains"
+
+    HELIX_RESOURCE {
+        guid resourceId PK
+        string name "Primary"
+        guid systemUserId FK "1:1 with systemuser"
+        choice accessLevel "Admin/Manager/PM/Member"
+        choice jobRole "Dev/QA/BA/PM/etc"
+        decimal capacityHoursPerWeek
+        currency hourlyRate "FLS"
+        boolean billable
+        guid managedBy FK "self-reference"
+        boolean active
+    }
+
+    HELIX_PROJECT {
+        guid projectId PK
+        string name "Primary"
+        string code "Alt key, unique"
+        choice status "Planning/Active/OnHold/Completed"
+        choice priority "Critical/High/Medium/Low"
+        choice department
+        date startDate
+        date endDate
+        decimal estimatedHours
+        currency budget "FLS"
+        currency funding "FLS"
+        currency spent "FLS rollup"
+        calculated fundingGap "FLS"
+        guid projectManager FK
+        guid teamManager FK
+        int healthScore
+    }
+
+    HELIX_PHASE {
+        guid phaseId PK
+        guid projectId FK
+        string name
+        choice phaseType "Discovery/Design/Build/Test/Deploy"
+        date startDate
+        date endDate
+        int progress
+        guid owner FK
+    }
+
+    HELIX_DEPENDENCY {
+        guid dependencyId PK
+        guid fromPhaseId FK
+        guid toPhaseId FK
+        choice type "FS/SS/FF/SF"
+        int lagDays
+    }
+
+    HELIX_ALLOCATION {
+        guid allocationId PK
+        guid projectId FK
+        guid resourceId FK
+        date weekStartDate "Alt key"
+        decimal hoursPerWeek
+        string roleOnProject
+        boolean committed
+    }
+
+    HELIX_SCENARIO {
+        guid scenarioId PK
+        string name "Primary"
+        guid projectId FK
+        choice status
+        date baselineEndDate
+        date proposedEndDate
+        int timelineDeltaDays
+        currency baselineBudget "FLS"
+        currency estimatedCostDelta "FLS"
+        decimal efficiencyCoefficient
+        guid owner FK
+    }
+
+    HELIX_SCENARIO_ALLOCATION {
+        guid scenarioAllocationId PK
+        guid scenarioId FK
+        guid resourceId FK
+        choice action "Add/Remove/Modify"
+        date weekStartDate
+        decimal baselineHours
+        decimal proposedHours
+        calculated hoursDelta
+    }
+
+    HELIX_TIME_ENTRY {
+        guid timeEntryId PK
+        guid projectId FK
+        guid resourceId FK
+        date entryDate
+        decimal hours
+        string description
+        boolean approved
+    }
+    </pre>
+  </div>
+
+  <div class="callout callout-info">
+    <span class="callout-icon">ⓘ</span>
+    <div><strong>Reading the diagram:</strong> The <code>||--o{</code> notation means "one to many" (one project has many phases). The <code>||--o|</code> means "one to one or zero" (one systemuser has at most one helix_resource record). Field rows show <code>type</code> <code>name</code> <code>"annotation"</code>. FLS-marked fields enforce Admin-only read via Dataverse Field Security Profile.</div>
+  </div>
+
+  <h2>Entity field cards</h2>
+  <p class="section-sub">Compact reference for each table — see <a href="schema.html" style="color: var(--primary); font-weight: 500;">schema.html</a> for full column descriptions and choice option values.</p>
+
+  <div class="entity-grid">
+
+    <!-- helix_resource -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_resource</div>
+          <div class="entity-display">Resource</div>
+        </div>
+        <span class="entity-badge">Master</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">resourceId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">name</div><div class="field-type">Text · Primary</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">systemUserId</div><div class="field-type">Lookup → systemuser</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+          <span class="field-tag field-tag-unique">UQ</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">accessLevel</div><div class="field-type">Choice (4 values)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">jobRole</div><div class="field-type">Choice (9 values)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">capacityHoursPerWeek</div><div class="field-type">Decimal(5,2)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">hourlyRate</div><div class="field-type">Currency</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">managedBy</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">billable, active</div><div class="field-type">Yes/No</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_project -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_project</div>
+          <div class="entity-display">Project</div>
+        </div>
+        <span class="entity-badge">Master</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">name</div><div class="field-type">Text · Primary</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">code</div><div class="field-type">Text(20)</div></div>
+          <span class="field-tag field-tag-unique">UQ</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">status, priority, department</div><div class="field-type">Choice</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">startDate, endDate</div><div class="field-type">Date</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">estimatedHours</div><div class="field-type">Decimal(8,2)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">budget</div><div class="field-type">Currency</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">funding</div><div class="field-type">Currency</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">spent</div><div class="field-type">Currency · Rollup</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">fundingGap</div><div class="field-type">Calculated $</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectManager, teamManager</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">healthScore</div><div class="field-type">Whole(0–100)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_phase -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_phase</div>
+          <div class="entity-display">Phase</div>
+        </div>
+        <span class="entity-badge">Child</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">phaseId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectId</div><div class="field-type">Lookup → helix_project</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">name</div><div class="field-type">Text · Primary</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">phaseType</div><div class="field-type">Choice (5 values)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">startDate, endDate</div><div class="field-type">Date</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">progress</div><div class="field-type">Whole(0–100)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">owner</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_dependency -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_dependency</div>
+          <div class="entity-display">Dependency</div>
+        </div>
+        <span class="entity-badge">Link</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">dependencyId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">fromPhaseId</div><div class="field-type">Lookup → helix_phase</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">toPhaseId</div><div class="field-type">Lookup → helix_phase</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">type</div><div class="field-type">Choice (FS/SS/FF/SF)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">lagDays</div><div class="field-type">Whole</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_allocation -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_allocation</div>
+          <div class="entity-display">Allocation</div>
+        </div>
+        <span class="entity-badge">Transactional</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">allocationId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectId</div><div class="field-type">Lookup → helix_project</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">resourceId</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">weekStartDate</div><div class="field-type">Date</div></div>
+          <span class="field-tag field-tag-unique">UQ</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">hoursPerWeek</div><div class="field-type">Decimal(5,2)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">roleOnProject</div><div class="field-type">Text(80)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">committed</div><div class="field-type">Yes/No</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_scenario -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_scenario</div>
+          <div class="entity-display">Scenario</div>
+        </div>
+        <span class="entity-badge">Playground</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">scenarioId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">name</div><div class="field-type">Text · Primary</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectId</div><div class="field-type">Lookup → helix_project</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">status</div><div class="field-type">Choice (5 values)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">baselineEndDate, proposedEndDate</div><div class="field-type">Date</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">timelineDeltaDays</div><div class="field-type">Whole</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">baselineBudget</div><div class="field-type">Currency</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">estimatedCostDelta</div><div class="field-type">Currency</div></div>
+          <span class="field-tag field-tag-fls">FLS</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">efficiencyCoefficient</div><div class="field-type">Decimal(3,2)</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_scenarioallocation -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_scenarioallocation</div>
+          <div class="entity-display">Scenario Allocation</div>
+        </div>
+        <span class="entity-badge">Playground</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">scenarioAllocationId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">scenarioId</div><div class="field-type">Lookup → helix_scenario</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">resourceId</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">action</div><div class="field-type">Choice (Add/Remove/Modify)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">weekStartDate</div><div class="field-type">Date</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">baselineHours, proposedHours</div><div class="field-type">Decimal(5,2)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">hoursDelta</div><div class="field-type">Calculated</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- helix_timeentry -->
+    <div class="entity-card">
+      <div class="entity-card-head">
+        <div>
+          <div class="entity-name">helix_timeentry</div>
+          <div class="entity-display">Time Entry</div>
+        </div>
+        <span class="entity-badge">Phase 2</span>
+      </div>
+      <div class="entity-card-body">
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">timeEntryId</div><div class="field-type">Uniqueidentifier</div></div>
+          <span class="field-tag field-tag-pk">PK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">projectId</div><div class="field-type">Lookup → helix_project</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">resourceId</div><div class="field-type">Lookup → helix_resource</div></div>
+          <span class="field-tag field-tag-fk">FK</span>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">entryDate</div><div class="field-type">Date</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">hours</div><div class="field-type">Decimal(4,2)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">description</div><div class="field-type">Text(500)</div></div>
+        </div>
+        <div class="field-row">
+          <div class="field-info"><div class="field-name">approved</div><div class="field-type">Yes/No</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Relationship summary</h2>
+  <p class="section-sub">Cardinality and cascade behavior between tables.</p>
+
+  <table>
+    <thead><tr><th>From</th><th>To</th><th>Cardinality</th><th>Cascade on delete</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">systemuser</td><td class="mono">helix_resource</td><td>1:1</td><td>Restrict</td><td>Identity / Entra ID linkage</td></tr>
+      <tr><td class="mono">helix_resource</td><td class="mono">helix_resource</td><td>1:N (self)</td><td>Set null</td><td>Manager → direct reports</td></tr>
+      <tr><td class="mono">helix_resource</td><td class="mono">helix_project</td><td>1:N</td><td>Restrict</td><td>Project manager / team manager assignment</td></tr>
+      <tr><td class="mono">helix_resource</td><td class="mono">helix_allocation</td><td>1:N</td><td>Restrict</td><td>Resource is assigned hours to projects</td></tr>
+      <tr><td class="mono">helix_project</td><td class="mono">helix_phase</td><td>1:N</td><td>Cascade</td><td>Phases belong to a project</td></tr>
+      <tr><td class="mono">helix_project</td><td class="mono">helix_allocation</td><td>1:N</td><td>Cascade</td><td>Project receives hours from resources</td></tr>
+      <tr><td class="mono">helix_project</td><td class="mono">helix_scenario</td><td>1:N</td><td>Cascade</td><td>What-if scenarios for a project</td></tr>
+      <tr><td class="mono">helix_phase</td><td class="mono">helix_dependency</td><td>1:N (from)</td><td>Cascade</td><td>Predecessor phase</td></tr>
+      <tr><td class="mono">helix_phase</td><td class="mono">helix_dependency</td><td>1:N (to)</td><td>Cascade</td><td>Successor phase</td></tr>
+      <tr><td class="mono">helix_scenario</td><td class="mono">helix_scenarioallocation</td><td>1:N</td><td>Cascade</td><td>Proposed allocation changes</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-accent" style="margin-top: 32px;">
+    <span class="callout-icon">→</span>
+    <div><strong>Next step:</strong> See <a href="schema.html" style="font-weight: 600;">schema.html</a> for full column descriptions, choice option values, validation rules, and field-level security configuration. See <a href="developer.html" style="font-weight: 600;">developer.html</a> for the step-by-step build sequence in Power Platform.</div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#eef2ff',
+      primaryTextColor: '#0c0a09',
+      primaryBorderColor: '#4f46e5',
+      lineColor: '#78716c',
+      fontFamily: 'Geist, system-ui, sans-serif',
+      fontSize: '13px'
+    },
+    er: {
+      diagramPadding: 20,
+      layoutDirection: 'TB',
+      entityPadding: 18,
+      stroke: '#4f46e5',
+      fill: '#ffffff',
+      fontSize: 12
+    }
+  });
+</script>
+
+</body>
+</html>

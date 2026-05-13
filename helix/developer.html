@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Helix · Developer Setup Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --surface-2: #f5f5f4; --border: #e7e5e4; --border-strong: #d6d3d1;
+    --text: #0c0a09; --text-muted: #57534e; --text-soft: #a8a29e;
+    --primary: #4f46e5; --primary-bg: #eef2ff;
+    --success: #16a34a; --success-bg: #dcfce7;
+    --warning: #d97706; --warning-bg: #fef3c7;
+    --danger: #dc2626; --danger-bg: #fee2e2;
+    --info: #0284c7; --info-bg: #e0f2fe;
+    --code-bg: #1c1917; --code-text: #fafaf9;
+    --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 2px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: 'Geist', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  code, .mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+  a { color: inherit; text-decoration: none; }
+  code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; font-size: 0.9em; }
+
+  .page-header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .header-inner { max-width: 1400px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo { width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(79,70,229,0.3); }
+  .brand-logo svg { width: 20px; height: 20px; stroke: white; }
+  .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+  .brand-name { font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
+  .brand-tag { font-size: 10px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+  .cross-nav { display: flex; gap: 2px; padding: 4px; background: var(--surface-2); border-radius: var(--radius-lg); }
+  .cross-nav a { padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 500; color: var(--text-muted); transition: all 180ms var(--ease); }
+  .cross-nav a:hover { color: var(--text); background: rgba(255,255,255,0.6); }
+  .cross-nav a.active { background: white; color: var(--text); box-shadow: var(--shadow-sm); }
+
+  .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px 80px; display: grid; grid-template-columns: 240px 1fr; gap: 40px; align-items: flex-start; }
+  @media (max-width: 980px) { .container { grid-template-columns: 1fr; } .sidebar { position: static; } }
+
+  .sidebar { position: sticky; top: 88px; max-height: calc(100vh - 110px); overflow-y: auto; padding-right: 8px; }
+  .sidebar-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 500; padding: 8px 12px; }
+  .sidebar a { display: block; padding: 7px 12px; border-radius: 6px; font-size: 13px; color: var(--text-muted); transition: all 120ms var(--ease); }
+  .sidebar a:hover { background: var(--surface-2); color: var(--text); }
+  .sidebar a.active { background: var(--primary-bg); color: var(--primary); font-weight: 500; }
+
+  h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; margin: 48px 0 8px; scroll-margin-top: 88px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  h2 .phase-num { width: 32px; height: 32px; border-radius: 10px; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+  h2 .phase-time { font-size: 11px; color: var(--text-soft); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; margin-left: auto; }
+  h3 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; }
+  .subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; }
+  p { color: #292524; margin: 0 0 12px; }
+
+  .prereqs { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 32px; }
+  .prereqs h3 { margin-top: 0; }
+  .step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 12px; }
+  .step-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+  .step-num { font-family: 'Geist Mono', monospace; font-size: 11px; color: var(--text-soft); font-weight: 500; padding-top: 3px; min-width: 32px; }
+  .step-title { font-size: 15px; font-weight: 600; flex: 1; }
+  .step-body { padding-left: 44px; font-size: 13.5px; color: #44403c; }
+  .step-body p:first-child { margin-top: 0; }
+  .step-body ol, .step-body ul { padding-left: 20px; font-size: 13px; }
+  .step-body li { margin-bottom: 4px; }
+
+  .code-block { background: var(--code-bg); color: var(--code-text); border-radius: var(--radius); padding: 16px 20px; font-family: 'Geist Mono', monospace; font-size: 12.5px; line-height: 1.65; white-space: pre; overflow-x: auto; margin: 10px 0; border: 1px solid #292524; }
+  .c-comment { color: #78716c; }
+  .c-cmd { color: #5eead4; }
+  .c-string { color: #a3e635; }
+  .c-flag { color: #fbbf24; }
+  .c-keyword { color: #f472b6; }
+
+  .callout { padding: 12px 16px; border-radius: var(--radius); margin: 12px 0; font-size: 13px; border: 1px solid; display: flex; gap: 10px; align-items: flex-start; }
+  .callout-icon { font-size: 16px; flex-shrink: 0; line-height: 1.2; }
+  .callout-warn { background: var(--warning-bg); border-color: rgba(217,119,6,0.2); color: #78350f; }
+  .callout-info { background: var(--info-bg); border-color: rgba(2,132,199,0.2); color: #0c4a6e; }
+  .callout-danger { background: var(--danger-bg); border-color: rgba(220,38,38,0.2); color: #7f1d1d; }
+  .callout-accent { background: var(--primary-bg); border-color: rgba(79,70,229,0.2); color: #312e81; }
+  .callout-success { background: var(--success-bg); border-color: rgba(22,163,74,0.2); color: #14532d; }
+
+  .checklist { margin: 10px 0; }
+  .checklist label { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; cursor: pointer; font-size: 13px; user-select: none; }
+  .checklist input { margin-top: 3px; flex-shrink: 0; accent-color: var(--primary); }
+  .checklist label:hover { color: var(--primary); }
+
+  .inline-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 12px 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .inline-table th { text-align: left; padding: 8px 12px; background: var(--surface-2); font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .inline-table td { padding: 8px 12px; border-top: 1px solid var(--border); vertical-align: top; }
+  .inline-table td.mono { font-family: 'Geist Mono', monospace; font-size: 11.5px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 0 0 32px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 18px; }
+  .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+  .stat-value { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  .gotcha { background: var(--surface); border: 1px solid var(--danger); border-left-width: 4px; border-radius: var(--radius); padding: 14px 18px; margin-bottom: 12px; }
+  .gotcha-num { display: inline-block; background: var(--danger); color: white; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-right: 8px; font-family: 'Geist Mono', monospace; }
+  .gotcha-title { font-size: 14px; font-weight: 600; display: inline; }
+  .gotcha p { margin: 8px 0 0; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4c4 4 12 12 16 16M20 4c-4 4-12 12-16 16"/>
+          <line x1="4" y1="8" x2="20" y2="8"/>
+          <line x1="4" y1="16" x2="20" y2="16"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Helix</span>
+        <span class="brand-tag">IT Portfolio &amp; Resource OS</span>
+      </div>
+    </a>
+    <nav class="cross-nav">
+      <a href="index.html">App</a>
+      <a href="schema.html">Schema</a>
+      <a href="erd.html">ERD</a>
+      <a href="developer.html" class="active">Dev Setup</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+  <aside class="sidebar">
+    <div class="sidebar-title">Phases</div>
+    <a href="#phase-0">0 · Prerequisites</a>
+    <a href="#phase-1">1 · Environment</a>
+    <a href="#phase-2">2 · Solution &amp; choices</a>
+    <a href="#phase-3">3 · Tables</a>
+    <a href="#phase-4">4 · FLS profile</a>
+    <a href="#phase-5">5 · Security roles</a>
+    <a href="#phase-6">6 · Code App scaffold</a>
+    <a href="#phase-7">7 · Connection refs</a>
+    <a href="#phase-8">8 · Local dev</a>
+    <a href="#phase-9">9 · Deploy</a>
+    <a href="#phase-10">10 · User onboarding</a>
+    <a href="#gotchas">Known gotchas</a>
+  </aside>
+
+  <main>
+    <h1>Developer setup guide</h1>
+    <p class="subtitle">Step-by-step sequence to provision Helix in Power Platform — from empty environment to deployed Code App.</p>
+
+    <div class="stats">
+      <div class="stat-card"><div class="stat-label">Phases</div><div class="stat-value">10</div><div class="stat-sub">+ gotchas reference</div></div>
+      <div class="stat-card"><div class="stat-label">Estimated time</div><div class="stat-value">~16h</div><div class="stat-sub">Excluding QA &amp; UAT</div></div>
+      <div class="stat-card"><div class="stat-label">Tables to create</div><div class="stat-value">8</div><div class="stat-sub">7 custom + systemuser link</div></div>
+      <div class="stat-card"><div class="stat-label">Environments</div><div class="stat-value">3</div><div class="stat-sub">Dev / Test / Prod</div></div>
+    </div>
+
+    <!-- ============= PHASE 0 ============= -->
+    <h2 id="phase-0"><span class="phase-num">0</span>Prerequisites <span class="phase-time">~30 min</span></h2>
+    <p>Before starting, confirm you have everything below. Missing any of these will block at least one later phase.</p>
+
+    <div class="prereqs">
+      <h3>Accounts &amp; access</h3>
+      <div class="checklist">
+        <label><input type="checkbox"/> Power Platform System Administrator rights in target tenant</label>
+        <label><input type="checkbox"/> Three Power Platform environments: <code>Helix-DEV</code> (unmanaged), <code>Helix-TEST</code> (managed), <code>Helix-PROD</code> (managed)</label>
+        <label><input type="checkbox"/> Dataverse database provisioned in each environment</label>
+        <label><input type="checkbox"/> Entra ID app registration for service principal CI/CD</label>
+        <label><input type="checkbox"/> Power Platform Pipelines configured between environments</label>
+      </div>
+
+      <h3>Local tooling</h3>
+      <div class="checklist">
+        <label><input type="checkbox"/> Node.js 20+ &nbsp; (verify: <code>node -v</code>)</label>
+        <label><input type="checkbox"/> npm 10+ &nbsp; (verify: <code>npm -v</code>)</label>
+        <label><input type="checkbox"/> Git installed and configured</label>
+        <label><input type="checkbox"/> Visual Studio Code with Power Platform Tools extension</label>
+        <label><input type="checkbox"/> PAC CLI v1.30.0 — <strong>not v2.5.1</strong> (see gotcha #1)</label>
+      </div>
+
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠</span>
+        <div><strong>PAC CLI version pinning:</strong> v2.5.1 has a confirmed bug in <code>pac code push</code>. Either install v1.30.0 or use <code>npx power-apps push</code> via the <code>@microsoft/power-apps</code> npm package as the workaround. See <a href="#gotchas" style="color: inherit; font-weight: 600;">gotchas section</a>.</div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 1 ============= -->
+    <h2 id="phase-1"><span class="phase-num">1</span>Environment &amp; publisher <span class="phase-time">~45 min</span></h2>
+    <p>Establish the publisher that owns the <code>helix_</code> namespace. Do this in DEV — it'll flow to TEST and PROD via solution import.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1.1</div><div class="step-title">Authenticate PAC CLI to DEV</div></div>
+      <div class="step-body">
+        <p>Sign in to your Helix-DEV environment from the terminal.</p>
+        <div class="code-block"><span class="c-comment"># Authenticate</span>
+<span class="c-cmd">pac auth create</span> <span class="c-flag">--url</span> <span class="c-string">https://huntoil-helix-dev.crm.dynamics.com</span>
+
+<span class="c-comment"># Verify</span>
+<span class="c-cmd">pac auth list</span>
+<span class="c-cmd">pac org who</span></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">1.2</div><div class="step-title">Create the Helix publisher</div></div>
+      <div class="step-body">
+        <p>In <strong>make.powerapps.com → Solutions → Publishers → New publisher</strong>:</p>
+        <table class="inline-table">
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Display name</td><td class="mono">Helix</td></tr>
+          <tr><td>Name</td><td class="mono">helix</td></tr>
+          <tr><td>Prefix</td><td class="mono">helix</td></tr>
+          <tr><td>Choice value prefix</td><td class="mono">10000</td></tr>
+          <tr><td>Description</td><td>IT Portfolio &amp; Resource Management</td></tr>
+        </table>
+        <div class="callout callout-info">
+          <span class="callout-icon">ⓘ</span>
+          <div><strong>Want to use Hunt Oil's existing publisher?</strong> Substitute <code>hun_</code> for <code>helix_</code> in all the schema names, and update <code>database.json</code> mapping notes accordingly. Lower deploy risk if you have an established publisher.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 2 ============= -->
+    <h2 id="phase-2"><span class="phase-num">2</span>Solution &amp; global choices <span class="phase-time">~1.5h</span></h2>
+    <p>Create the unmanaged solution that will hold all Helix objects, then build the global choice sets <em>first</em> so tables can reference them on creation.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2.1</div><div class="step-title">Create unmanaged solution</div></div>
+      <div class="step-body">
+        <p>In <strong>make.powerapps.com → Solutions → New solution</strong>:</p>
+        <table class="inline-table">
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Display name</td><td>Helix</td></tr>
+          <tr><td>Name</td><td class="mono">Helix</td></tr>
+          <tr><td>Publisher</td><td>Helix (from step 1.2)</td></tr>
+          <tr><td>Version</td><td class="mono">0.1.0</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">2.2</div><div class="step-title">Build global choice sets</div></div>
+      <div class="step-body">
+        <p>Inside the Helix solution → <strong>New → More → Choice</strong>. Create these 9 global choices:</p>
+        <table class="inline-table">
+          <tr><th>Display name</th><th>Logical name</th><th>Values</th></tr>
+          <tr><td>Access Level</td><td class="mono">helix_accesslevel</td><td>Admin/100, Manager/200, PM/300, Member/400</td></tr>
+          <tr><td>Job Role</td><td class="mono">helix_jobrole</td><td>Developer, QA, BA, PM, UX, DevOps, Data Eng, Cloud Arch, Manager (1–9)</td></tr>
+          <tr><td>Project Status</td><td class="mono">helix_projectstatus</td><td>Planning, Active, On hold, Completed, Cancelled (1–5)</td></tr>
+          <tr><td>Project Priority</td><td class="mono">helix_projectpriority</td><td>Critical, High, Medium, Low (1–4)</td></tr>
+          <tr><td>Department</td><td class="mono">helix_department</td><td>IT-Apps, IT-Infra, IT-Data, IT-Security (1–4)</td></tr>
+          <tr><td>Phase Type</td><td class="mono">helix_phasetype</td><td>Discovery, Design, Build, Test, Deploy (1–5)</td></tr>
+          <tr><td>Dependency Type</td><td class="mono">helix_dependencytype</td><td>FS, SS, FF, SF (1–4)</td></tr>
+          <tr><td>Scenario Action</td><td class="mono">helix_scenarioaction</td><td>Add, Remove, Modify (1–3)</td></tr>
+          <tr><td>Scenario Status</td><td class="mono">helix_scenariostatus</td><td>Draft, Proposed, Approved, Rejected, Applied (1–5)</td></tr>
+        </table>
+        <div class="callout callout-accent">
+          <span class="callout-icon">→</span>
+          <div>Full value labels and integer codes in <a href="schema.html#choices" style="font-weight: 600;">schema.html § Choice column values</a>.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 3 ============= -->
+    <h2 id="phase-3"><span class="phase-num">3</span>Tables &amp; columns <span class="phase-time">~3h</span></h2>
+    <p>Create the seven custom tables. Build in this order — dependent tables come last so lookups resolve cleanly.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3.1</div><div class="step-title">Creation order</div></div>
+      <div class="step-body">
+        <ol>
+          <li><code>helix_resource</code> — no lookups yet (managedBy added in 3.2)</li>
+          <li><code>helix_project</code> — depends on helix_resource (projectManager, teamManager)</li>
+          <li><code>helix_phase</code> — depends on helix_project &amp; helix_resource</li>
+          <li><code>helix_dependency</code> — depends on helix_phase</li>
+          <li><code>helix_allocation</code> — depends on helix_project, helix_resource</li>
+          <li><code>helix_scenario</code> — depends on helix_project</li>
+          <li><code>helix_scenarioallocation</code> — depends on helix_scenario, helix_resource</li>
+          <li><code>helix_timeentry</code> (Phase 2 work — skip for MVP)</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3.2</div><div class="step-title">Self-reference on helix_resource</div></div>
+      <div class="step-body">
+        <p>After <code>helix_resource</code> is created, add the <code>helix_managedby</code> lookup pointing back to <code>helix_resource</code>. Maker portal supports this via <strong>Add column → Type: Lookup → Related table: Resource</strong>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3.3</div><div class="step-title">Alternate key on helix_allocation</div></div>
+      <div class="step-body">
+        <p>Critical for preventing duplicate weekly allocations. In maker portal: <strong>helix_allocation → Keys → New key</strong>:</p>
+        <table class="inline-table">
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Display name</td><td>Unique allocation per week</td></tr>
+          <tr><td>Schema name</td><td class="mono">helix_uniqueallocation</td></tr>
+          <tr><td>Columns</td><td>helix_project, helix_resource, helix_weekstartdate</td></tr>
+        </table>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠</span>
+          <div>Maker portal sometimes drops alternate keys on solution export. After export, inspect the solution XML and confirm the <code>EntityKey</code> element exists before importing to TEST.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">3.4</div><div class="step-title">Field configuration reference</div></div>
+      <div class="step-body">
+        <p>Full column lists, types, descriptions, and FLS markers are in <a href="schema.html" style="color: var(--primary); font-weight: 500;">schema.html</a>. Use it as the source of truth while building.</p>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 4 ============= -->
+    <h2 id="phase-4"><span class="phase-num">4</span>Field Security Profile <span class="phase-time">~30 min</span></h2>
+    <p>The "Helix Finance" profile enforces Admin-only access to financial columns. Without it, any user querying Dataverse directly (Power BI, Excel) can see budgets and rates regardless of app logic.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">4.1</div><div class="step-title">Enable field security on protected columns</div></div>
+      <div class="step-body">
+        <p>For each column below, set <strong>Advanced options → Enable column security = Yes</strong>. This locks the field at the platform level.</p>
+        <table class="inline-table">
+          <tr><th>Table</th><th>Column</th></tr>
+          <tr><td class="mono">helix_resource</td><td class="mono">helix_hourlyrate</td></tr>
+          <tr><td class="mono">helix_project</td><td class="mono">helix_budget</td></tr>
+          <tr><td class="mono">helix_project</td><td class="mono">helix_funding</td></tr>
+          <tr><td class="mono">helix_project</td><td class="mono">helix_spent</td></tr>
+          <tr><td class="mono">helix_project</td><td class="mono">helix_fundinggap</td></tr>
+          <tr><td class="mono">helix_scenario</td><td class="mono">helix_baselinebudget</td></tr>
+          <tr><td class="mono">helix_scenario</td><td class="mono">helix_estimatedcostdelta</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">4.2</div><div class="step-title">Create the Field Security Profile</div></div>
+      <div class="step-body">
+        <p>In <strong>Power Platform admin center → Environments → Helix-DEV → Settings → Users + permissions → Field security profiles → New</strong>:</p>
+        <table class="inline-table">
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Name</td><td>Helix Finance</td></tr>
+          <tr><td>Description</td><td>Read access to financial columns across Helix tables</td></tr>
+        </table>
+        <p>Open the profile → <strong>Field permissions</strong> tab. For each secured field, set:</p>
+        <ul>
+          <li><strong>Read</strong> = Allowed</li>
+          <li><strong>Update</strong> = Allowed (for budget/funding only; leave Read-only for spent/fundinggap)</li>
+          <li><strong>Create</strong> = Allowed (for budget/funding/rate only)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">4.3</div><div class="step-title">Add Admin users to the profile</div></div>
+      <div class="step-body">
+        <p>Profile → <strong>Users</strong> tab → <strong>Add users</strong>. Add only users who will hold the Helix Admin role. Everyone else will see <code>null</code> for these fields automatically.</p>
+        <div class="callout callout-success">
+          <span class="callout-icon">✓</span>
+          <div><strong>Test it now:</strong> Sign in as a non-Admin user and query <code>helix_project</code> via the WebAPI. <code>helix_budget</code> should return <code>null</code>. If you see actual values, the profile isn't applied — check field security is enabled on the column itself.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 5 ============= -->
+    <h2 id="phase-5"><span class="phase-num">5</span>Security roles <span class="phase-time">~1h</span></h2>
+    <p>Four Dataverse security roles map 1:1 to Helix access levels. Row-level scoping uses Business Unit and User ownership.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">5.1</div><div class="step-title">Create the four security roles</div></div>
+      <div class="step-body">
+        <p>In <strong>Power Platform admin center → Environments → Helix-DEV → Settings → Users + permissions → Security roles → New role</strong>. Create each role with the table privileges below.</p>
+        <table class="inline-table">
+          <tr><th>Role</th><th>Read scope</th><th>Write scope</th></tr>
+          <tr><td><code>Helix Admin</code></td><td>Organization</td><td>Organization</td></tr>
+          <tr><td><code>Helix Manager</code></td><td>Business Unit</td><td>Business Unit (allocations only)</td></tr>
+          <tr><td><code>Helix PM</code></td><td>User (own + cascaded from owned projects)</td><td>User-owned projects only</td></tr>
+          <tr><td><code>Helix Member</code></td><td>User (own resource + own allocations)</td><td>None</td></tr>
+        </table>
+        <p>Apply these privileges to every <code>helix_*</code> table. Use the <strong>Core records</strong> tab on the role for the helix tables.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">5.2</div><div class="step-title">Assign Helix Admin to Field Security Profile</div></div>
+      <div class="step-body">
+        <p>Users with <code>Helix Admin</code> must <strong>also</strong> be members of the Helix Finance FLS profile. The security role alone doesn't grant field access — both layers are required.</p>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 6 ============= -->
+    <h2 id="phase-6"><span class="phase-num">6</span>Code App scaffold <span class="phase-time">~2h</span></h2>
+    <p>Scaffold the React + TypeScript Code App locally using your published <code>powerapps-code-app</code> Claude Code skill.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">6.1</div><div class="step-title">Initialize the project</div></div>
+      <div class="step-body">
+        <p>Create the Code App workspace with the established stack.</p>
+        <div class="code-block"><span class="c-comment"># From your dev directory</span>
+<span class="c-cmd">npm create</span> <span class="c-string">vite@latest</span> helix-app <span class="c-flag">--</span> <span class="c-flag">--template</span> react-ts
+<span class="c-cmd">cd</span> helix-app
+
+<span class="c-comment"># Install core deps</span>
+<span class="c-cmd">npm install</span> @tanstack/react-query react-router-dom zod
+<span class="c-cmd">npm install -D</span> tailwindcss @tailwindcss/vite vitest @vitest/ui
+
+<span class="c-comment"># Power Apps tooling (workaround for PAC v2.5.1 bug)</span>
+<span class="c-cmd">npm install -D</span> @microsoft/power-apps</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">6.2</div><div class="step-title">Apply the Helix scaffolding prompt</div></div>
+      <div class="step-body">
+        <p>Open Claude Code in the project root. Paste the Helix scaffolding prompt (provided as a separate deliverable after management approval). The prompt encodes:</p>
+        <ul>
+          <li>The 6 route structure (Dashboard / Projects / Gantt / Allocations / Playground / My View)</li>
+          <li>The <code>useCurrentUser</code> hook with role-aware flags</li>
+          <li>Service layer files per Dataverse table</li>
+          <li>FLS-aware rendering (hide cost columns when <code>canSeeFinance</code> is false)</li>
+          <li>The scenario engine with Brooks's Law penalty</li>
+          <li>Vitest unit tests on the engine</li>
+        </ul>
+        <div class="callout callout-info">
+          <span class="callout-icon">ⓘ</span>
+          <div>The scaffolding prompt is the next deliverable after management signs off on the prototype. It produces a complete <code>src/</code> tree wired against Dataverse.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 7 ============= -->
+    <h2 id="phase-7"><span class="phase-num">7</span>Connection references <span class="phase-time">~30 min</span></h2>
+    <p>Connection references decouple the Code App from environment-specific connection IDs. Required for clean DEV → TEST → PROD promotion.</p>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">7.1</div><div class="step-title">Create the Dataverse connection reference</div></div>
+      <div class="step-body">
+        <p>In your Helix solution → <strong>New → More → Connection reference</strong>:</p>
+        <table class="inline-table">
+          <tr><th>Field</th><th>Value</th></tr>
+          <tr><td>Display name</td><td>Helix Dataverse</td></tr>
+          <tr><td>Name</td><td class="mono">helix_dataverse</td></tr>
+          <tr><td>Connector</td><td>Microsoft Dataverse</td></tr>
+          <tr><td>Connection</td><td>Pick your active connection (or create new)</td></tr>
+        </table>
+        <div class="callout callout-danger">
+          <span class="callout-icon">!</span>
+          <div><strong>Never hardcode connection IDs</strong> in <code>power.config.json</code> or anywhere in the Code App. Reference only the schema name (<code>helix_dataverse</code>). Hardcoded IDs are the #1 cause of solution import failures across environments.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">7.2</div><div class="step-title">Wire up power.config.json</div></div>
+      <div class="step-body">
+        <div class="code-block"><span class="c-comment">// power.config.json</span>
+{
+  <span class="c-string">"name"</span>: <span class="c-string">"Helix"</span>,
+  <span class="c-string">"displayName"</span>: <span class="c-string">"Helix · IT Portfolio &amp; Resource OS"</span>,
+  <span class="c-string">"connectionReferences"</span>: {
+    <span class="c-string">"helix_dataverse"</span>: {
+      <span class="c-string">"connectorId"</span>: <span class="c-string">"shared_commondataserviceforapps"</span>,
+      <span class="c-string">"dataSourceName"</span>: <span class="c-string">"helix_dataverse"</span>
+    }
+  },
+  <span class="c-string">"environmentVariables"</span>: {}
+}</div>
+        <div class="callout callout-warn">
+          <span class="callout-icon">⚠</span>
+          <div><code>dataSourceName</code> must be lowercase — capitalized values cause PAC to silently fail the push without an error message.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 8 ============= -->
+    <h2 id="phase-8"><span class="phase-num">8</span>Local development <span class="phase-time">~1h</span></h2>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">8.1</div><div class="step-title">Run the dev server</div></div>
+      <div class="step-body">
+        <div class="code-block"><span class="c-comment"># Always port 3000 — Power Platform bridge expects it</span>
+<span class="c-cmd">npm run dev</span>
+
+<span class="c-comment"># In a separate terminal — push to DEV for testing in Power Apps</span>
+<span class="c-cmd">npx power-apps push</span> <span class="c-flag">--environment</span> <span class="c-string">$DEV_ENV_ID</span></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">8.2</div><div class="step-title">Test the role gates</div></div>
+      <div class="step-body">
+        <ol>
+          <li>Sign in to the app as <code>Helix Admin</code> — verify budgets, rates, and Playground are visible</li>
+          <li>Sign in as <code>Helix Manager</code> — verify Playground is visible but all $ are hidden / null</li>
+          <li>Sign in as <code>Helix PM</code> — verify scope is limited to projects where they're the PM</li>
+          <li>Sign in as <code>Helix Member</code> — verify they land on /me and other nav items are hidden</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 9 ============= -->
+    <h2 id="phase-9"><span class="phase-num">9</span>Deploy to TEST &amp; PROD <span class="phase-time">~2h first time</span></h2>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">9.1</div><div class="step-title">Export managed solution from DEV</div></div>
+      <div class="step-body">
+        <div class="code-block"><span class="c-cmd">pac solution export</span> <span class="c-flag">--path</span> ./solutions/Helix_managed.zip <span class="c-flag">--name</span> Helix <span class="c-flag">--managed</span></div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">9.2</div><div class="step-title">Promote via Power Platform Pipelines</div></div>
+      <div class="step-body">
+        <p>From the Pipelines app inside DEV: select Helix solution → Deploy → choose TEST → review &amp; approve. Pipelines handles the import, connection reference mapping, and environment variable swap.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">9.3</div><div class="step-title">GitHub Actions CI/CD (optional)</div></div>
+      <div class="step-body">
+        <p>For automated builds on push to <code>main</code>, configure a workflow that runs <code>npm test</code>, builds the app, and calls <code>npx power-apps push</code> with service-principal auth. Sample workflow file in the README.</p>
+      </div>
+    </div>
+
+    <!-- ============= PHASE 10 ============= -->
+    <h2 id="phase-10"><span class="phase-num">10</span>User onboarding <span class="phase-time">~1h ongoing</span></h2>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">10.1</div><div class="step-title">Create helix_resource records</div></div>
+      <div class="step-body">
+        <p>For each IT department user, create a row in <code>helix_resource</code>:</p>
+        <ul>
+          <li>Set <code>helix_systemuser</code> to their Dataverse user record (1:1 link)</li>
+          <li>Set <code>helix_accesslevel</code> to Admin / Manager / PM / Member</li>
+          <li>Set <code>helix_jobrole</code> to their functional role</li>
+          <li>Set <code>helix_capacityhoursperweek</code> (40 default; 20–32 for part-time)</li>
+          <li>Set <code>helix_hourlyrate</code> (Admin can do this; FLS hides from others)</li>
+          <li>Set <code>helix_managedby</code> to their manager's helix_resource record</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-head"><div class="step-num">10.2</div><div class="step-title">Assign security roles</div></div>
+      <div class="step-body">
+        <p>In <strong>Power Platform admin center → Users → [select user] → Manage security roles</strong>, assign the matching Helix role (Admin / Manager / PM / Member). For Admins, also add to the Helix Finance Field Security Profile.</p>
+      </div>
+    </div>
+
+    <!-- ============= GOTCHAS ============= -->
+    <h2 id="gotchas">Known gotchas <span class="phase-time">Critical reading</span></h2>
+    <p>Production lessons. Most cost half a day each the first time.</p>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#1</span><span class="gotcha-title">PAC CLI v2.5.1 <code>pac code push</code> is broken</span>
+      <p>The push command silently exits with a 0 status code but doesn't actually upload your build. Use <code>npx power-apps push</code> from the <code>@microsoft/power-apps</code> npm package instead, or downgrade to PAC v1.30.0. Microsoft hasn't published a fix as of this writing — check release notes before assuming a newer version resolves it.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#2</span><span class="gotcha-title">window.powerAppsBridge timing</span>
+      <p>The Power Platform bridge that exposes the current user (<code>window.powerAppsBridge</code>) is not always available on first render. Wrap your <code>useCurrentUser</code> hook with a retry-on-undefined pattern using <code>setTimeout</code>, or use TanStack Query's <code>retry</code> with a backoff. Without this, your role gates flicker between "Member" and the actual role on every refresh.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#3</span><span class="gotcha-title">Full vs short connection IDs</span>
+      <p>When PAC outputs the connection reference info, it shows both a full GUID and a short ID. The Code App needs the <strong>short</strong> form in <code>power.config.json</code>. Mixing them causes 401 errors at runtime that look like auth problems but are actually wiring problems.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#4</span><span class="gotcha-title">Lowercase dataSourceName</span>
+      <p>PAC normalizes <code>dataSourceName</code> to lowercase when generating the config. If you handwrite the config with PascalCase, PAC will silently overwrite or fail. Always lowercase.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#5</span><span class="gotcha-title">Build-time env substitution only</span>
+      <p>Vite environment variables are baked in at build time, not runtime. If you change <code>VITE_*</code> values between DEV and TEST, you must rebuild — not just redeploy. Use connection references for things that vary by environment; reserve <code>VITE_*</code> for feature flags only.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#6</span><span class="gotcha-title">FLS profile membership is not exported</span>
+      <p>The Helix Finance FLS profile is part of the solution, but the <em>list of users assigned to it</em> is not. After importing the solution to TEST or PROD, you must manually re-add the Admin users to the profile in the target environment. Add this to your deployment checklist.</p>
+    </div>
+
+    <div class="gotcha">
+      <span class="gotcha-num">#7</span><span class="gotcha-title">Alternate key on solution export</span>
+      <p>Maker portal sometimes drops the alternate key on <code>helix_allocation</code> when exporting the solution. Open the exported XML and confirm <code>&lt;EntityKey&gt;</code> is present. If missing, re-add via PAC: <code>pac solution add-component --component-type 14 --component helix_uniqueallocation</code>.</p>
+    </div>
+
+    <div class="callout callout-accent" style="margin-top: 32px;">
+      <span class="callout-icon">→</span>
+      <div><strong>You're ready.</strong> After Phase 10, the Helix Code App is live in DEV with seeded data, security tested across all four roles, and ready for the scaffolding prompt to fill in the views. See <a href="schema.html" style="font-weight: 600;">schema.html</a> for ongoing column reference and <a href="erd.html" style="font-weight: 600;">erd.html</a> for the data model overview.</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // Sidebar active link on scroll
+  const links = document.querySelectorAll('.sidebar a[href^="#"]');
+  const sections = Array.from(links).map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  function updateActive() {
+    let active = sections[0];
+    for (const s of sections) {
+      if (s && s.getBoundingClientRect().top < 120) active = s;
+    }
+    if (!active) return;
+    links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + active.id));
+  }
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+</script>
+
+</body>
+</html>
