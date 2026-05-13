@@ -1079,6 +1079,44 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   to { transform: scaleX(1); }
 }
 
+/* ===================== EDITABLE GANTT ===================== */
+.gantt-bar { cursor: grab; user-select: none; }
+.gantt-bar.dragging { cursor: grabbing; opacity: 0.85; box-shadow: 0 6px 20px rgba(0,0,0,0.18); z-index: 20; }
+.gantt-bar-handle {
+  position: absolute; top: 0; height: 100%; width: 8px;
+  cursor: ew-resize;
+  opacity: 0;
+  transition: opacity 120ms var(--ease);
+  background: rgba(255,255,255,0.3);
+}
+.gantt-bar-handle.left { left: 0; border-radius: 6px 0 0 6px; }
+.gantt-bar-handle.right { right: 0; border-radius: 0 6px 6px 0; }
+.gantt-bar:hover .gantt-bar-handle { opacity: 1; }
+.gantt-canvas.dep-mode .gantt-bar { cursor: crosshair !important; }
+.gantt-canvas.dep-mode .gantt-bar.dep-source { box-shadow: 0 0 0 3px var(--primary), 0 4px 12px rgba(79,70,229,0.3); }
+.dependency-path { pointer-events: stroke; cursor: pointer; transition: stroke 150ms var(--ease), stroke-width 150ms var(--ease); }
+.dependency-path:hover { stroke: var(--danger); stroke-width: 2.5; stroke-dasharray: none; }
+.gantt-zoom button.toggle-on { background: var(--primary); color: white; box-shadow: var(--shadow-sm); }
+
+/* ===================== EDITABLE ALLOCATIONS ===================== */
+.alloc-pill { cursor: pointer; }
+.alloc-pill.idle { border: 1px dashed transparent; }
+.alloc-pill.idle:hover { background: var(--primary-bg); color: var(--primary); border-color: var(--primary); }
+
+/* ===================== EDITABLE SCENARIO ===================== */
+.scenario-action { position: relative; }
+.scenario-action-x {
+  color: var(--text-soft);
+  padding: 4px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 120ms var(--ease);
+}
+.scenario-action-x:hover { background: rgba(0,0,0,0.06); color: var(--danger); }
+.scenario-action-x svg { width: 14px; height: 14px; }
+
+.toast.danger { background: var(--danger); }
+
 /* ===================== SCROLLBAR ===================== */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1195,9 +1233,13 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
         <p id="dashboardSubtitle">Active portfolio across IT — Apps, Infra, Data, and Security workstreams</p>
       </div>
       <div class="page-actions">
-        <button class="btn" id="exportBtn">
+        <button class="btn" id="resetBtn" title="Discard local changes and reload the original data.json">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Reset
+        </button>
+        <button class="btn" id="exportBtn" title="Download current state as data.json">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export
+          Download data.json
         </button>
         <button class="btn btn-primary" data-open-modal="project">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1329,6 +1371,10 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
         <p>Phases nested under projects · Click bars for detail · Dashed lines are dependencies</p>
       </div>
       <div class="page-actions">
+        <button class="btn" id="ganttDepModeBtn" title="Click two phases in sequence to create a dependency">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="7 7 17 7 17 17"/><line x1="7" y1="17" x2="17" y2="7"/></svg>
+          Add dependency
+        </button>
         <div class="gantt-zoom">
           <button>Day</button>
           <button>Week</button>
@@ -1466,59 +1512,19 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
       </div>
 
       <div class="scenario-builder">
-        <div class="card-title">Scenario builder</div>
-        <div class="card-subtitle">3 changes proposed</div>
-        <div class="scenario-action add">
-          <div class="scenario-action-icon">+</div>
-          <div class="scenario-action-text">
-            <div class="scenario-action-title">Add Aisha Khan (QA Lead)</div>
-            <div class="scenario-action-meta">25h/week from Week 21</div>
-          </div>
+        <div class="card-title" style="display: flex; align-items: center; justify-content: space-between;">
+          <span>Scenario builder</span>
+          <select class="select" id="scenarioProject" style="font-size: 11px;"></select>
         </div>
-        <div class="scenario-action add">
-          <div class="scenario-action-icon">+</div>
-          <div class="scenario-action-text">
-            <div class="scenario-action-title">Add Alex Chen (Sr. Developer)</div>
-            <div class="scenario-action-meta">20h/week from Week 22</div>
-          </div>
-        </div>
-        <div class="scenario-action remove">
-          <div class="scenario-action-icon">−</div>
-          <div class="scenario-action-text">
-            <div class="scenario-action-title">Reduce James O'Brien (DevOps)</div>
-            <div class="scenario-action-meta">20h → 10h/week</div>
-          </div>
-        </div>
-        <button class="btn" style="width: 100%; margin-top: 8px; justify-content: center; border-style: dashed;">
+        <div class="card-subtitle" id="scenarioSubtitle">0 changes proposed</div>
+        <div id="scenarioActionList"></div>
+        <button class="btn" id="addScenarioBtn" style="width: 100%; margin-top: 8px; justify-content: center; border-style: dashed;">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add change
         </button>
       </div>
 
-      <div>
-        <div class="impact-stat">
-          <div class="impact-stat-label">Timeline impact</div>
-          <div class="impact-stat-value positive">−24 days</div>
-          <div class="impact-stat-sub">Forecast end: <strong>Aug 4</strong> (target Jun 30)</div>
-        </div>
-        <div class="impact-stat finance-only">
-          <div class="impact-stat-label">Cost impact</div>
-          <div class="impact-stat-value negative">+$48,210</div>
-          <div class="impact-stat-sub">Cumulative over scenario duration</div>
-        </div>
-        <div class="impact-stat">
-          <div class="impact-stat-label">Team size</div>
-          <div class="impact-stat-value">3 → 5</div>
-          <div class="impact-stat-sub">+67% — Brooks's penalty: <strong>0.92×</strong></div>
-        </div>
-        <div class="impact-stat" style="background: #fffbeb; border: 1px solid #fde68a;">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <span style="font-size: 12px; font-weight: 500; color: #92400e;">Capacity warning</span>
-          </div>
-          <div style="font-size: 11px; color: #78350f; margin-top: 4px;">Alex Chen would hit 105% utilization. Aisha is at 95%. Both within recoverable range.</div>
-        </div>
-      </div>
+      <div id="scenarioImpact"></div>
     </div>
   </section>
 
@@ -1694,6 +1700,125 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   </div>
 </div>
 
+<!-- ===================== PHASE MODAL ===================== -->
+<div class="modal-backdrop" id="phaseModal" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="phaseModalTitle">Edit phase</div>
+      <button class="btn btn-icon btn-ghost" data-close-modal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="phaseName">Name</label>
+        <input class="field-control" id="phaseName" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="phaseProject">Project</label>
+        <select class="field-control" id="phaseProject"></select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="phaseStart">Start</label>
+          <input class="field-control" id="phaseStart" type="date" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="phaseEnd">End</label>
+          <input class="field-control" id="phaseEnd" type="date" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="phaseProgress">Progress (%)</label>
+          <input class="field-control" id="phaseProgress" type="number" min="0" max="100" step="5" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="phaseColor">Color</label>
+          <select class="field-control" id="phaseColor">
+            <option value="#4f46e5">Discovery (indigo)</option>
+            <option value="#8b5cf6">Design (violet)</option>
+            <option value="#10b981">Build (green)</option>
+            <option value="#f59e0b">Test (amber)</option>
+            <option value="#06b6d4">Deploy (cyan)</option>
+            <option value="#ec4899">Other (pink)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="phaseDeleteBtn" style="margin-right: auto;">Delete</button>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="phaseSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== ALLOCATION MODAL ===================== -->
+<div class="modal-backdrop" id="allocModal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width: 420px;">
+    <div class="modal-head">
+      <div class="modal-title">Edit allocation</div>
+      <button class="btn btn-icon btn-ghost" data-close-modal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="allocContext" style="font-size: 12px; color: var(--text-muted);"></div>
+      <div class="field">
+        <label class="field-label" for="allocHours">Hours per week</label>
+        <input class="field-control" id="allocHours" type="number" min="0" max="60" step="1" />
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted);" id="allocHelper"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger" id="allocDeleteBtn" style="margin-right: auto;">Remove</button>
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="allocSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SCENARIO CHANGE MODAL ===================== -->
+<div class="modal-backdrop" id="scenarioModal" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-head">
+      <div class="modal-title" id="scenarioModalTitle">Add scenario change</div>
+      <button class="btn btn-icon btn-ghost" data-close-modal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label" for="scChangeType">Change type</label>
+        <select class="field-control" id="scChangeType">
+          <option value="add">Add resource</option>
+          <option value="reduce">Reduce hours</option>
+          <option value="remove">Remove resource</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label" for="scResource">Resource</label>
+        <select class="field-control" id="scResource"></select>
+      </div>
+      <div class="field-row" id="scHoursRow">
+        <div class="field">
+          <label class="field-label" for="scHours">Hours / week</label>
+          <input class="field-control" id="scHours" type="number" min="0" max="60" step="1" value="20" />
+        </div>
+        <div class="field" id="scHoursToWrap" style="display: none;">
+          <label class="field-label" for="scHoursTo">Reduce to</label>
+          <input class="field-control" id="scHoursTo" type="number" min="0" max="60" step="1" value="10" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" data-close-modal>Cancel</button>
+      <button class="btn btn-primary" id="scenarioSaveBtn">Add change</button>
+    </div>
+  </div>
+</div>
+
 <div class="tooltip" id="tooltip"></div>
 <div class="toast" id="toast"></div>
 
@@ -1730,8 +1855,23 @@ const FALLBACK_DATA = {
 let DATA = FALLBACK_DATA;
 let currentRole = 'admin';
 let editingTaskId = null;
+let editingPhaseId = null;
+let editingAlloc = null;
+let editingScenarioId = null;
 let projectStatusFilter = 'all';
 let kanbanFilters = { project: 'all', assignee: 'all', sprint: 'all', priority: 'all' };
+let ganttRange = { min: null, max: null, totalMs: 0 };
+let depMode = false;
+let depSource = null;
+let scenario = {
+  projectId: 'p3',
+  changes: [
+    { id: 'sc1', type: 'add',    resource: 'r8', hours: 25 },
+    { id: 'sc2', type: 'add',    resource: 'r1', hours: 20 },
+    { id: 'sc3', type: 'reduce', resource: 'r7', hours: 20, hoursTo: 10 }
+  ]
+};
+const STORAGE_KEY = 'helix.data.v1';
 
 const STATUS_LABELS = { active: 'Active', planning: 'Planning', onhold: 'On hold', completed: 'Completed' };
 const ROLE_LABELS = { admin: 'Admin', manager: 'Manager', pm: 'Project Manager', member: 'Team Member' };
@@ -1788,19 +1928,33 @@ function iconSvg(name) {
 
 /* ===================== DATA LOAD ===================== */
 async function loadData() {
-  try {
-    const res = await fetch('./data.json');
-    if (res.ok) {
-      DATA = await res.json();
-    } else {
-      console.warn('data.json not reachable, using embedded fallback');
+  const cached = localStorage.getItem(STORAGE_KEY);
+  if (cached) {
+    try { DATA = JSON.parse(cached); } catch { /* fall through */ }
+  }
+  if (!cached) {
+    try {
+      const res = await fetch('./data.json');
+      if (res.ok) DATA = await res.json();
+      else console.warn('data.json not reachable, using embedded fallback');
+    } catch (e) {
+      console.warn('Loading via file:// — using embedded fallback. Serve over http for full data.', e);
     }
-  } catch (e) {
-    console.warn('Loading via file:// — using embedded fallback. Serve over http for full data.', e);
   }
   document.title = DATA.meta.app_name + ' · IT Portfolio & Resource Management';
   byId('brandName').textContent = DATA.meta.app_name;
   byId('brandTag').textContent = DATA.meta.tagline;
+}
+
+function persist() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(DATA)); }
+  catch (e) { console.warn('localStorage write failed', e); }
+}
+
+function resetData() {
+  if (!confirm('Reset all changes back to the original data.json?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
 }
 
 /* ===================== NAVIGATION ===================== */
@@ -2163,6 +2317,7 @@ function renderGantt() {
     </div>`).join('');
 
   const totalMs = maxDate.getTime() - minDate.getTime();
+  ganttRange = { min: minDate, max: maxDate, totalMs };
   const sidebarRows = [];
   const canvasRows = [];
   let rowIdx = 0;
@@ -2191,7 +2346,9 @@ function renderGantt() {
       </div>`);
       canvasRows.push(`<div class="gantt-grid-row">
         <div class="gantt-bar" data-phase="${ph.id}" data-pid="${p.id}" style="left: ${left}%; width: ${width}%; background: ${ph.color};">
-          <span>${escapeHtml(ph.name)}</span>
+          <div class="gantt-bar-handle left" data-handle="left"></div>
+          <span style="pointer-events: none;">${escapeHtml(ph.name)}</span>
+          <div class="gantt-bar-handle right" data-handle="right"></div>
         </div>
       </div>`);
       rowIdx++;
@@ -2226,6 +2383,7 @@ function renderGantt() {
     }));
     bar.addEventListener('mousemove', moveTooltip);
     bar.addEventListener('mouseleave', hideTooltip);
+    attachGanttBarInteractions(bar, phase, proj);
   });
 
   byId('ganttProjCount').innerHTML = `<span class="badge-dot"></span>${visible.length} project${visible.length !== 1 ? 's' : ''}`;
@@ -2244,7 +2402,7 @@ function drawDependencies() {
   svg.setAttribute('width', canvasRect.width);
   svg.setAttribute('height', canvasRect.height);
   svg.querySelectorAll('path').forEach(p => p.remove());
-  DATA.dependencies.forEach(dep => {
+  DATA.dependencies.forEach((dep, idx) => {
     const fromBar = document.querySelector(`.gantt-bar[data-phase="${dep.from}"]`);
     const toBar   = document.querySelector(`.gantt-bar[data-phase="${dep.to}"]`);
     if (!fromBar || !toBar) return;
@@ -2258,6 +2416,7 @@ function drawDependencies() {
     path.setAttribute('d', `M ${x1} ${y1} C ${x1 + 20} ${y1}, ${x2 - 20} ${y2}, ${x2 - 4} ${y2}`);
     path.setAttribute('class', 'dependency-path');
     path.setAttribute('marker-end', 'url(#arrowhead)');
+    path.setAttribute('data-dep-idx', idx);
     svg.appendChild(path);
   });
 }
@@ -2347,6 +2506,131 @@ function renderMatrix() {
     }));
     el.addEventListener('mousemove', moveTooltip);
     el.addEventListener('mouseleave', hideTooltip);
+    el.addEventListener('click', () => openAllocModal(rid, pid));
+  });
+}
+
+/* ===================== GANTT BAR INTERACTIONS ===================== */
+function attachGanttBarInteractions(bar, phase, proj) {
+  let dragMode = null;
+  let dragStartX = 0;
+  let origStart = 0, origEnd = 0;
+  let moved = false;
+
+  function pxToMs(px) {
+    const canvas = bar.closest('.gantt-canvas');
+    const canvasWidth = canvas.getBoundingClientRect().width;
+    return (px / canvasWidth) * ganttRange.totalMs;
+  }
+
+  function snapToDay(ms) {
+    const d = new Date(ms);
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }
+
+  bar.addEventListener('mousedown', e => {
+    if (depMode) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleDepClick(bar, phase);
+      return;
+    }
+    const target = e.target.closest('.gantt-bar-handle');
+    if (target) dragMode = target.dataset.handle === 'left' ? 'resize-left' : 'resize-right';
+    else dragMode = 'move';
+    dragStartX = e.clientX;
+    origStart = new Date(phase.start).getTime();
+    origEnd   = new Date(phase.end).getTime();
+    moved = false;
+    bar.classList.add('dragging');
+    hideTooltip();
+    e.preventDefault();
+    e.stopPropagation();
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', onDragEnd);
+  });
+
+  function onDrag(e) {
+    const dx = e.clientX - dragStartX;
+    if (Math.abs(dx) > 2) moved = true;
+    const deltaMs = pxToMs(dx);
+    let s = origStart, en = origEnd;
+    if (dragMode === 'move') { s = origStart + deltaMs; en = origEnd + deltaMs; }
+    else if (dragMode === 'resize-left')  { s = Math.min(origStart + deltaMs, origEnd - 86400000); }
+    else if (dragMode === 'resize-right') { en = Math.max(origEnd + deltaMs, origStart + 86400000); }
+    s = snapToDay(s); en = snapToDay(en);
+    const leftPct  = ((s - ganttRange.min.getTime()) / ganttRange.totalMs) * 100;
+    const widthPct = ((en - s) / ganttRange.totalMs) * 100;
+    bar.style.left = leftPct + '%';
+    bar.style.width = widthPct + '%';
+    phase._dragStart = s;
+    phase._dragEnd = en;
+  }
+
+  function onDragEnd() {
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', onDragEnd);
+    bar.classList.remove('dragging');
+    if (moved && phase._dragStart && phase._dragEnd) {
+      phase.start = new Date(phase._dragStart).toISOString().slice(0, 10);
+      phase.end   = new Date(phase._dragEnd).toISOString().slice(0, 10);
+      delete phase._dragStart; delete phase._dragEnd;
+      persist();
+      drawDependencies();
+      showToast(`${phase.name} → ${fmt.shortDate(phase.start)} – ${fmt.shortDate(phase.end)}`);
+    } else if (!moved) {
+      if (depMode) handleDepClick(bar, phase);
+      else openPhaseModal(phase.id);
+    }
+    dragMode = null;
+  }
+}
+
+function handleDepClick(bar, phase) {
+  if (!depSource) {
+    depSource = phase;
+    bar.classList.add('dep-source');
+  } else if (depSource.id === phase.id) {
+    bar.classList.remove('dep-source');
+    depSource = null;
+  } else {
+    const exists = DATA.dependencies.some(d => d.from === depSource.id && d.to === phase.id);
+    if (exists) {
+      showToast('Dependency already exists');
+    } else {
+      DATA.dependencies.push({ from: depSource.id, to: phase.id });
+      persist();
+      drawDependencies();
+      showToast(`Linked ${depSource.name} → ${phase.name}`);
+    }
+    document.querySelectorAll('.gantt-bar.dep-source').forEach(b => b.classList.remove('dep-source'));
+    depSource = null;
+  }
+}
+
+function setupGanttToolbar() {
+  const btn = byId('ganttDepModeBtn');
+  btn.addEventListener('click', () => {
+    depMode = !depMode;
+    btn.classList.toggle('btn-primary', depMode);
+    byId('ganttCanvas').classList.toggle('dep-mode', depMode);
+    depSource = null;
+    document.querySelectorAll('.gantt-bar.dep-source').forEach(b => b.classList.remove('dep-source'));
+    showToast(depMode ? 'Dependency mode on — click two phases to link them' : 'Dependency mode off');
+  });
+  byId('dependencySvg').addEventListener('click', e => {
+    const path = e.target.closest('.dependency-path');
+    if (!path) return;
+    const idx = parseInt(path.dataset.depIdx, 10);
+    if (isNaN(idx)) return;
+    const dep = DATA.dependencies[idx];
+    if (confirm(`Remove dependency between phases?`)) {
+      DATA.dependencies.splice(idx, 1);
+      persist();
+      drawDependencies();
+      showToast('Dependency removed');
+    }
   });
 }
 
@@ -2452,9 +2736,11 @@ function attachKanbanInteractions() {
       const task = DATA.tasks.find(t => t.id === taskId);
       if (task && task.status !== newStatus) {
         task.status = newStatus;
+        persist();
         renderKanban();
         renderSprintSnapshot();
         renderProjects();
+        updateSavedIndicator();
         const colDef = findColumn(newStatus);
         showToast(`Moved "${task.title.slice(0, 32)}${task.title.length > 32 ? '…' : ''}" to ${colDef.label}`);
       }
@@ -2523,21 +2809,25 @@ function saveTask() {
     DATA.tasks.push({ id, ...data });
     showToast('Task created');
   }
+  persist();
   closeModal();
   renderKanban();
   renderSprintSnapshot();
   renderProjects();
   renderMyTasks();
+  updateSavedIndicator();
 }
 
 function deleteTask() {
   if (!editingTaskId) return;
   DATA.tasks = DATA.tasks.filter(t => t.id !== editingTaskId);
+  persist();
   closeModal();
   renderKanban();
   renderSprintSnapshot();
   renderProjects();
   renderMyTasks();
+  updateSavedIndicator();
   showToast('Task deleted');
 }
 
@@ -2584,6 +2874,7 @@ function saveProject() {
   };
   DATA.projects.push(proj);
   DATA.phases[id] = [];
+  persist();
   closeModal();
   renderAll();
   showToast(`Created ${proj.code}`);
@@ -2592,6 +2883,314 @@ function saveProject() {
 function closeModal() {
   $$('.modal-backdrop').forEach(m => m.classList.remove('open'));
   editingTaskId = null;
+  editingPhaseId = null;
+  editingAlloc = null;
+  editingScenarioId = null;
+}
+
+/* ===================== PHASE MODAL ===================== */
+function setupPhaseModal() {
+  byId('phaseProject').innerHTML = DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
+  byId('phaseSaveBtn').addEventListener('click', savePhase);
+  byId('phaseDeleteBtn').addEventListener('click', deletePhase);
+  byId('phaseModal').addEventListener('click', e => { if (e.target.id === 'phaseModal') closeModal(); });
+}
+
+function openPhaseModal(phaseId) {
+  let phase = null, projId = null;
+  for (const [pid, list] of Object.entries(DATA.phases)) {
+    const found = list.find(p => p.id === phaseId);
+    if (found) { phase = found; projId = pid; break; }
+  }
+  if (!phase) return;
+  editingPhaseId = phaseId;
+  byId('phaseModalTitle').textContent = 'Edit phase';
+  byId('phaseName').value = phase.name;
+  byId('phaseProject').value = projId;
+  byId('phaseStart').value = fmt.dateInput(phase.start);
+  byId('phaseEnd').value = fmt.dateInput(phase.end);
+  byId('phaseProgress').value = phase.progress;
+  byId('phaseColor').value = phase.color;
+  byId('phaseModal').classList.add('open');
+}
+
+function savePhase() {
+  if (!editingPhaseId) return;
+  let phase = null, oldProj = null;
+  for (const [pid, list] of Object.entries(DATA.phases)) {
+    const found = list.find(p => p.id === editingPhaseId);
+    if (found) { phase = found; oldProj = pid; break; }
+  }
+  if (!phase) return;
+  const newProj = byId('phaseProject').value;
+  phase.name = byId('phaseName').value.trim() || phase.name;
+  phase.start = byId('phaseStart').value;
+  phase.end = byId('phaseEnd').value;
+  phase.progress = Math.max(0, Math.min(100, parseInt(byId('phaseProgress').value, 10) || 0));
+  phase.color = byId('phaseColor').value;
+  if (newProj !== oldProj) {
+    DATA.phases[oldProj] = DATA.phases[oldProj].filter(p => p.id !== phase.id);
+    if (!DATA.phases[newProj]) DATA.phases[newProj] = [];
+    DATA.phases[newProj].push(phase);
+  }
+  persist();
+  closeModal();
+  renderGantt();
+  renderProjects();
+  showToast('Phase updated');
+}
+
+function deletePhase() {
+  if (!editingPhaseId) return;
+  if (!confirm('Delete this phase? Dependencies referencing it will also be removed.')) return;
+  for (const pid of Object.keys(DATA.phases)) {
+    DATA.phases[pid] = DATA.phases[pid].filter(p => p.id !== editingPhaseId);
+  }
+  DATA.dependencies = DATA.dependencies.filter(d => d.from !== editingPhaseId && d.to !== editingPhaseId);
+  persist();
+  closeModal();
+  renderGantt();
+  renderProjects();
+  showToast('Phase deleted');
+}
+
+/* ===================== ALLOCATION MODAL ===================== */
+function setupAllocModal() {
+  byId('allocSaveBtn').addEventListener('click', saveAlloc);
+  byId('allocDeleteBtn').addEventListener('click', deleteAlloc);
+  byId('allocModal').addEventListener('click', e => { if (e.target.id === 'allocModal') closeModal(); });
+}
+
+function openAllocModal(rid, pid) {
+  const r = findResource(rid);
+  const p = findProject(pid);
+  if (!r || !p) return;
+  editingAlloc = { rid, pid };
+  const existing = DATA.allocations.find(a => a.resource === rid && a.project === pid);
+  byId('allocContext').innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+      <div class="avatar" style="background: ${r.color};">${r.initials}</div>
+      <div>
+        <div style="font-weight: 600;">${escapeHtml(r.name)}</div>
+        <div style="font-size: 11px; color: var(--text-soft);">${escapeHtml(r.role)} · capacity ${r.cap}h/wk</div>
+      </div>
+    </div>
+    <div style="font-size: 12px; color: var(--text-muted);">Project: <strong>${escapeHtml(p.name)}</strong> <span class="mono">${p.code}</span></div>`;
+  byId('allocHours').value = existing ? existing.hours : 0;
+  byId('allocDeleteBtn').style.display = existing ? '' : 'none';
+  const otherHours = DATA.allocations.filter(a => a.resource === rid && a.project !== pid).reduce((s, a) => s + a.hours, 0);
+  byId('allocHelper').textContent = `${otherHours}h already allocated to other projects this week. Cap ${r.cap}h.`;
+  byId('allocModal').classList.add('open');
+  setTimeout(() => byId('allocHours').focus(), 50);
+}
+
+function saveAlloc() {
+  if (!editingAlloc) return;
+  const { rid, pid } = editingAlloc;
+  const hours = Math.max(0, parseInt(byId('allocHours').value, 10) || 0);
+  const existing = DATA.allocations.find(a => a.resource === rid && a.project === pid);
+  if (hours === 0) {
+    DATA.allocations = DATA.allocations.filter(a => !(a.resource === rid && a.project === pid));
+  } else if (existing) {
+    existing.hours = hours;
+  } else {
+    DATA.allocations.push({ project: pid, resource: rid, hours });
+  }
+  persist();
+  closeModal();
+  renderMatrix();
+  renderKpis();
+  renderUtilChart();
+  renderMe();
+  showToast('Allocation saved');
+}
+
+function deleteAlloc() {
+  if (!editingAlloc) return;
+  const { rid, pid } = editingAlloc;
+  DATA.allocations = DATA.allocations.filter(a => !(a.resource === rid && a.project === pid));
+  persist();
+  closeModal();
+  renderMatrix();
+  renderKpis();
+  renderUtilChart();
+  renderMe();
+  showToast('Allocation removed');
+}
+
+/* ===================== SCENARIO BUILDER ===================== */
+function setupScenarioBuilder() {
+  const projSel = byId('scenarioProject');
+  projSel.innerHTML = DATA.projects.map(p => `<option value="${p.id}">${escapeHtml(p.code)} · ${escapeHtml(p.name)}</option>`).join('');
+  projSel.value = scenario.projectId;
+  projSel.addEventListener('change', () => { scenario.projectId = projSel.value; renderScenario(); });
+
+  byId('addScenarioBtn').addEventListener('click', () => openScenarioModal());
+  byId('scChangeType').addEventListener('change', updateScenarioModalFields);
+  byId('scenarioSaveBtn').addEventListener('click', saveScenarioChange);
+  byId('scenarioModal').addEventListener('click', e => { if (e.target.id === 'scenarioModal') closeModal(); });
+
+  byId('scResource').innerHTML = DATA.resources.map(r => `<option value="${r.id}">${escapeHtml(r.name)} (${escapeHtml(r.role)})</option>`).join('');
+}
+
+function updateScenarioModalFields() {
+  const type = byId('scChangeType').value;
+  byId('scHoursToWrap').style.display = type === 'reduce' ? '' : 'none';
+  byId('scHoursRow').style.display = type === 'remove' ? 'none' : '';
+}
+
+function openScenarioModal(changeId) {
+  editingScenarioId = changeId || null;
+  byId('scenarioModalTitle').textContent = changeId ? 'Edit change' : 'Add scenario change';
+  byId('scenarioSaveBtn').textContent = changeId ? 'Save' : 'Add change';
+  if (changeId) {
+    const c = scenario.changes.find(x => x.id === changeId);
+    if (c) {
+      byId('scChangeType').value = c.type;
+      byId('scResource').value = c.resource;
+      byId('scHours').value = c.hours || 0;
+      byId('scHoursTo').value = c.hoursTo || 0;
+    }
+  } else {
+    byId('scChangeType').value = 'add';
+    byId('scResource').value = DATA.resources[0]?.id || '';
+    byId('scHours').value = 20;
+    byId('scHoursTo').value = 10;
+  }
+  updateScenarioModalFields();
+  byId('scenarioModal').classList.add('open');
+}
+
+function saveScenarioChange() {
+  const change = {
+    id: editingScenarioId || ('sc' + (scenario.changes.length + 1) + '-' + Date.now()),
+    type: byId('scChangeType').value,
+    resource: byId('scResource').value,
+    hours: parseInt(byId('scHours').value, 10) || 0,
+    hoursTo: parseInt(byId('scHoursTo').value, 10) || 0
+  };
+  if (editingScenarioId) {
+    const idx = scenario.changes.findIndex(c => c.id === editingScenarioId);
+    if (idx >= 0) scenario.changes[idx] = change;
+  } else {
+    scenario.changes.push(change);
+  }
+  closeModal();
+  renderScenario();
+  showToast(editingScenarioId ? 'Change updated' : 'Change added');
+}
+
+function removeScenarioChange(id) {
+  scenario.changes = scenario.changes.filter(c => c.id !== id);
+  renderScenario();
+}
+
+function renderScenario() {
+  const list = byId('scenarioActionList');
+  const sub = byId('scenarioSubtitle');
+  if (!list) return;
+  sub.textContent = `${scenario.changes.length} change${scenario.changes.length !== 1 ? 's' : ''} proposed`;
+  list.innerHTML = scenario.changes.map(c => {
+    const r = findResource(c.resource);
+    if (!r) return '';
+    const cls = c.type === 'add' ? 'add' : 'remove';
+    const icon = c.type === 'add' ? '+' : '−';
+    const title = c.type === 'add' ? `Add ${r.name} (${r.role})` : c.type === 'reduce' ? `Reduce ${r.name} (${r.role})` : `Remove ${r.name} (${r.role})`;
+    const meta = c.type === 'add' ? `${c.hours}h/week` : c.type === 'reduce' ? `${c.hours}h → ${c.hoursTo}h/week` : `Was ${c.hours}h/week`;
+    return `
+      <div class="scenario-action ${cls}" data-sc-id="${c.id}">
+        <div class="scenario-action-icon">${icon}</div>
+        <div class="scenario-action-text">
+          <div class="scenario-action-title">${escapeHtml(title)}</div>
+          <div class="scenario-action-meta">${escapeHtml(meta)}</div>
+        </div>
+        <button class="scenario-action-x" data-remove-sc="${c.id}" title="Remove change">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>`;
+  }).join('') || `<div class="empty-state" style="padding: 20px 0;">${iconSvg('inbox')}<div class="empty-state-title">No changes yet</div></div>`;
+  list.querySelectorAll('.scenario-action').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.closest('[data-remove-sc]')) return;
+      openScenarioModal(el.dataset.scId);
+    });
+  });
+  list.querySelectorAll('[data-remove-sc]').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); removeScenarioChange(btn.dataset.removeSc); });
+  });
+  renderScenarioImpact();
+}
+
+function renderScenarioImpact() {
+  const target = byId('scenarioImpact');
+  if (!target) return;
+  const proj = findProject(scenario.projectId);
+  const baseAllocs = DATA.allocations.filter(a => a.project === scenario.projectId);
+  const baseHours  = baseAllocs.reduce((s, a) => s + a.hours, 0);
+  const baseCost   = baseAllocs.reduce((s, a) => { const r = findResource(a.resource); return s + (r ? a.hours * r.rate : 0); }, 0);
+  const baseTeam   = baseAllocs.length;
+
+  let scenHours = baseHours, scenCost = baseCost, scenTeam = baseTeam;
+  scenario.changes.forEach(c => {
+    const r = findResource(c.resource);
+    if (!r) return;
+    const existing = baseAllocs.find(a => a.resource === c.resource);
+    if (c.type === 'add' && !existing) { scenHours += c.hours; scenCost += c.hours * r.rate; scenTeam += 1; }
+    else if (c.type === 'add' && existing) { scenHours += c.hours; scenCost += c.hours * r.rate; }
+    else if (c.type === 'reduce' && existing) { const d = existing.hours - c.hoursTo; scenHours -= d; scenCost -= d * r.rate; }
+    else if (c.type === 'remove' && existing) { scenHours -= existing.hours; scenCost -= existing.hours * r.rate; scenTeam -= 1; }
+  });
+
+  const brooks = scenTeam > baseTeam ? Math.max(0.7, 1 - (scenTeam - baseTeam) * 0.04) : 1;
+  const effective = scenHours * brooks;
+  const baselineWeeks = baseHours > 0 ? 12 : 0;
+  const scenWeeks = effective > 0 ? Math.max(1, Math.round((baseHours * baselineWeeks) / effective)) : baselineWeeks;
+  const daysSaved = (baselineWeeks - scenWeeks) * 7;
+  const costDelta = scenCost - baseCost;
+  const totalCostImpact = Math.round(costDelta * scenWeeks);
+
+  const overAllocated = [];
+  scenario.changes.forEach(c => {
+    const r = findResource(c.resource); if (!r) return;
+    const otherHours = DATA.allocations.filter(a => a.resource === c.resource && a.project !== scenario.projectId).reduce((s, a) => s + a.hours, 0);
+    const newHours = c.type === 'add' ? otherHours + c.hours : c.type === 'reduce' ? otherHours + c.hoursTo : otherHours;
+    const pct = Math.round(newHours / r.cap * 100);
+    if (pct > 95) overAllocated.push(`${r.name} at ${pct}%`);
+  });
+
+  const isAdmin = currentRole === 'admin';
+  target.innerHTML = `
+    <div class="impact-stat">
+      <div class="impact-stat-label">Timeline impact</div>
+      <div class="impact-stat-value ${daysSaved > 0 ? 'positive' : daysSaved < 0 ? 'negative' : ''}">${daysSaved > 0 ? '−' : daysSaved < 0 ? '+' : ''}${Math.abs(daysSaved)} days</div>
+      <div class="impact-stat-sub">${proj ? proj.name : ''} · ${scenWeeks}wk forecast</div>
+    </div>
+    ${isAdmin ? `
+    <div class="impact-stat">
+      <div class="impact-stat-label">Cost impact</div>
+      <div class="impact-stat-value ${costDelta > 0 ? 'negative' : 'positive'}">${costDelta >= 0 ? '+' : '−'}$${Math.abs(totalCostImpact).toLocaleString()}</div>
+      <div class="impact-stat-sub">Cumulative over scenario duration</div>
+    </div>` : ''}
+    <div class="impact-stat">
+      <div class="impact-stat-label">Team size</div>
+      <div class="impact-stat-value">${baseTeam} → ${scenTeam}</div>
+      <div class="impact-stat-sub">${scenTeam > baseTeam ? '+' : ''}${Math.round((scenTeam - baseTeam) / Math.max(1, baseTeam) * 100)}% — Brooks's penalty: <strong>${brooks.toFixed(2)}×</strong></div>
+    </div>
+    ${overAllocated.length > 0 ? `
+    <div class="impact-stat" style="background: #fffbeb; border: 1px solid #fde68a;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span style="font-size: 12px; font-weight: 500; color: #92400e;">Capacity warning</span>
+      </div>
+      <div style="font-size: 11px; color: #78350f; margin-top: 4px;">${overAllocated.join(' · ')}.</div>
+    </div>` : `
+    <div class="impact-stat" style="background: #f0fdf4; border: 1px solid #bbf7d0;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        <span style="font-size: 12px; font-weight: 500; color: #15803d;">No capacity issues</span>
+      </div>
+      <div style="font-size: 11px; color: #14532d; margin-top: 4px;">All affected resources stay under 95%.</div>
+    </div>`}`;
 }
 
 /* ===================== PLAYGROUND FORECAST ===================== */
@@ -2799,10 +3398,10 @@ function exportSnapshot() {
   const blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `helix-snapshot-${new Date().toISOString().slice(0, 10)}.json`;
+  a.download = 'data.json';
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast('Snapshot exported');
+  showToast('Downloaded — replace helix/data.json to publish');
 }
 
 /* ===================== FILTERS ===================== */
@@ -2812,6 +3411,7 @@ function setupFilters() {
     renderProjects();
   });
   byId('exportBtn').addEventListener('click', exportSnapshot);
+  byId('resetBtn').addEventListener('click', resetData);
 }
 
 /* ===================== RENDER ALL ===================== */
@@ -2828,7 +3428,22 @@ function renderAll() {
   renderMatrix();
   renderKanban();
   renderForecast();
+  renderScenario();
   renderMe();
+  updateSavedIndicator();
+}
+
+function updateSavedIndicator() {
+  const hasLocal = !!localStorage.getItem(STORAGE_KEY);
+  const btn = byId('exportBtn');
+  if (!btn) return;
+  if (hasLocal) {
+    btn.classList.add('btn-primary');
+    btn.title = 'Local changes pending — download to update data.json';
+  } else {
+    btn.classList.remove('btn-primary');
+    btn.title = 'Export current state';
+  }
 }
 
 /* ===================== BOOT ===================== */
@@ -2840,6 +3455,10 @@ function renderAll() {
   setupKanbanFilters();
   setupTaskModal();
   setupProjectModal();
+  setupPhaseModal();
+  setupAllocModal();
+  setupScenarioBuilder();
+  setupGanttToolbar();
   applyRoleVisibility();
   renderAll();
   window.addEventListener('resize', () => {
