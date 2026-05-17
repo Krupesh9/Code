@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CA Roadtrip">
+<meta name="theme-color" content="#1B2A3B">
+<title>California Roadtrip · Patel × Panchal · May 30 – Jun 10, 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F2EA;
+    --bg-elevated:#FFFFFF;
+    --bg-sunken:#EFE9DE;
+    --ink:#1B2A3B;
+    --ink-soft:#4A5868;
+    --ink-mute:#8A8275;
+    --line:rgba(27,42,59,0.08);
+    --line-strong:rgba(27,42,59,0.14);
+    --sunset:#E26D45;
+    --sunset-deep:#C8512B;
+    --ocean:#2C5577;
+    --ocean-deep:#1E3F5C;
+    --forest:#3F634D;
+    --gold:#C99441;
+    --purple:#7B4F8C;
+    --sand:#E8DCC6;
+    --safe-top:env(safe-area-inset-top, 0px);
+    --safe-bottom:env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  body{min-height:100dvh;overflow-x:hidden}
+  .app{max-width:540px;margin:0 auto;min-height:100dvh;padding-bottom:calc(76px + var(--safe-bottom));background:var(--bg)}
+  h1,h2,h3,h4,.display{font-family:'Fraunces','Georgia',serif;font-weight:600;letter-spacing:-0.01em;color:var(--ink)}
+  a{color:inherit;text-decoration:none}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  img{max-width:100%;display:block}
+
+  /* ---------- Top bar ---------- */
+  .topbar{position:sticky;top:0;z-index:50;background:var(--bg);padding:calc(12px + var(--safe-top)) 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--sunset),var(--gold));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 8px rgba(226,109,69,0.25)}
+  .brand-text{display:flex;flex-direction:column;line-height:1.1}
+  .brand-title{font-family:'Fraunces',serif;font-weight:700;font-size:16px}
+  .brand-sub{font-size:11px;color:var(--ink-mute);letter-spacing:0.04em;text-transform:uppercase}
+  .topbar-meta{font-size:11px;color:var(--ink-mute);text-align:right;letter-spacing:0.02em}
+
+  /* ---------- Screens ---------- */
+  .screen{display:none;padding:18px 16px 24px}
+  .screen.active{display:block;animation:fadeUp .25s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .section-title{font-family:'Fraunces',serif;font-weight:600;font-size:22px;margin-bottom:14px;letter-spacing:-0.01em}
+  .section-sub{font-size:13px;color:var(--ink-mute);margin-top:-10px;margin-bottom:14px}
+
+  /* ---------- Today screen ---------- */
+  .hero{background:linear-gradient(160deg,var(--ocean) 0%,var(--ocean-deep) 60%, #15324A 100%);color:#fff;border-radius:22px;padding:22px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(30,63,92,0.25)}
+  .hero::before{content:"";position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,var(--sunset) 0%,transparent 70%);opacity:0.35}
+  .hero-eyebrow{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;opacity:.75;font-weight:600}
+  .hero-title{font-family:'Fraunces',serif;font-size:36px;line-height:1.05;margin-top:6px;color:#fff;font-weight:600}
+  .hero-sub{font-size:14px;opacity:.85;margin-top:8px}
+  .countdown{display:flex;align-items:baseline;gap:10px;margin-top:18px}
+  .countdown-num{font-family:'Fraunces',serif;font-size:72px;font-weight:700;line-height:1;color:#fff;letter-spacing:-0.02em}
+  .countdown-label{font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:.85}
+
+  .today-banner{background:var(--bg-elevated);border-radius:18px;padding:18px;margin-top:16px;border:1px solid var(--line);box-shadow:0 2px 12px rgba(27,42,59,0.04)}
+  .today-day{display:flex;align-items:baseline;gap:10px}
+  .today-day-num{font-family:'Fraunces',serif;font-weight:700;font-size:30px;color:var(--sunset)}
+  .today-day-meta{font-size:12px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em}
+  .today-theme{font-family:'Fraunces',serif;font-size:20px;margin-top:4px}
+  .today-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .today-row:first-of-type{margin-top:10px}
+  .today-row-label{font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-mute);font-weight:600}
+  .today-row-val{font-size:14px;font-weight:500;text-align:right}
+
+  .checklist{background:var(--bg-elevated);border-radius:18px;padding:14px 6px;margin-top:16px;border:1px solid var(--line)}
+  .checklist h3{font-family:'Fraunces',serif;font-size:17px;padding:0 12px 8px;font-weight:600}
+  .check-item{display:flex;gap:10px;padding:10px 12px;border-top:1px solid var(--line);align-items:flex-start;cursor:pointer}
+  .check-item:first-of-type{border-top:none}
+  .check-box{flex:0 0 22px;width:22px;height:22px;border-radius:7px;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:all .15s}
+  .check-item.done .check-box{background:var(--forest);border-color:var(--forest)}
+  .check-item.done .check-text{color:var(--ink-mute);text-decoration:line-through}
+  .check-text{font-size:14px;line-height:1.45;padding-top:1px}
+
+  .quick-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--ink);color:#fff;padding:14px;border-radius:14px;font-weight:600;font-size:15px;margin-top:14px;box-shadow:0 4px 14px rgba(27,42,59,0.2)}
+
+  /* ---------- Days screen ---------- */
+  .day-pills{position:sticky;top:62px;z-index:40;background:var(--bg);padding:10px 0 12px;margin:0 -16px;border-bottom:1px solid var(--line);overflow:hidden}
+  .day-pills-scroll{display:flex;gap:8px;overflow-x:auto;padding:0 16px;scrollbar-width:none}
+  .day-pills-scroll::-webkit-scrollbar{display:none}
+  .day-pill{flex:0 0 auto;padding:8px 14px;border-radius:999px;background:var(--bg-sunken);font-size:12px;font-weight:600;letter-spacing:0.04em;color:var(--ink-soft);white-space:nowrap;border:1px solid transparent;position:relative}
+  .day-pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .day-pill.today::after{content:"";position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--sunset)}
+
+  .days-carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:14px -16px 0;padding:0 16px;scrollbar-width:none;gap:16px}
+  .days-carousel::-webkit-scrollbar{display:none}
+  .day-slide{flex:0 0 calc(100% - 0px);scroll-snap-align:start;min-width:0}
+
+  .day-header{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+  .day-num{font-family:'Fraunces',serif;font-weight:700;font-size:28px;color:var(--sunset)}
+  .day-date{font-size:12px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.08em}
+  .day-theme{font-family:'Fraunces',serif;font-size:22px;line-height:1.15;margin-bottom:10px}
+
+  .day-stats{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .stat{background:var(--bg-elevated);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;display:flex;gap:6px;align-items:center;flex:1;min-width:0}
+  .stat-icon{font-size:14px}
+  .stat-label{color:var(--ink-mute);font-size:10px;text-transform:uppercase;letter-spacing:0.06em;display:block;font-weight:600}
+  .stat-val{font-weight:600;font-size:13px;display:block}
+
+  .warn{background:#FFF6E6;border:1px solid #F0CD7F;border-left:4px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.5;color:#7A5A1A}
+  .warn::before{content:"⚠️ ";margin-right:2px}
+
+  .activity{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(27,42,59,0.03)}
+  .activity-main{display:flex;gap:12px;padding:12px}
+  .activity-photo{flex:0 0 100px;width:100px;height:100px;border-radius:12px;overflow:hidden;position:relative;background:var(--bg-sunken)}
+  .activity-photo img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+  .activity-photo.fallback img{display:none}
+  .activity-photo.fallback::after{content:attr(data-initials);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Fraunces',serif;font-size:28px;font-weight:600;letter-spacing:-0.02em}
+  .activity-photo.type-activity{background:linear-gradient(135deg,var(--sunset),var(--ocean))}
+  .activity-photo.type-hike{background:linear-gradient(135deg,var(--forest),#2A4A35)}
+  .activity-photo.type-food{background:linear-gradient(135deg,var(--gold),var(--sunset))}
+  .activity-photo.type-stay{background:linear-gradient(135deg,var(--purple),#3F2A55)}
+  .activity-photo.type-drive{background:linear-gradient(135deg,var(--ocean),var(--ocean-deep))}
+  .activity-photo.type-flight{background:linear-gradient(135deg,var(--ocean-deep),#0F2235)}
+  .activity-photo.type-car{background:linear-gradient(135deg,var(--ink-soft),var(--ink))}
+  .activity-photo.type-beach{background:linear-gradient(135deg,#7CB8D9,var(--ocean))}
+
+  .activity-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+  .activity-time-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .activity-time{font-size:13px;font-weight:600;color:var(--ink-soft)}
+  .activity-name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;line-height:1.2;color:var(--ink)}
+  .activity-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.45;margin-top:2px}
+  .activity-meta{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap;font-size:11.5px;color:var(--ink-mute)}
+  .activity-meta span{display:inline-flex;align-items:center;gap:3px}
+
+  .badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 7px;border-radius:6px}
+  .badge.must{background:#FCE5DC;color:var(--sunset-deep)}
+  .badge.skip{background:var(--bg-sunken);color:var(--ink-mute)}
+  .badge.gem{background:#FBEED1;color:#8B621D}
+  .badge.opt{background:#EFE3F2;color:var(--purple)}
+  .badge.kid{background:#DDEAE2;color:var(--forest)}
+
+  .activity-row{padding:10px 12px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.45;display:flex;gap:8px;align-items:flex-start}
+  .activity-row-icon{font-size:14px;flex:0 0 18px}
+  .activity-row-content{flex:1;min-width:0}
+  .activity-row-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:2px}
+  .addr-actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .addr-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:var(--bg-sunken);border-radius:8px;font-size:11.5px;font-weight:600;color:var(--ink)}
+  .addr-btn:active{background:var(--line-strong)}
+
+  .info-block{background:#F1F4F2;border-left:3px solid var(--forest);padding:12px 14px;border-radius:10px;margin:12px 0;font-size:12.5px;line-height:1.5}
+  .info-block strong{color:var(--forest);font-weight:600;display:block;margin-bottom:4px;font-size:11px;letter-spacing:0.08em;text-transform:uppercase}
+
+  .day-summary{display:flex;gap:10px;margin-top:14px}
+  .day-summary-card{flex:1;background:var(--bg-elevated);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:12px}
+  .day-summary-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:6px}
+  .day-summary-val{font-family:'Fraunces',serif;font-size:14px;line-height:1.3;font-weight:500}
+
+  /* ---------- Stays ---------- */
+  .stay{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;display:flex;gap:12px}
+  .stay-mark{flex:0 0 56px;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--purple),#3F2A55);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .stay.type-airbnb .stay-mark{background:linear-gradient(135deg,var(--sunset),var(--sunset-deep))}
+  .stay-info{flex:1;min-width:0}
+  .stay-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:4px;flex-wrap:wrap}
+  .stay-name{font-family:'Fraunces',serif;font-size:16px;font-weight:600;line-height:1.2}
+  .stay-nights{font-size:11px;color:var(--ink-mute);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;flex-shrink:0}
+  .stay-dates{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px}
+  .stay-addr{font-size:12.5px;color:var(--ink-soft);line-height:1.4}
+  .stay-conf{display:inline-block;font-size:10.5px;letter-spacing:0.06em;background:var(--bg-sunken);color:var(--ink-soft);padding:3px 7px;border-radius:6px;margin-top:8px;font-weight:600;font-family:'JetBrains Mono','SF Mono',monospace}
+
+  /* ---------- Logistics ---------- */
+  .logistics-card{background:var(--bg-elevated);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+  .logistics-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .logistics-icon{font-size:22px;width:42px;height:42px;border-radius:12px;background:var(--bg-sunken);display:flex;align-items:center;justify-content:center}
+  .logistics-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600}
+  .logistics-sub{font-size:12px;color:var(--ink-mute)}
+  .flight-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:13px;flex-wrap:wrap}
+  .flight-row:first-of-type{border-top:none}
+  .flight-meta{font-size:11.5px;color:var(--ink-mute);margin-top:2px}
+  .flight-conf{font-family:'JetBrains Mono','SF Mono',monospace;font-size:11px;background:var(--bg-sunken);padding:2px 6px;border-radius:5px;letter-spacing:0.04em;font-weight:600}
+  .car-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .car-cell{background:var(--bg-sunken);border-radius:10px;padding:10px;font-size:12px}
+  .car-cell-label{font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:4px}
+  .car-cell-val{font-weight:600;font-size:13px;line-height:1.3}
+
+  /* ---------- Eats ---------- */
+  .eats-search-wrap{position:sticky;top:62px;z-index:40;background:var(--bg);padding:6px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
+  .eats-search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line-strong);background:var(--bg-elevated);font-size:14px;font-family:inherit;color:var(--ink)}
+  .eats-search:focus{outline:none;border-color:var(--ocean);box-shadow:0 0 0 3px rgba(44,85,119,0.12)}
+  .eats-chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:2px;scrollbar-width:none}
+  .eats-chips::-webkit-scrollbar{display:none}
+  .eats-chip{flex:0 0 auto;padding:6px 12px;border-radius:999px;background:var(--bg-sunken);font-size:12px;font-weight:600;color:var(--ink-soft);border:1px solid transparent;white-space:nowrap}
+  .eats-chip.active{background:var(--ink);color:#fff}
+  .eat-card{background:var(--bg-elevated);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px}
+  .eat-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+  .eat-name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;line-height:1.2}
+  .eat-rating{font-size:12px;font-weight:700;background:var(--gold);color:#fff;padding:3px 8px;border-radius:6px;flex-shrink:0;letter-spacing:0.02em}
+  .eat-meta{display:flex;gap:8px;font-size:11.5px;color:var(--ink-mute);margin:6px 0;flex-wrap:wrap;align-items:center}
+  .eat-tag{background:var(--bg-sunken);padding:3px 8px;border-radius:6px;font-weight:600;color:var(--ink-soft)}
+  .eat-cuisine{font-weight:600;color:var(--ocean)}
+  .eat-notes{font-size:12.5px;color:var(--ink-soft);line-height:1.45;margin-top:6px}
+  .eat-addr{font-size:12px;color:var(--ink-mute);margin-top:8px;line-height:1.4}
+  .eats-empty{text-align:center;color:var(--ink-mute);font-size:13px;padding:30px 16px}
+
+  /* ---------- Bottom nav ---------- */
+  .nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:540px;background:rgba(247,242,234,0.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + var(--safe-bottom));z-index:60}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;color:var(--ink-mute);font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;border-radius:10px;transition:color .15s}
+  .nav-btn .nav-icon{font-size:20px;line-height:1}
+  .nav-btn.active{color:var(--ink)}
+  .nav-btn.active .nav-icon{filter:none}
+
+  /* ---------- Toast ---------- */
+  .toast{position:fixed;bottom:calc(90px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:500;opacity:0;transition:all .2s ease;z-index:100;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  @media (max-width:380px){
+    .activity-photo{flex:0 0 84px;width:84px;height:84px}
+    .activity-name{font-size:16px}
+    .countdown-num{font-size:60px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">🌴</div>
+      <div class="brand-text">
+        <span class="brand-title">CA Roadtrip</span>
+        <span class="brand-sub">Patel × Panchal · 2026</span>
+      </div>
+    </div>
+    <div class="topbar-meta" id="topbar-meta">May 30 – Jun 10</div>
+  </header>
+
+  <main>
+    <section class="screen active" id="screen-today" data-screen="today"></section>
+    <section class="screen" id="screen-days" data-screen="days"></section>
+    <section class="screen" id="screen-stays" data-screen="stays"></section>
+    <section class="screen" id="screen-logistics" data-screen="logistics"></section>
+    <section class="screen" id="screen-eats" data-screen="eats"></section>
+  </main>
+
+  <nav class="nav" id="nav">
+    <button class="nav-btn active" data-target="today"><span class="nav-icon">🏖️</span><span>Today</span></button>
+    <button class="nav-btn" data-target="days"><span class="nav-icon">🗓️</span><span>Days</span></button>
+    <button class="nav-btn" data-target="stays"><span class="nav-icon">🛏️</span><span>Stays</span></button>
+    <button class="nav-btn" data-target="logistics"><span class="nav-icon">✈️</span><span>Logistics</span></button>
+    <button class="nav-btn" data-target="eats"><span class="nav-icon">🍛</span><span>Eats</span></button>
+  </nav>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+/* ---------------------------------------------------------------
+   TRIP DATA
+--------------------------------------------------------------- */
+const PHOTO = (filename) => `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=400`;
+
+const TRIP = {
+  meta: {
+    families: "Patel × Panchal",
+    start: "2026-05-30",
+    end: "2026-06-10",
+    totalDays: 12
+  },
+  flights: [
+    { who:"Panchal Family", type:"Arrival", conf:"GF4DYQ", date:"May 26, 10:53 AM", route:"SFO", carrier:"Delta" },
+    { who:"Patel Family", type:"Arrival", conf:"GERBYK", date:"May 30, 10:27 PM", route:"SFO", carrier:"Delta" },
+    { who:"Both Families", type:"Departure", conf:"GERBYK", date:"Jun 10, 9:55 AM", route:"SFO → SLC → DFW", carrier:"Delta · DL0920 + DL2811" }
+  ],
+  car: {
+    company:"Alamo Rent-A-Car",
+    vehicle:"Chrysler Pacifica Mini Van",
+    costcoConf:"C488250262",
+    alamoConf:"1596397883",
+    pickup:"May 30, 10:00 PM · SFO",
+    dropoff:"Jun 9, 10:00 PM · SFO"
+  },
+  stays: [
+    { id:"burlingame", name:"Hampton Inn & Suites SF–Burlingame Airport South", addr:"1755 Bayshore Hwy, Burlingame, CA 94010", checkin:"May 30", checkout:"May 31", nights:1, conf:"85991366", type:"Hotel", icon:"🏨" },
+    { id:"monterey", name:"Hampton Inn Monterey", addr:"2401 Del Monte Ave, Monterey, CA 93940", checkin:"May 31", checkout:"Jun 2", nights:2, conf:"94520764", type:"Hotel", icon:"🏨" },
+    { id:"oakhurst", name:"Hampton Inn Oakhurst–Yosemite", addr:"40740 Highway 41, Oakhurst, CA 93644", checkin:"Jun 2", checkout:"Jun 5", nights:3, conf:"90574140", type:"Hotel", icon:"🏨" },
+    { id:"tahoe", name:"Enchanting Chamberlands Cabin", addr:"6270 Flicker Ave, Tahoma, CA 96142", checkin:"Jun 5", checkout:"Jun 7", nights:2, conf:"HM32PP9SWF", type:"Airbnb", icon:"🏡" },
+    { id:"sfo-north", name:"Hilton Garden Inn SF Airport North", addr:"670 Gateway Blvd, South San Francisco, CA 94080", checkin:"Jun 7", checkout:"Jun 9", nights:2, conf:"3451357510", type:"Hotel", icon:"🏨" },
+    { id:"embassy", name:"Embassy Suites by Hilton SF Airport Oyster Point", addr:"250 Gateway Blvd, South San Francisco, CA 94080", checkin:"Jun 9", checkout:"Jun 10", nights:1, conf:"91486917", type:"Hotel", icon:"🏨" }
+  ],
+  eats: [
+    { day:2, area:"Monterey", name:"Ambrosia India Bistro", cuisine:"Indian", addr:"510 Broadway Ave, Seaside, CA 93955", rating:"4.4", reviews:"600+", notes:"Classic North Indian, family-friendly, near Monterey hotel", veg:true, indian:true, gem:false },
+    { day:2, area:"Santa Cruz (en route)", name:"Chipotle", cuisine:"Mexican (Veg)", addr:"Multiple along US-101 / I-280", rating:"4.0", reviews:"—", notes:"Quick veg burrito bowls", veg:true, indian:false, gem:false },
+    { day:4, area:"Tracy (en route)", name:"New Indian Supermarket", cuisine:"Grocery · Sweets · Chaat", addr:"3250 N Tracy Blvd, Tracy, CA 95376", rating:"3.8", reviews:"100+", notes:"Pick up road snacks. Open 9 AM–9:30 PM. Ample parking.", veg:true, indian:true, gem:true },
+    { day:4, area:"Tracy", name:"Dhaba Indian Cuisine", cuisine:"Indian", addr:"1500 W 11th St, Tracy, CA 95376", rating:"4.2", reviews:"300+", notes:"Backup if friend's lunch falls through", veg:true, indian:true, gem:false },
+    { day:4, area:"Oakhurst", name:"Tandoori Express", cuisine:"Indian (Punjabi)", addr:"40278 Rd 425A, Oakhurst, CA 93644", rating:"4.3", reviews:"470+", notes:"Family-run. Owners Omi & Vanshu personally cook. Order Aloo Paratha (off-menu).", veg:true, indian:true, gem:true, star:true },
+    { day:5, area:"In-park Yosemite", name:"Base Camp Eatery", cuisine:"American (Veg)", addr:"Yosemite Valley Lodge", rating:"3.8", reviews:"800+", notes:"Pizza, grain bowls, kid-friendly", veg:true, indian:false, gem:false },
+    { day:6, area:"Oakhurst", name:"Plazuelas Mexican Grill", cuisine:"Mexican (Veg)", addr:"40768 CA-41, Oakhurst, CA 93644", rating:"4.4", reviews:"350+", notes:"Local fav", veg:true, indian:false, gem:false },
+    { day:6, area:"In-park Yosemite", name:"Curry Village Pizza Deck", cuisine:"Pizza", addr:"Half Dome Village, Yosemite Valley", rating:"3.6", reviews:"1000+", notes:"Outdoor deck, fast", veg:true, indian:false, gem:false },
+    { day:7, area:"Lee Vining", name:"Whoa Nellie Deli", cuisine:"American (Veg options)", addr:"22 Vista Point Dr, Lee Vining, CA 93541", rating:"4.5", reviews:"1900+", notes:"LEGENDARY Tioga Pass exit deli", veg:true, indian:false, gem:true },
+    { day:8, area:"South Lake Tahoe", name:"Shangrila Himalayan Kitchen", cuisine:"Indian / Nepalese", addr:"4115 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.4", reviews:"600+", notes:"Family-run, momos & curries", veg:true, indian:true, gem:true, star:true },
+    { day:8, area:"South Lake Tahoe", name:"Curry & Grill", cuisine:"Indian", addr:"3601 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.2", reviews:"250+", notes:"Lunch buffet often", veg:true, indian:true, gem:false },
+    { day:8, area:"South Lake Tahoe", name:"Nikki's Chaat Cafe", cuisine:"Indian (Chaat / Snacks)", addr:"3469 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.0", reviews:"200+", notes:"Chaat, dosas, owner-run", veg:true, indian:true, gem:false },
+    { day:10, area:"SF Marina", name:"Chipotle", cuisine:"Mexican (Veg)", addr:"2675 Geary Blvd, SF, CA 94118", rating:"3.9", reviews:"500+", notes:"Quick option", veg:true, indian:false, gem:false },
+    { day:11, area:"SF Yerba Buena", name:"Amber India", cuisine:"Indian (Upscale)", addr:"25 Yerba Buena Ln, SF, CA 94103", rating:"4.4", reviews:"1700+", notes:"Bib Gourmand. Book ahead.", veg:true, indian:true, gem:false, star:true },
+    { day:11, area:"SF West Portal", name:"Roti Indian Bistro", cuisine:"Indian", addr:"53 W Portal Ave, SF, CA 94127", rating:"4.3", reviews:"500+", notes:"Backup", veg:true, indian:true, gem:false }
+  ],
+  preTripChecklist: [
+    "Book Muir Woods parking at gomuirwoods.com (90 days out)",
+    "Buy Mystery Spot tickets at mysteryspot.com",
+    "Pre-buy Heavenly Gondola tickets at skiheavenly.com",
+    "Buy America the Beautiful pass ($80) — covers Yosemite + Muir Woods entrance",
+    "Confirm 3 car seats/boosters with Alamo or bring from home (~$13/day each at counter)",
+    "Download offline Google Maps for Yosemite + Tioga Pass area (no signal in either)",
+    "Pack: Dramamine for kids, layers (cold at altitude), reef-safe sunscreen, swim gear for Tahoe, binoculars for El Cap climbers"
+  ],
+  days: [
+    {
+      n:1, dateISO:"2026-05-30", dateLabel:"Fri, May 30", theme:"Arrival",
+      depart:"—", driving:"0.5 hrs (SFO → hotel)", stayId:"burlingame",
+      activities:[
+        { time:"10:27 PM", name:"Arrive SFO Airport", desc:"Patel Family · Delta · Conf GERBYK", badge:"must", initials:"✈", type:"flight", duration:"" },
+        { time:"11:00 PM", name:"Pick up Alamo Rental Car (Pacifica)", desc:"Conf 1596397883 · Costco C488250262", addr:"San Francisco International Airport, San Francisco, CA", parking:"Alamo SFO rental counter, on-airport shuttle", duration:"30 min", type:"car", initials:"🚐", badge:"must" }
+      ],
+      kids:"Hotel has 24-hr front desk + shuttle from SFO; Hampton Inn breakfast 6–10 AM",
+      eats:"Late arrival — sleep, eat hotel breakfast"
+    },
+    {
+      n:2, dateISO:"2026-05-31", dateLabel:"Sat, May 31", theme:"Santa Cruz & Carmel",
+      depart:"9:00 AM", driving:"~3.5 hrs total", stayId:"monterey",
+      activities:[
+        { time:"10:30 AM", name:"The Mystery Spot", desc:"Gravity-defying tilted shack, 45-min guided tour. Kids 4+ love it.", addr:"465 Mystery Spot Rd, Santa Cruz, CA 95065", duration:"1.5 hrs", drive:"1h 30min", parking:"$10 cash", tickets:"$10/adult, $5 kids 4–11, free under 4 — BOOK AHEAD at mysteryspot.com (time slots sell out)", badge:"must", photo:"Mystery_Spot_(Santa_Cruz)_sign_2008.jpg", initials:"MS", type:"activity" },
+        { time:"12:30 PM", name:"Lunch: Chipotle Santa Cruz", desc:"Quick veg burrito bowls", addr:"2401 Soquel Dr, Santa Cruz, CA 95062", duration:"45 min", badge:"kid", initials:"🌯", type:"food" },
+        { time:"1:45 PM", name:"17-Mile Drive (Lone Cypress)", desc:"Iconic Pebble Beach coastal drive", addr:"17-Mile Drive Pacific Grove Gate", duration:"1.5 hrs", tickets:"$11.75/vehicle (refunded if dining at Pebble Beach restaurant)", badge:"must", photo:"Lone_Cypress.jpg", initials:"LC", type:"beach" },
+        { time:"3:45 PM", name:"Explore Carmel-by-the-Sea", desc:"Storybook village, dog-friendly beach", addr:"Ocean Ave, Carmel-by-the-Sea, CA", duration:"1.5 hrs", parking:"Free 2-hr street parking", badge:"must", photo:"Carmel-by-the-Sea_-_Ocean_Avenue.jpg", initials:"CM", type:"activity" },
+        { time:"6:30 PM", name:"Dinner: Ambrosia India Bistro", desc:"4.4⭐ Indian", addr:"510 Broadway Ave, Seaside, CA 93955", duration:"1 hr", badge:"kid", initials:"🍛", type:"food" }
+      ],
+      kids:"Mystery Spot has full restrooms + water (gravel paths, no strollers); Spanish Bay restrooms at resort entrance; Carmel Beach restrooms at top of Ocean Ave"
+    },
+    {
+      n:3, dateISO:"2026-06-01", dateLabel:"Sun, Jun 1", theme:"Big Sur Coast",
+      depart:"8:30 AM", driving:"~4.5 hrs round-trip", stayId:"monterey",
+      activities:[
+        { time:"9:00 AM", name:"Point Lobos State Natural Reserve", desc:"Sea otters, tide pools, easy 1-mi Cypress Grove loop", addr:"62 CA-1, Carmel-By-The-Sea, CA 93923", duration:"1.5 hrs", parking:"$10/vehicle, arrive by 9 AM weekends", badge:"must", photo:"Point_Lobos_State_Natural_Reserve.jpg", initials:"PL", type:"hike" },
+        { time:"11:00 AM", name:"Garrapata State Park (Calla Lily Valley)", desc:"Park gates 18–19 on Hwy 1, valley of white calla lilies, sea arches", duration:"30 min", parking:"Free roadside parking, no facilities", badge:"gem", initials:"CL", type:"beach" },
+        { time:"12:00 PM", name:"Bixby Creek Bridge + Hurricane Point", desc:"Best view from Hurricane Point south pull-off", addr:"Bixby Creek Bridge, Big Sur, CA 93920", duration:"30 min", parking:"No public restrooms here", badge:"must", photo:"Bixby_Bridge_Big_Sur_California_United_States_Landscape_Photography_(106473129).jpeg", initials:"BB", type:"activity" },
+        { time:"12:45 PM", name:"Point Sur State Historic Park", desc:"1889 lighthouse, tour-only access — drive-by only", duration:"15 min drive-by", badge:"skip", initials:"PS", type:"activity" },
+        { time:"1:30 PM", name:"Lunch: Nepenthe", desc:"Cliff-side terrace, 800 ft above Pacific", addr:"48510 CA-1, Big Sur, CA 93920", duration:"1.5 hrs", tickets:"Call ahead, wait expected", badge:"must", initials:"NP", type:"food" },
+        { time:"3:30 PM", name:"Pfeiffer Beach (Purple Sand + Keyhole Arch)", desc:"Unmarked turn 0.5 mi south of Big Sur Station, then 2 mi down narrow Sycamore Canyon Rd", duration:"45 min", parking:"$15/vehicle, lot is small", badge:"gem", photo:"Pfeiffer_Beach_-_Big_Sur,_California.jpg", initials:"PB", type:"beach" },
+        { time:"5:00 PM", name:"McWay Falls", desc:"80-ft waterfall on a beach, 0.5 mi paved overlook", addr:"Julia Pfeiffer Burns State Park, 52801 CA-1, Big Sur, CA 93920", duration:"30 min", parking:"$10/vehicle (covers all CA State Parks for the day)", badge:"must", photo:"McWay_Falls_Julia_Pfeiffer_Burns_State_Park.jpg", initials:"MW", type:"hike" }
+      ],
+      kids:"Restrooms: Point Lobos (multiple), Nepenthe, McWay Falls trailhead. NO restrooms between Garrapata and Nepenthe. Bring extra water — Nepenthe + Big Sur Station are only refills."
+    },
+    {
+      n:4, dateISO:"2026-06-02", dateLabel:"Mon, Jun 2", theme:"Transit & Reunion",
+      depart:"8:00 AM", driving:"~6 hrs (Monterey → Tracy → Oakhurst)", stayId:"oakhurst",
+      activities:[
+        { time:"11:30 AM", name:"Arrive at Friend's house (Tracy)", desc:"Lunch with friends", addr:"3163 Neil Jerome Dr, Tracy, CA 95377", duration:"2 hrs", drive:"2h 15min from Monterey", badge:"must", initials:"🏠", type:"activity" },
+        { time:"1:30 PM", name:"New Indian Supermarket (road snacks pickup)", desc:"Biggest Indian grocery in Tracy. Samosas, sweets, chaat, fruit, chai mixes for the Yosemite days.", addr:"3250 N Tracy Blvd, Tracy, CA 95376", duration:"30 min", parking:"Open 9 AM–9:30 PM daily, ample free parking", badge:"must", initials:"🛒", type:"food" },
+        { time:"2:30 PM", name:"Drive to Oakhurst", desc:"Tracy → Oakhurst: 2h 45min via I-5 S + CA-152 E + CA-99 S + CA-41 N. Restroom stop in Madera or Chowchilla suggested.", duration:"2h 45min", badge:"must", initials:"🛣️", type:"drive" },
+        { time:"6:00 PM", name:"Check in: Hampton Inn Oakhurst", desc:"Settle, decompress", addr:"40740 Highway 41, Oakhurst, CA 93644", initials:"🏨", type:"stay" },
+        { time:"7:00 PM", name:"Dinner: Tandoori Express", desc:"4.3⭐ (470+ reviews). Family-run Punjabi. Owners Omi & Vanshu personally cook. Order Aloo Paratha (off-menu), Butter Chicken, Dal Tadka.", addr:"40278 Rd 425A, Oakhurst, CA 93644", duration:"1.5 hrs", parking:"5 min from hotel", badge:"must", initials:"🍛", type:"food" }
+      ],
+      kids:"Restrooms at friend's house, New Indian Supermarket, Madera/Chowchilla gas stations. Stock up on snacks at Indian grocery — no Indian food in Yosemite. Long day, plan a 15-min stretch break mid-drive."
+    },
+    {
+      n:5, dateISO:"2026-06-03", dateLabel:"Tue, Jun 3", theme:"Yosemite High Views",
+      depart:"7:30 AM", driving:"~3.5 hrs total", stayId:"oakhurst",
+      warn:"Glacier Point Rd is a 16-mile windy mountain road. Bring Dramamine / motion sickness bands for the 4-year-olds. Drive slow, stop at pullouts.",
+      activities:[
+        { time:"7:30 AM", name:"Depart Oakhurst → Yosemite South Entrance", desc:"1 hr to park entrance + 1 hr up Glacier Point Rd", duration:"2 hrs", badge:"must", initials:"🛣️", type:"drive" },
+        { time:"9:30 AM", name:"Sentinel Dome OR Taft Point Trailhead", desc:"Sentinel Dome (kid-friendlier): 2.2 mi RT, 360° view of Half Dome, El Cap, Yosemite Falls. Taft Point has UNFENCED cliffs — not safe for 4-year-olds.", addr:"Glacier Point Rd, Yosemite Valley, CA", duration:"2 hrs", drive:"45 min from Yosemite gate", parking:"Free, fills by 10 AM", badge:"must", initials:"SD", type:"hike" },
+        { time:"12:00 PM", name:"Lunch: packed Indian food picnic", desc:"Picnic at Glacier Point or pullout", duration:"45 min", badge:"kid", initials:"🥘", type:"food" },
+        { time:"1:00 PM", name:"Glacier Point (Half Dome View)", desc:"THE iconic viewpoint. Half Dome looks close enough to touch.", addr:"Glacier Point, Yosemite National Park, CA", duration:"1.5 hrs", parking:"Free large parking lot, fills 11 AM–2 PM. Geology Hut closed for restoration in 2026.", badge:"must", photo:"Yosemite_National_Park,_El_Capitan,_Half_Dome,_and_Bridalveil_Fall,_from_Tunnel_View_(7882617076).jpg", initials:"GP", type:"hike" },
+        { time:"7:30 PM", name:"OPTIONAL: Stay for Alpenglow on Half Dome", desc:"Sunset 8:15 PM. Half Dome turns pink-orange for 10–15 min after sunset. Natural Firefall substitute. Adds 2 hrs. Bring layers — cold at 7,200 ft.", duration:"2 hrs", badge:"opt", initials:"🌅", type:"activity" },
+        { time:"10:00 PM", name:"OPTIONAL: Moonbow at Lower Yosemite Falls", desc:"Solo mission while kids stay with Panchal family. Jun 3 = LAST predicted moonbow night of 2026. Drive 1.5 hrs Oakhurst → Valley. Lower Falls 1-mi paved loop. Check yosemitemoonbow.com for exact time.", duration:"3 hrs", badge:"opt", photo:"Lower_Yosemite_Falls.jpg", initials:"MB", type:"hike" }
+      ],
+      kids:"Restrooms at South Entrance station, Glacier Point parking, Sentinel Dome trailhead. Water refills at South Entrance + Glacier Point. Kids need fleece + hat at 7,200 ft even in June."
+    },
+    {
+      n:6, dateISO:"2026-06-04", dateLabel:"Wed, Jun 4", theme:"Valley, Sequoias & Falls",
+      depart:"7:00 AM", driving:"~3.5 hrs total", stayId:"oakhurst",
+      warn:"Yosemite Valley parking fills by 9 AM in summer. Aim for arrival ≤8:30 AM. Use the FREE Valley shuttle once parked.",
+      activities:[
+        { time:"7:30 AM", name:"Mariposa Grove of Giant Sequoias", desc:"500+ ancient sequoias including 1,800-yr-old Grizzly Giant. Free shuttle from Welcome Plaza. Easy 0.4-mi Big Trees Loop for 4-year-olds; 2-mi loop adds Grizzly Giant + California Tunnel Tree (walk THROUGH it!)", addr:"Mariposa Grove Welcome Plaza, Wawona Rd, Yosemite NP, CA 95389", duration:"2 hrs", badge:"must", photo:"Grizzly_Giant_Mariposa_Grove_Sequoia.jpg", initials:"MG", type:"hike" },
+        { time:"10:00 AM", name:"Drive to Yosemite Valley", desc:"~1 hr via Wawona Rd", duration:"1 hr", initials:"🛣️", type:"drive" },
+        { time:"11:30 AM", name:"Lower Yosemite Falls", desc:"KID-PERFECT WATERFALL. 1-mi paved loop, flat. Kids walk to the base of the 320-ft Lower Fall and get sprayed by mist.", addr:"Lower Yosemite Fall Trailhead, Yosemite Valley, CA", duration:"45 min", badge:"kid", photo:"Lower_Yosemite_Falls.jpg", initials:"LF", type:"hike" },
+        { time:"12:30 PM", name:"Lunch: Curry Village Pizza Deck", desc:"Outdoor pizza deck, kid-friendly, fast", addr:"Half Dome Village, Yosemite Valley", duration:"1 hr", badge:"kid", initials:"🍕", type:"food" },
+        { time:"1:45 PM", name:"Mist Trail to Vernal Falls Footbridge", desc:"0.8 mi each way, paved, gradual climb. Kids 4+ can do this. View of the falls from the bridge.", addr:"Happy Isles Trailhead (Shuttle Stop 16), Yosemite Valley", duration:"1.5 hrs", parking:"Park at Curry Village, take East Valley Shuttle to Stop 16", badge:"kid", photo:"Vernal_Fall_Yosemite.jpg", initials:"VF", type:"hike" },
+        { time:"3:15 PM", name:"OPTIONAL: Mist Trail Steps to top of Vernal Fall", desc:"600+ steep wet granite steps. 3.4 mi RT, gains 1,000 ft. SOLO MISSION — leave kids with Panchal family at the footbridge. NOT safe for 4-year-olds.", duration:"2.5 hrs solo", badge:"opt", initials:"VT", type:"hike" },
+        { time:"4:30 PM", name:"Bridalveil Fall", desc:"620-ft waterfall, short 0.5-mi paved walk. Windswept mist often soaks viewing area — kids love it.", addr:"Bridalveil Fall Parking, Wawona Rd", duration:"30 min", parking:"Free parking, recently expanded", badge:"must", photo:"Bridalveil_Fall_Yosemite.jpg", initials:"BF", type:"hike" },
+        { time:"5:15 PM", name:"El Capitan Meadow", desc:"Pull-off on Northside Drive. Stand in the meadow, look STRAIGHT UP the 3,000-ft face. Bring binoculars to spot climbers (tiny dots on the wall). Pure awe for kids.", addr:"El Capitan Meadow, Northside Drive, Yosemite Valley", duration:"20 min", badge:"gem", photo:"El_Capitan_Yosemite.jpg", initials:"EC", type:"activity" },
+        { time:"5:45 PM", name:"Valley View (Gates of the Valley)", desc:"Better than Tunnel View for some. El Capitan reflected in the Merced River. Most tourists skip.", addr:"Valley View, Northside Drive, Yosemite Valley", duration:"15 min", badge:"gem", initials:"VV", type:"activity" },
+        { time:"6:30 PM", name:"Tunnel View (sunset alpenglow)", desc:"THE iconic Yosemite postcard — El Capitan + Half Dome + Bridalveil all in one frame. STAY until 8:15 PM sunset for golden hour on El Cap.", addr:"Tunnel View Overlook, Wawona Rd", duration:"2 hrs", parking:"Free large parking lot", badge:"must", photo:"Yosemite_National_Park,_El_Capitan,_Half_Dome,_and_Bridalveil_Fall,_from_Tunnel_View_(7882617076).jpg", initials:"TV", type:"activity" },
+        { time:"9:30 PM", name:"Return to Oakhurst, late dinner", desc:"Tandoori Express closes ~9 PM weekdays — call ahead for pickup", initials:"🍛", type:"food" }
+      ],
+      kids:"Restrooms at Mariposa Grove Welcome Plaza, Curry Village, Lower Yosemite Falls trailhead, Bridalveil parking, Tunnel View. Water refills at Curry Village, Yosemite Village, Glacier Point. Big day! Pack snacks, sunscreen, extra layers for Tunnel View at altitude."
+    },
+    {
+      n:7, dateISO:"2026-06-05", dateLabel:"Thu, Jun 5", theme:"Tioga Pass Drive",
+      depart:"7:00 AM", driving:"~7 hrs total — LONGEST DRIVING DAY", stayId:"tahoe",
+      warn:"LONG DRIVING DAY. Tioga Rd has NO food, water, gas, or services between Crane Flat and Lee Vining (135 mi). Fill gas in Oakhurst. Bring lots of water + snacks. Vault toilets only at Tioga stops.",
+      activities:[
+        { time:"7:00 AM", name:"Depart Oakhurst — fill gas first", desc:"Crane Flat in-park gas is the LAST gas until Lee Vining", initials:"⛽", type:"drive" },
+        { time:"9:00 AM", name:"Olmsted Point", desc:"Granite slabs you can walk on. Kids love scrambling. View of Half Dome from the back side.", addr:"Olmsted Point, Tioga Rd, Yosemite NP", duration:"30 min", parking:"Free roadside pull-off, vault toilets nearby", badge:"must", photo:"Olmsted_Point_Yosemite.jpg", initials:"OP", type:"activity" },
+        { time:"10:00 AM", name:"Tenaya Lake", desc:"Sapphire alpine lake at 8,150 ft. Kids can splash on the east beach.", addr:"Tenaya Lake, Tioga Rd, Yosemite NP", duration:"45 min", badge:"must", photo:"Tenaya_Lake_Yosemite.jpg", initials:"TL", type:"beach" },
+        { time:"11:30 AM", name:"Tuolumne Meadows + Lembert Dome view", desc:"Largest subalpine meadow in the Sierra. Vault toilets — last stop before Lee Vining.", addr:"Tuolumne Meadows, Tioga Rd, Yosemite NP", duration:"30 min", badge:"gem", photo:"Tuolumne_Meadows.jpg", initials:"TM", type:"hike" },
+        { time:"12:30 PM", name:"Tioga Pass + Lee Vining descent", desc:"Highest pass in Sierra at 9,943 ft. Steep, winding descent to Hwy 395.", drive:"45 min", badge:"must", initials:"⛰️", type:"drive" },
+        { time:"1:30 PM", name:"Lunch: Whoa Nellie Deli (Lee Vining)", desc:"4.5⭐ LEGENDARY gas-station deli at Tioga Pass exit. Fish tacos, buffalo meatloaf, veg options. Outdoor Mono Lake views.", addr:"22 Vista Point Dr, Lee Vining, CA 93541", duration:"1 hr", badge:"must", initials:"🥪", type:"food" },
+        { time:"2:45 PM", name:"Convict Lake (photo stop)", desc:"Crystal-clear lake against jagged Sierra peaks. 30 min detour south on Hwy 395. Adds ~1.5 hrs total. Just drive to lake parking, walk 5 min to shore, photograph, leave.", addr:"2000 Convict Lake Rd, Mammoth Lakes, CA 93546", duration:"30 min", parking:"Free day-use lot, restrooms available", badge:"gem", photo:"Convict_Lake_California.jpg", initials:"CV", type:"beach" },
+        { time:"4:00 PM", name:"Drive Lee Vining → Tahoma", desc:"~3.5 hrs north on Hwy 395 + 89. Bridgeport restroom stop midway.", duration:"3.5 hrs", badge:"must", initials:"🛣️", type:"drive" },
+        { time:"7:30 PM", name:"Arrive Tahoma Cabin", desc:"Conf HM32PP9SWF", addr:"6270 Flicker Ave, Tahoma, CA 96142", initials:"🏡", type:"stay" },
+        { time:"8:00 PM", name:"Dinner: Shangrila Himalayan Kitchen", desc:"4.4⭐ Indian/Nepalese. 40 min drive south from cabin. Slow service but worth it. CALL AHEAD for pickup to save time.", addr:"4115 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", duration:"1.5 hrs", badge:"must", initials:"🥟", type:"food" }
+      ],
+      kids:"Vault-only restrooms at Crane Flat, Olmsted Point, Tuolumne Meadows, Tioga Pass entrance. Full facilities at Whoa Nellie Deli + Lee Vining Mobil. Bridgeport gas + restrooms midway. Bring 1 gallon water per person — Tioga has zero water sources."
+    },
+    {
+      n:8, dateISO:"2026-06-06", dateLabel:"Fri, Jun 6", theme:"Lake Tahoe",
+      depart:"8:30 AM", driving:"~2 hrs around the lake", stayId:"tahoe",
+      activities:[
+        { time:"9:30 AM", name:"Heavenly Gondola", desc:"2.4-mi gondola to 9,123 ft observation deck. 360° lake + Carson Valley views. Kids 5+ love it.", addr:"4080 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", duration:"2 hrs", drive:"45 min from cabin", parking:"Heavenly Village garage at 1 Bellamy Ct, $1.50/hr, $20 daily max", tickets:"~$79/adult, ~$45/child at skiheavenly.com (buy online to skip line)", badge:"must", photo:"Heavenly_Mountain_Resort_gondola.jpg", initials:"HG", type:"activity" },
+        { time:"12:00 PM", name:"Lunch: Curry & Grill", desc:"4.2⭐ Indian. Lunch buffet often $8.99. Backup: Chipotle next door.", addr:"3601 Lake Tahoe Blvd, South Lake Tahoe", duration:"1 hr", badge:"kid", initials:"🍛", type:"food" },
+        { time:"1:30 PM", name:"Emerald Bay State Park Lookout", desc:"Most photographed view in Tahoe. Vikingsholm Castle visible 1,000 ft below. Quick photo OR add 2-hr round-trip hike down.", addr:"Inspiration Point, Emerald Bay, CA", duration:"30 min (photo) or 2.5 hrs (with hike)", parking:"$10 fee, lot fills 10 AM–4 PM", badge:"must", photo:"Emerald_Bay_Lake_Tahoe.jpg", initials:"EB", type:"beach" },
+        { time:"2:30 PM", name:"Sand Harbor State Park", desc:"BEST FAMILY BEACH on the lake. Sandy beach, giant granite boulders to scramble + jump from, kayak rentals, shallow swimming.", addr:"2005 NV-28, Incline Village, NV 89451", duration:"2.5 hrs", parking:"$15 out-of-state vehicle ($12 NV). Fills by 11 AM weekends.", badge:"must", photo:"Sand_Harbor_State_Park_Lake_Tahoe.jpg", initials:"SH", type:"beach" },
+        { time:"5:00 PM", name:"Bonsai Rock + Whale Rock", desc:"1 mi south of Sand Harbor on NV-28. Iconic granite boulder with 4 small trees on top. Short scramble down to beach. ROCK JUMPING for the 10-year-old (parents check depth first). 4-year-olds wade.", addr:"NV-28, ~1 mi south of Sand Harbor, Crystal Bay, NV", duration:"1 hr", parking:"Small unofficial roadside pullouts — park carefully. Steep 5-min scramble down.", badge:"gem", photo:"Bonsai_Rock_Lake_Tahoe.jpg", initials:"BR", type:"beach" },
+        { time:"6:30 PM", name:"Cave Rock (drive-by)", desc:"Sacred Washoe tribal site, tunnel through the rock on US-50.", addr:"Cave Rock, US-50, Glenbrook, NV", duration:"10 min", parking:"$5 NV state lot", badge:"skip", photo:"Cave_Rock_Lake_Tahoe.jpg", initials:"CR", type:"activity" },
+        { time:"7:30 PM", name:"Dinner: Nikki's Chaat Cafe", desc:"4.0⭐ chaat, dosas, samosas. Quick + casual.", addr:"3469 Lake Tahoe Blvd, South Lake Tahoe", duration:"1 hr", badge:"kid", initials:"🥟", type:"food" }
+      ],
+      kids:"Full restrooms at Heavenly Village, Emerald Bay Inspiration Point, Sand Harbor (also showers). Bonsai Rock has NO restrooms. Sand Harbor has water fountains — bring extra for Bonsai Rock. Water is COLD (~60°F in June). High-altitude sun is intense — sunscreen."
+    },
+    {
+      n:9, dateISO:"2026-06-07", dateLabel:"Sat, Jun 7", theme:"Return to the Bay",
+      depart:"10:00 AM", driving:"~4 hrs total (Tahoma → SF)", stayId:"sfo-north",
+      activities:[
+        { time:"10:00 AM", name:"Check out of Tahoma cabin", desc:"Final breakfast, pack up", duration:"1 hr", initials:"🏡", type:"stay" },
+        { time:"11:00 AM", name:"Eagle Rock Trail (west shore)", desc:"Quick 20-min hike to a volcanic outcrop with panoramic Tahoe views. Easy for kids, <1 mi round-trip.", addr:"Eagle Rock Trailhead, Homewood, CA", duration:"1 hr", parking:"Free roadside pull-off on Hwy 89", badge:"gem", photo:"Eagle_Rock_Lake_Tahoe.jpg", initials:"ER", type:"hike" },
+        { time:"12:30 PM", name:"Drive I-80 West to SF", desc:"~3 hrs. Stop in Auburn or Davis for lunch (In-N-Out, Chipotle).", duration:"3 hrs", badge:"must", initials:"🛣️", type:"drive" },
+        { time:"4:30 PM", name:"Check in: Hilton Garden Inn SFO N", desc:"Settle, kids nap. Conf 3451357510", addr:"670 Gateway Blvd, South San Francisco, CA 94080", initials:"🏨", type:"stay" },
+        { time:"7:00 PM", name:"Battery Spencer Viewpoint (sunset)", desc:"BEST Golden Gate Bridge photo spot in SF. Bridge fills your camera frame at golden hour. Bring jacket — windy.", addr:"Battery Spencer, Conzelman Rd, Sausalito, CA 94965", duration:"1 hr", drive:"45 min from hotel", parking:"Small free lot, fills before sunset — arrive 30 min early", badge:"must", photo:"Golden_Gate_Bridge_from_Battery_Spencer.jpg", initials:"BS", type:"activity" },
+        { time:"9:00 PM", name:"Late dinner", desc:"Order delivery to the room (Roti Indian or Chipotle delivery)", initials:"🍛", type:"food" }
+      ],
+      kids:"Restrooms at cabin (go before Eagle Rock — none on trail), Auburn/Davis stop, Battery Spencer (vault only). Long drive day — bring snacks, books, downloaded shows."
+    },
+    {
+      n:10, dateISO:"2026-06-08", dateLabel:"Sun, Jun 8", theme:"Muir Woods & Bridges",
+      depart:"7:30 AM", driving:"~3 hrs around city", stayId:"sfo-north",
+      warn:"MUIR WOODS REQUIRES ADVANCE PARKING RESERVATION. Book at gomuirwoods.com — $10/vehicle + $15/adult entry, kids 15 & under FREE. Reservations open 90 days out. BOOK NOW.",
+      activities:[
+        { time:"8:30 AM", name:"Muir Woods National Monument", desc:"Ancient coast redwoods, 1-mi paved boardwalk loop perfect for 4-year-olds. Cool & misty year-round — bring jackets. NO cell signal.", addr:"1 Muir Woods Rd, Mill Valley, CA 94941", duration:"2 hrs", drive:"45 min from hotel", parking:"RESERVATION REQUIRED. Standard vehicle $10. 30-min arrival window.", badge:"must", photo:"Muir_Woods_National_Monument.jpg", initials:"MU", type:"hike" },
+        { time:"11:00 AM", name:"Golden Gate Bridge Welcome Center", desc:"Bridge views, gift shop, exhibits. Walk a short stretch onto the bridge. Crissy Field walk along the bay is a 5-min drive away.", addr:"Golden Gate Bridge Welcome Center, San Francisco, CA 94129", duration:"1.5 hrs", drive:"30 min", parking:"Try Crissy Field East Beach lot ($1.20/hr) — 10-min walk to bridge", badge:"must", photo:"Golden_Gate_Bridge_from_Marin.jpg", initials:"GG", type:"activity" },
+        { time:"1:00 PM", name:"Lunch: Chipotle Marina", desc:"Quick option", addr:"2675 Geary Blvd, SF, CA 94118", duration:"45 min", badge:"kid", initials:"🌯", type:"food" },
+        { time:"2:00 PM", name:"Lands End Labyrinth", desc:"Stone labyrinth on a cliff above the Pacific. 20-min walk from Lands End parking. Kids love walking the spiral.", addr:"Lands End Lookout, San Francisco, CA 94121", duration:"1 hr", parking:"Free lot at Merrie Way, fills 11 AM–4 PM weekends", badge:"gem", photo:"Lands_End_Labyrinth_San_Francisco.jpg", initials:"LE", type:"hike" },
+        { time:"4:00 PM", name:"16th Avenue Tiled Steps", desc:"163 mosaic steps with sun-and-sea design. Quick photo.", addr:"16th Ave & Moraga St, SF, CA 94122", duration:"30 min", parking:"Free residential parking on Moraga or 15th Ave", badge:"gem", photo:"16th_Avenue_Tiled_Steps_San_Francisco.jpg", initials:"TS", type:"activity" },
+        { time:"5:30 PM", name:"Twin Peaks (sunset)", desc:"Highest accessible view in SF. 360° city + bridges + ocean. Get there 30 min before 8:25 PM sunset.", addr:"501 Twin Peaks Blvd, SF, CA 94114", duration:"1.5 hrs", parking:"Free parking at upper viewing lot, fills 30 min before sunset", badge:"must", photo:"Twin_Peaks_San_Francisco_view.jpg", initials:"TP", type:"activity" },
+        { time:"8:30 PM", name:"Dinner near hotel", desc:"Quick option in South SF or hotel restaurant", initials:"🍽️", type:"food" }
+      ],
+      kids:"Restrooms at Muir Woods (multiple), Golden Gate Welcome Center, Lands End Lookout, Twin Peaks (upper lot). NO cell at Muir Woods — download offline maps before. Layers: Muir Woods ~55°F even in June, bridges windy."
+    },
+    {
+      n:11, dateISO:"2026-06-09", dateLabel:"Mon, Jun 9", theme:"City Landmarks",
+      depart:"8:00 AM", driving:"~2 hrs total + rental return", stayId:"embassy",
+      activities:[
+        { time:"9:00 AM", name:"Cable Car Ride (Powell-Hyde line)", desc:"Classic SF experience. Hold on tight!", addr:"Powell-Hyde Cable Car Turnaround, 2099 Hyde St, SF", duration:"1 hr", drive:"25 min", parking:"Park at Pier 39 garage and ride cable car as a loop. Don't park near Lombard.", tickets:"$8/ride or $26 day pass", badge:"must", photo:"San_Francisco_Cable_Car_Hyde_Street.jpg", initials:"CC", type:"activity" },
+        { time:"11:00 AM", name:"Lombard Street (Crookedest Street)", desc:"Walk down the brick stairs on either side — DON'T queue to drive it (1+ hr wait). View from bottom at Leavenworth is best.", addr:"1070 Lombard St, SF, CA 94109", duration:"30 min", badge:"must", photo:"Lombard_Street_San_Francisco.jpg", initials:"LS", type:"activity" },
+        { time:"12:00 PM", name:"Lunch: Amber India (Yerba Buena)", desc:"4.4⭐ best Indian in SF, Bib Gourmand. Book ahead. Try Murgh Makhani, Bhel Puri, Tandoori platter.", addr:"25 Yerba Buena Ln, SF, CA 94103", duration:"1.5 hrs", tickets:"amber-india.com — book ahead", badge:"must", initials:"🍛", type:"food" },
+        { time:"2:00 PM", name:"Pier 39 + Sea Lions", desc:"Famous sea lion colony on K-Dock. Aquarium of the Bay nearby. Touristy but kids love it.", addr:"Pier 39, The Embarcadero, SF, CA 94133", duration:"2 hrs", parking:"Pier 39 garage $9/hr or $40 day max with validation", badge:"must", photo:"Pier_39_sea_lions_San_Francisco.jpg", initials:"P39", type:"activity" },
+        { time:"4:30 PM", name:"Wave Organ", desc:"Sculpture of PVC pipes set into a marina jetty. Wave action plays low musical tones. Kids put ears to pipes.", addr:"Wave Organ, 83 Marina Green Dr, SF, CA 94123", duration:"45 min", parking:"Free marina parking, 10-min walk on jetty", badge:"gem", photo:"Wave_Organ_San_Francisco.jpg", initials:"WO", type:"activity" },
+        { time:"5:45 PM", name:"Transamerica Pyramid (drive-by)", desc:"Iconic 853-ft pyramid. Quick photo from across the street.", addr:"600 Montgomery St, SF, CA 94111", duration:"15 min", badge:"skip", photo:"Transamerica_Pyramid_San_Francisco.jpg", initials:"TX", type:"activity" },
+        { time:"7:30 PM", name:"Dinner: light meal near hotel", desc:"Save energy for tomorrow's flight", duration:"1 hr", badge:"kid", initials:"🍽️", type:"food" },
+        { time:"10:00 PM", name:"Drop off Rental Van at SFO Airport (Alamo)", desc:"Conf 1596397883. Fill gas first at SFO Costco or Chevron.", addr:"Alamo SFO Return, San Francisco International Airport", duration:"30 min", badge:"must", initials:"🚐", type:"car" },
+        { time:"10:45 PM", name:"Shuttle to Embassy Suites Oyster Point", desc:"Conf 91486917", addr:"250 Gateway Blvd, South San Francisco, CA 94080", initials:"🏨", type:"stay" }
+      ],
+      kids:"Restrooms at Pier 39 (multiple), Lombard St (Hyde St cafes), Amber India, Embassy Suites. Cable car LOUD when bells ring — smaller kids may need parent's lap. Sea lions are loud and smelly — kids find both hilarious."
+    },
+    {
+      n:12, dateISO:"2026-06-10", dateLabel:"Tue, Jun 10", theme:"Departure",
+      depart:"6:30 AM", driving:"15 min shuttle", stayId:null,
+      activities:[
+        { time:"6:30 AM", name:"Hotel Shuttle to SFO Airport", desc:"Embassy Suites runs continuous SFO shuttle. 90 min before Delta domestic.", duration:"15 min", badge:"must", initials:"🚐", type:"car" },
+        { time:"8:00 AM", name:"TSA + breakfast at SFO", desc:"Kid-friendly food at Terminal 2", duration:"1.5 hrs", badge:"kid", initials:"🥐", type:"food" },
+        { time:"9:55 AM", name:"Depart SFO · Delta DL0920", desc:"SFO → SLC (Salt Lake City)", badge:"must", initials:"✈", type:"flight" },
+        { time:"Connecting", name:"SLC → DFW · Delta DL2811", desc:"Final leg home", initials:"✈", type:"flight" }
+      ],
+      kids:"SFO Terminal 2 has play area near Gate 54. Bring snacks + Dramamine for motion-prone kids."
+    }
+  ]
+};
+
+/* ---------------------------------------------------------------
+   UTILITIES
+--------------------------------------------------------------- */
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+const esc = (str) => String(str ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const mapsLink = (addr) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`;
+
+function badgeHTML(b){
+  if(!b) return "";
+  const labels = {must:"MUST SEE", skip:"OK TO SKIP", gem:"HIDDEN GEM", opt:"OPTIONAL", kid:"KID FRIENDLY"};
+  return `<span class="badge ${esc(b)}">${labels[b] || ""}</span>`;
+}
+
+function todayISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function diffDays(fromISO, toISO){
+  const a = new Date(fromISO+"T00:00:00");
+  const b = new Date(toISO+"T00:00:00");
+  return Math.round((b-a) / 86400000);
+}
+
+function copyText(text){
+  const showToast = () => {
+    const t = $("#toast");
+    t.classList.add("show");
+    clearTimeout(window.__toastT);
+    window.__toastT = setTimeout(()=>t.classList.remove("show"), 1600);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(showToast);
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    showToast();
+  }
+}
+
+function addrRowHTML(addr){
+  if(!addr) return "";
+  return `
+    <div class="activity-row">
+      <div class="activity-row-icon">📍</div>
+      <div class="activity-row-content">
+        <div>${esc(addr)}</div>
+        <div class="addr-actions">
+          <button class="addr-btn copy-btn" data-copy="${esc(addr)}">📋 Copy</button>
+          <a class="addr-btn" target="_blank" rel="noopener" href="${mapsLink(addr)}">🗺 Maps</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function activityHTML(a){
+  const photoSrc = a.photo ? PHOTO(a.photo) : "";
+  const photoTag = photoSrc
+    ? `<img src="${esc(photoSrc)}" alt="${esc(a.name)}" loading="lazy" onerror="this.parentElement.classList.add('fallback')">`
+    : "";
+  return `
+    <article class="activity">
+      <div class="activity-main">
+        <div class="activity-photo type-${esc(a.type || 'activity')} ${photoSrc ? '' : 'fallback'}" data-initials="${esc(a.initials || '?')}">
+          ${photoTag}
+        </div>
+        <div class="activity-body">
+          <div class="activity-time-row">
+            <span class="activity-time">${esc(a.time)}</span>
+            ${badgeHTML(a.badge)}
+          </div>
+          <h3 class="activity-name">${esc(a.name)}</h3>
+          ${a.desc ? `<p class="activity-desc">${esc(a.desc)}</p>` : ""}
+          <div class="activity-meta">
+            ${a.duration ? `<span>⏱ ${esc(a.duration)}</span>` : ""}
+            ${a.drive ? `<span>🧭 ${esc(a.drive)}</span>` : ""}
+          </div>
+        </div>
+      </div>
+      ${addrRowHTML(a.addr)}
+      ${a.parking ? `
+        <div class="activity-row">
+          <div class="activity-row-icon">🅿</div>
+          <div class="activity-row-content">
+            <div class="activity-row-label">Parking</div>
+            <div>${esc(a.parking)}</div>
+          </div>
+        </div>` : ""}
+      ${a.tickets ? `
+        <div class="activity-row">
+          <div class="activity-row-icon">🎫</div>
+          <div class="activity-row-content">
+            <div class="activity-row-label">Tickets / Booking</div>
+            <div>${esc(a.tickets)}</div>
+          </div>
+        </div>` : ""}
+    </article>
+  `;
+}
+
+function stayLookup(id){ return TRIP.stays.find(s => s.id === id); }
+
+/* ---------------------------------------------------------------
+   TODAY SCREEN
+--------------------------------------------------------------- */
+function renderToday(){
+  const root = $("#screen-today");
+  const today = todayISO();
+  const startISO = TRIP.meta.start;
+  const endISO = TRIP.meta.end;
+
+  let html = "";
+
+  if(today < startISO){
+    const days = diffDays(today, startISO);
+    html += `
+      <div class="hero">
+        <div class="hero-eyebrow">Trip Countdown</div>
+        <div class="hero-title">California, here we come</div>
+        <div class="hero-sub">${esc(TRIP.meta.families)} · 12-day roadtrip</div>
+        <div class="countdown">
+          <div class="countdown-num">${days}</div>
+          <div class="countdown-label">${days === 1 ? "day to go" : "days to go"}<br>departing ${esc(formatDateLong(startISO))}</div>
+        </div>
+      </div>
+
+      <div class="checklist">
+        <h3>Pre-Trip Checklist</h3>
+        ${TRIP.preTripChecklist.map((item, i) => `
+          <div class="check-item" data-i="${i}">
+            <div class="check-box">✓</div>
+            <div class="check-text">${esc(item)}</div>
+          </div>
+        `).join("")}
+      </div>
+
+      <button class="quick-btn" data-go="days">🗓️ Browse the Itinerary →</button>
+    `;
+  } else if(today > endISO){
+    html += `
+      <div class="hero">
+        <div class="hero-eyebrow">Trip Complete</div>
+        <div class="hero-title">Welcome home</div>
+        <div class="hero-sub">12 days · 2 families · countless memories. Tap Days to relive any moment.</div>
+      </div>
+      <button class="quick-btn" data-go="days">🗓️ Browse the Itinerary →</button>
+    `;
+  } else {
+    const td = TRIP.days.find(d => d.dateISO === today);
+    if(td){
+      const stay = stayLookup(td.stayId);
+      const next = findNextActivity(td);
+      html += `
+        <div class="hero">
+          <div class="hero-eyebrow">Day ${td.n} of 12 · ${esc(td.dateLabel)}</div>
+          <div class="hero-title">${esc(td.theme)}</div>
+          <div class="hero-sub">Depart by ${esc(td.depart)} · ${esc(td.driving)}</div>
+        </div>
+        <div class="today-banner">
+          <div class="today-day">
+            <div class="today-day-num">D${td.n}</div>
+            <div class="today-day-meta">${esc(td.dateLabel)}</div>
+          </div>
+          <div class="today-theme">${esc(td.theme)}</div>
+          ${next ? `
+            <div class="today-row">
+              <div class="today-row-label">Next Up</div>
+              <div class="today-row-val">${esc(next.time)} · ${esc(next.name)}</div>
+            </div>` : ""}
+          ${stay ? `
+            <div class="today-row">
+              <div class="today-row-label">Tonight</div>
+              <div class="today-row-val">${esc(stay.name)}</div>
+            </div>` : ""}
+        </div>
+        <button class="quick-btn" data-go="days" data-day="${td.n}">→ Today's Full Itinerary</button>
+      `;
+    } else {
+      html += `
+        <div class="hero">
+          <div class="hero-eyebrow">Trip in progress</div>
+          <div class="hero-title">Enjoy the road</div>
+          <div class="hero-sub">Tap Days to see the full itinerary.</div>
+        </div>
+        <button class="quick-btn" data-go="days">🗓️ Open Itinerary →</button>
+      `;
+    }
+  }
+
+  root.innerHTML = html;
+
+  // wire checklist
+  $$(".check-item", root).forEach(el => {
+    const i = el.dataset.i;
+    const stored = localStorage.getItem("ca-check-"+i) === "1";
+    if(stored) el.classList.add("done");
+    el.addEventListener("click", () => {
+      el.classList.toggle("done");
+      localStorage.setItem("ca-check-"+i, el.classList.contains("done") ? "1" : "0");
+    });
+  });
+
+  // wire quick navigation buttons
+  $$("[data-go]", root).forEach(el => {
+    el.addEventListener("click", () => {
+      const target = el.dataset.go;
+      const dayIdx = el.dataset.day ? parseInt(el.dataset.day,10) - 1 : null;
+      switchScreen(target);
+      if(target === "days" && dayIdx != null) scrollToDay(dayIdx);
+    });
+  });
+}
+
+function findNextActivity(day){
+  const now = new Date();
+  const nowMin = now.getHours()*60 + now.getMinutes();
+  for(const a of day.activities){
+    const t = parseTime(a.time);
+    if(t != null && t >= nowMin) return a;
+  }
+  return day.activities[0];
+}
+
+function parseTime(s){
+  if(!s) return null;
+  const m = String(s).match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  if(!m) return null;
+  let h = parseInt(m[1],10);
+  const min = parseInt(m[2],10);
+  const ap = (m[3] || "").toUpperCase();
+  if(ap === "PM" && h !== 12) h += 12;
+  if(ap === "AM" && h === 12) h = 0;
+  return h*60 + min;
+}
+
+function formatDateLong(iso){
+  const d = new Date(iso+"T00:00:00");
+  return d.toLocaleDateString("en-US", { weekday:"long", month:"short", day:"numeric" });
+}
+
+/* ---------------------------------------------------------------
+   DAYS SCREEN
+--------------------------------------------------------------- */
+function renderDays(){
+  const root = $("#screen-days");
+  const today = todayISO();
+  const pillsHTML = TRIP.days.map(d =>
+    `<button class="day-pill${d.dateISO === today ? ' today' : ''}" data-day="${d.n - 1}">D${d.n}</button>`
+  ).join("");
+
+  const slidesHTML = TRIP.days.map(d => {
+    const stay = stayLookup(d.stayId);
+    const eats = TRIP.eats.filter(e => e.day === d.n);
+    return `
+      <div class="day-slide" data-day="${d.n - 1}">
+        <div class="day-header">
+          <div class="day-num">D${d.n}</div>
+          <div class="day-date">${esc(d.dateLabel)}</div>
+        </div>
+        <div class="day-theme">${esc(d.theme)}</div>
+        <div class="day-stats">
+          <div class="stat"><span class="stat-icon">🕗</span><div><span class="stat-label">Depart</span><span class="stat-val">${esc(d.depart)}</span></div></div>
+          <div class="stat"><span class="stat-icon">🚗</span><div><span class="stat-label">Drive</span><span class="stat-val">${esc(d.driving)}</span></div></div>
+        </div>
+        ${d.warn ? `<div class="warn">${esc(d.warn)}</div>` : ""}
+        ${d.activities.map(activityHTML).join("")}
+        ${d.kids ? `<div class="info-block"><strong>Kid Logistics</strong>${esc(d.kids)}</div>` : ""}
+        <div class="day-summary">
+          ${stay ? `<div class="day-summary-card"><div class="day-summary-label">🛏️ Tonight</div><div class="day-summary-val">${esc(stay.name)}</div></div>` : ""}
+          ${eats.length ? `<div class="day-summary-card"><div class="day-summary-label">🍛 Eats</div><div class="day-summary-val">${eats.map(e=>esc(e.name)).join(" · ")}</div></div>` : ""}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  root.innerHTML = `
+    <div class="day-pills"><div class="day-pills-scroll">${pillsHTML}</div></div>
+    <div class="days-carousel" id="days-carousel">${slidesHTML}</div>
+  `;
+
+  const carousel = $("#days-carousel", root);
+  const pills = $$(".day-pill", root);
+
+  pills.forEach(p => p.addEventListener("click", () => {
+    scrollToDay(parseInt(p.dataset.day, 10));
+  }));
+
+  let scrollT;
+  carousel.addEventListener("scroll", () => {
+    clearTimeout(scrollT);
+    scrollT = setTimeout(() => {
+      const idx = Math.round(carousel.scrollLeft / carousel.clientWidth);
+      pills.forEach((p,i) => p.classList.toggle("active", i === idx));
+      const activePill = pills[idx];
+      if(activePill) activePill.scrollIntoView({ inline:"center", behavior:"smooth", block:"nearest" });
+    }, 80);
+  });
+
+  // Initial active pill: today if in trip, else day 1
+  const todayIdx = TRIP.days.findIndex(d => d.dateISO === today);
+  const initial = todayIdx >= 0 ? todayIdx : 0;
+  requestAnimationFrame(() => scrollToDay(initial, false));
+}
+
+function scrollToDay(idx, smooth=true){
+  const carousel = $("#days-carousel");
+  if(!carousel) return;
+  carousel.scrollTo({ left: idx * carousel.clientWidth, behavior: smooth ? "smooth" : "auto" });
+  $$(".day-pill", $("#screen-days")).forEach((p,i) => p.classList.toggle("active", i === idx));
+}
+
+/* ---------------------------------------------------------------
+   STAYS
+--------------------------------------------------------------- */
+function renderStays(){
+  const root = $("#screen-stays");
+  root.innerHTML = `
+    <h2 class="section-title">Where We're Sleeping</h2>
+    <p class="section-sub">${TRIP.stays.length} stays · ${TRIP.stays.reduce((s,x)=>s+x.nights,0)} nights total</p>
+    ${TRIP.stays.map(s => `
+      <article class="stay type-${s.type.toLowerCase()}">
+        <div class="stay-mark">${s.icon}</div>
+        <div class="stay-info">
+          <div class="stay-head">
+            <div class="stay-name">${esc(s.name)}</div>
+            <div class="stay-nights">${s.nights} ${s.nights === 1 ? "night" : "nights"}</div>
+          </div>
+          <div class="stay-dates">${esc(s.checkin)} → ${esc(s.checkout)} · ${esc(s.type)}</div>
+          <div class="stay-addr">${esc(s.addr)}</div>
+          <div class="addr-actions">
+            <button class="addr-btn copy-btn" data-copy="${esc(s.addr)}">📋 Copy</button>
+            <a class="addr-btn" target="_blank" rel="noopener" href="${mapsLink(s.addr)}">🗺 Maps</a>
+            <button class="addr-btn copy-btn" data-copy="${esc(s.conf)}">📋 Conf</button>
+          </div>
+          <span class="stay-conf">${esc(s.conf)}</span>
+        </div>
+      </article>
+    `).join("")}
+  `;
+}
+
+/* ---------------------------------------------------------------
+   LOGISTICS
+--------------------------------------------------------------- */
+function renderLogistics(){
+  const root = $("#screen-logistics");
+  root.innerHTML = `
+    <h2 class="section-title">Logistics</h2>
+    <article class="logistics-card">
+      <div class="logistics-head">
+        <div class="logistics-icon">✈️</div>
+        <div>
+          <div class="logistics-title">Flights · Delta</div>
+          <div class="logistics-sub">3 segments · 2 families</div>
+        </div>
+      </div>
+      ${TRIP.flights.map(f => `
+        <div class="flight-row">
+          <div>
+            <div><strong>${esc(f.who)}</strong> · ${esc(f.type)}</div>
+            <div class="flight-meta">${esc(f.date)} · ${esc(f.route)} · ${esc(f.carrier)}</div>
+          </div>
+          <div class="flight-conf">${esc(f.conf)}</div>
+        </div>
+      `).join("")}
+    </article>
+
+    <article class="logistics-card">
+      <div class="logistics-head">
+        <div class="logistics-icon">🚐</div>
+        <div>
+          <div class="logistics-title">Rental Car · ${esc(TRIP.car.company)}</div>
+          <div class="logistics-sub">${esc(TRIP.car.vehicle)}</div>
+        </div>
+      </div>
+      <div class="car-grid">
+        <div class="car-cell">
+          <div class="car-cell-label">Costco Conf</div>
+          <div class="car-cell-val">${esc(TRIP.car.costcoConf)}</div>
+        </div>
+        <div class="car-cell">
+          <div class="car-cell-label">Alamo Conf</div>
+          <div class="car-cell-val">${esc(TRIP.car.alamoConf)}</div>
+        </div>
+        <div class="car-cell">
+          <div class="car-cell-label">Pickup</div>
+          <div class="car-cell-val">${esc(TRIP.car.pickup)}</div>
+        </div>
+        <div class="car-cell">
+          <div class="car-cell-label">Dropoff</div>
+          <div class="car-cell-val">${esc(TRIP.car.dropoff)}</div>
+        </div>
+      </div>
+      <div class="addr-actions" style="margin-top:12px">
+        <button class="addr-btn copy-btn" data-copy="${esc(TRIP.car.alamoConf)}">📋 Alamo Conf</button>
+        <button class="addr-btn copy-btn" data-copy="${esc(TRIP.car.costcoConf)}">📋 Costco Conf</button>
+      </div>
+    </article>
+  `;
+}
+
+/* ---------------------------------------------------------------
+   EATS
+--------------------------------------------------------------- */
+let eatsFilter = "all";
+
+function renderEats(){
+  const root = $("#screen-eats");
+  root.innerHTML = `
+    <h2 class="section-title">Eats</h2>
+    <div class="eats-search-wrap">
+      <input class="eats-search" id="eats-search" type="search" placeholder="Search restaurants, cities, day…" autocomplete="off">
+      <div class="eats-chips">
+        <button class="eats-chip active" data-filter="all">All</button>
+        <button class="eats-chip" data-filter="indian">Indian</button>
+        <button class="eats-chip" data-filter="veg">Veg-friendly</button>
+        <button class="eats-chip" data-filter="gem">Hidden Gem</button>
+      </div>
+    </div>
+    <div id="eats-list"></div>
+  `;
+
+  const input = $("#eats-search", root);
+  const list = $("#eats-list", root);
+  const chips = $$(".eats-chip", root);
+
+  const update = () => {
+    const q = (input.value || "").toLowerCase().trim();
+    const filtered = TRIP.eats.filter(e => {
+      if(eatsFilter === "indian" && !e.indian) return false;
+      if(eatsFilter === "veg" && !e.veg) return false;
+      if(eatsFilter === "gem" && !e.gem) return false;
+      if(!q) return true;
+      const hay = [e.name, e.area, e.cuisine, e.notes, "day "+e.day, "d"+e.day, e.addr].join(" ").toLowerCase();
+      return hay.includes(q);
+    });
+    if(!filtered.length){
+      list.innerHTML = `<div class="eats-empty">No restaurants match. Try clearing filters or search.</div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(e => `
+      <article class="eat-card">
+        <div class="eat-head">
+          <div class="eat-name">${e.star ? "⭐ " : ""}${esc(e.name)}</div>
+          <div class="eat-rating">${esc(e.rating)}⭐</div>
+        </div>
+        <div class="eat-meta">
+          <span class="eat-tag">Day ${e.day} · ${esc(e.area)}</span>
+          <span class="eat-cuisine">${esc(e.cuisine)}</span>
+          ${e.reviews && e.reviews !== "—" ? `<span>${esc(e.reviews)} reviews</span>` : ""}
+        </div>
+        ${e.notes ? `<div class="eat-notes">${esc(e.notes)}</div>` : ""}
+        <div class="eat-addr">${esc(e.addr)}</div>
+        <div class="addr-actions" style="margin-top:8px">
+          <button class="addr-btn copy-btn" data-copy="${esc(e.addr)}">📋 Copy</button>
+          <a class="addr-btn" target="_blank" rel="noopener" href="${mapsLink(e.addr)}">🗺 Maps</a>
+        </div>
+      </article>
+    `).join("");
+  };
+
+  input.addEventListener("input", update);
+  chips.forEach(c => c.addEventListener("click", () => {
+    chips.forEach(x => x.classList.remove("active"));
+    c.classList.add("active");
+    eatsFilter = c.dataset.filter;
+    update();
+  }));
+
+  update();
+}
+
+/* ---------------------------------------------------------------
+   NAVIGATION
+--------------------------------------------------------------- */
+function switchScreen(target){
+  $$(".screen").forEach(s => s.classList.toggle("active", s.dataset.screen === target));
+  $$(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.target === target));
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ---------------------------------------------------------------
+   GLOBAL EVENT WIRING
+--------------------------------------------------------------- */
+document.addEventListener("click", (e) => {
+  const copyBtn = e.target.closest(".copy-btn");
+  if(copyBtn){
+    const text = copyBtn.dataset.copy;
+    if(text) copyText(text);
+    return;
+  }
+  const navBtn = e.target.closest(".nav-btn");
+  if(navBtn){
+    switchScreen(navBtn.dataset.target);
+  }
+});
+
+/* ---------------------------------------------------------------
+   INIT
+--------------------------------------------------------------- */
+renderToday();
+renderDays();
+renderStays();
+renderLogistics();
+renderEats();
+
+window.addEventListener("resize", () => {
+  // Re-align active day on resize
+  const carousel = $("#days-carousel");
+  if(carousel){
+    const pills = $$(".day-pill");
+    const activeIdx = pills.findIndex(p => p.classList.contains("active"));
+    if(activeIdx >= 0) carousel.scrollTo({ left: activeIdx * carousel.clientWidth });
+  }
+});
+</script>
+</body>
+</html>
