@@ -170,6 +170,13 @@
 
   .warn{display:flex;gap:10px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.5;color:var(--warn-fg)}
   .warn .icon{color:var(--warn-fg);flex-shrink:0;margin-top:1px}
+  .route-map-btn{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--teal),#0891B2);color:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:13px;text-decoration:none;box-shadow:0 2px 8px rgba(14,116,144,0.25);transition:transform .12s ease,box-shadow .15s ease}
+  .route-map-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(14,116,144,0.32)}
+  .route-map-btn:active{transform:scale(0.99)}
+  .route-map-btn .icon{color:#fff;flex-shrink:0}
+  .route-map-text{flex:1;min-width:0;display:flex;flex-direction:column}
+  .route-map-label{font-weight:700;font-size:13px;letter-spacing:0.01em;line-height:1.2}
+  .route-map-sub{font-size:11px;opacity:0.88;margin-top:2px;line-height:1.3}
 
   /* ---------- ACTIVITY CARD ---------- */
   .activity{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-card)}
@@ -295,6 +302,8 @@
   .car-cell{background:var(--sunken);border-radius:var(--radius);padding:12px;font-size:12px}
   .car-cell-label{font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:5px}
   .car-cell-val{font-weight:600;font-size:13.5px;line-height:1.35;color:var(--ink)}
+  .car-note{display:flex;align-items:flex-start;gap:6px;margin-top:10px;font-size:12px;color:var(--ink-mute);background:var(--sunken);padding:8px 10px;border-radius:8px;line-height:1.4}
+  .car-note .icon{color:var(--ink-mute);flex-shrink:0;margin-top:1px}
 
   /* ---------- EATS ---------- */
   .search-wrap{position:sticky;top:calc(56px + var(--safe-top));z-index:40;background:var(--bg);padding:8px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
@@ -567,6 +576,12 @@ const TRIP = {
     costcoConf:"C488250262", alamoConf:"1596397883",
     pickup:"May 30, 10:00 PM · SFO", dropoff:"Jun 9, 10:00 PM · SFO"
   },
+  carBackup: {
+    company:"Enterprise", vehicle:"12-Seater Van",
+    conf:"1593288767",
+    pickup:"May 30, 10:00 PM · SFO", dropoff:"Jun 9, 10:00 PM · SFO",
+    note:"Backup if Alamo Pacifica is unavailable at pickup"
+  },
   stays: [
     { id:"burlingame", name:"Hampton Inn & Suites SF–Burlingame Airport South", addr:"1755 Bayshore Hwy, Burlingame, CA 94010", checkin:"May 30", checkout:"May 31", nights:1, conf:"85991366", type:"Hotel" },
     { id:"monterey", name:"Hampton Inn Monterey", addr:"2401 Del Monte Ave, Monterey, CA 93940", checkin:"May 31", checkout:"Jun 2", nights:2, conf:"94520764", type:"Hotel" },
@@ -602,7 +617,7 @@ const TRIP = {
     "Pack: Dramamine for kids, layers (cold at altitude), reef-safe sunscreen, swim gear for Tahoe, binoculars for El Cap climbers"
   ],
   days: [
-    { n:1, dateISO:"2026-05-30", dateLabel:"Fri, May 30", theme:"Arrival",
+    { n:1, dateISO:"2026-05-30", dateLabel:"Sat, May 30", theme:"Arrival",
       depart:"—", driving:"0.5 hrs (SFO → hotel)", stayId:"burlingame",
       activities:[
         { time:"10:27 PM", name:"Arrive SFO Airport", desc:"Patel Family · Delta · Conf GERBYK", badge:"must", type:"flight" },
@@ -610,42 +625,49 @@ const TRIP = {
       ],
       kids:"Hotel has 24-hr front desk + shuttle from SFO; Hampton Inn breakfast 6–10 AM."
     },
-    { n:2, dateISO:"2026-05-31", dateLabel:"Sat, May 31", theme:"Santa Cruz & Carmel",
-      depart:"9:00 AM", driving:"~3.5 hrs total", stayId:"monterey",
+    { n:2, dateISO:"2026-05-31", dateLabel:"Sun, May 31", theme:"Ultimate Coastal Explorer & Sunset Drive",
+      depart:"8:30 AM", driving:"~4 hrs total (Burlingame → Monterey via Hwy 1)", stayId:"monterey",
+      routeMapUrl:"https://www.google.com/maps/dir/1755+Old+Bayshore+Hwy,+Burlingame,+CA+94010/Shark+Fin+Cove,+Davenport,+CA+95017/400+Beach+St,+Santa+Cruz,+CA+95060/2790+17+Mile+Dr,+Pebble+Beach,+CA+93953/Carmel+Beach,+California/2401+Del+Monte+Ave,+Monterey,+CA+93940/@37.0689392,-122.7592371,9z/data=!3m1!4b1!4m37!4m36!1m5!1m1!1s0x808f77cebe28a9c7:0xf953402a480dbb99!2m2!1d-122.3716712!2d37.6017748!1m5!1m1!1s0x808e5b50ae0ae325:0x510819b9aa565bf8!2m2!1d-122.1854138!2d37.0040866!1m5!1m1!1s0x808e6a98043f97a3:0xe054367d3b0a7a8!2m2!1d-122.0159883!2d36.9643379!1m5!1m1!1s0x808de133069daa59:0xc801e7a481f5855c!2m2!1d-121.9325848!2d36.6133164!1m5!1m1!1s0x808de638ca0ad14f:0xbc66c137c614f4b5!2m2!1d-121.9298893!2d36.5521696!1m5!1m1!1s0x808de459a1496e29:0x814af56bac4ec14f!2m2!1d-121.8602194!2d36.6057522?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D",
       activities:[
-        { time:"10:30 AM", name:"The Mystery Spot", desc:"Gravity-defying tilted shack, 45-min guided tour. Kids 4+ love it.", addr:"465 Mystery Spot Rd, Santa Cruz, CA 95065", duration:"1.5 hrs", drive:"1h 30min", parking:"$10 cash", tickets:"$10/adult, $5 kids 4–11, free under 4 — BOOK AHEAD at mysteryspot.com (time slots sell out)", restroom:"On-site restrooms + water", badge:"must", photo:"Mystery_Spot_(Santa_Cruz)_sign_2008.jpg", type:"activity" },
-        { time:"12:30 PM", name:"Lunch: Chipotle Santa Cruz", desc:"Quick veg burrito bowls.", addr:"2401 Soquel Dr, Santa Cruz, CA 95062", duration:"45 min", badge:"kid", type:"food" },
-        { time:"1:45 PM", name:"17-Mile Drive (Lone Cypress)", desc:"Iconic Pebble Beach coastal drive.", addr:"17-Mile Drive Pacific Grove Gate", duration:"1.5 hrs", tickets:"$11.75/vehicle (refunded if dining at Pebble Beach restaurant)", restroom:"Spanish Bay restrooms at resort entrance", badge:"must", photo:"Lone_Cypress.jpg", type:"beach" },
-        { time:"3:45 PM", name:"Explore Carmel-by-the-Sea", desc:"Storybook village, dog-friendly beach.", addr:"Ocean Ave, Carmel-by-the-Sea, CA", duration:"1.5 hrs", parking:"Free 2-hr street parking", restroom:"Carmel Beach restrooms at top of Ocean Ave", badge:"must", photo:"Carmel-by-the-Sea_-_Ocean_Avenue.jpg", type:"activity" },
-        { time:"6:30 PM", name:"Dinner: Ambrosia India Bistro", desc:"4.4⭐ Indian.", addr:"510 Broadway Ave, Seaside, CA 93955", duration:"1 hr", badge:"kid", type:"food" }
+        { time:"8:30 AM", name:"Depart Hampton Inn Burlingame", desc:"Roll out south on US-101 → CA-92 → Hwy 1 for the full coastal cruise.", addr:"1755 Bayshore Highway, Burlingame, CA 94010", type:"drive" },
+        { time:"9:45 AM", name:"Shark Fin Cove", desc:"Hidden Gem & Quick Photo Stop (9:45 AM – 10:15 AM). Pull off right along Highway 1 to take magnificent family photos of the massive 'shark fin' rock formation from the safe, flat upper cliff edges.", addr:"Shark Fin Cove, Davenport, CA 95017", duration:"30 min", parking:"Free roadside pullout on Hwy 1, north of Davenport", noRestroom:true, badge:"gem", type:"beach" },
+        { time:"10:45 AM", name:"Santa Cruz Beach Boardwalk", desc:"High-Energy Family Play (10:45 AM – 1:30 PM). Spend the peak of the day here. The kids can win prizes at the boardwalk games, explore the indoor video game arcade, and eat lunch right by the sand.", addr:"400 Beach St, Santa Cruz, CA 95060", duration:"2 hr 45 min", parking:"Beach St garage + surface lots, $20–30/day in summer", restroom:"Multiple on-site restrooms", badge:"kid", type:"activity" },
+        { time:"2:30 PM", name:"Pacific Grove Gate (17-Mile Drive)", desc:"Iconic Driving Loop, $11.75 Entry (2:30 PM – 4:00 PM). A gorgeous, relaxed driving track. Stop at Bird Rock so the kids can look at sea lions through the public binoculars, and take pictures at the Lone Cypress.", addr:"2790 17 Mile Dr, Pebble Beach, CA 93953", duration:"1 hr 30 min", tickets:"$11.75/vehicle (refunded if dining at a Pebble Beach restaurant)", restroom:"Spanish Bay restrooms at the resort entrance", badge:"must", photo:"Lone_Cypress.jpg", type:"beach" },
+        { time:"4:15 PM", name:"Carmel-by-the-Sea & Carmel Beach", desc:"Storybook Village & SUNSET STOP (4:15 PM – 8:15 PM). Stroll the secret fairytale paths and grab treats at the historic Carmel Bakery. Right around 7:45 PM, head down to the soft white sands of Carmel Beach to watch a stunning Pacific sunset together before heading to the hotel.", addr:"Carmel Beach, Carmel-by-the-Sea, CA 93923", duration:"4 hrs", parking:"Free 2-hr street parking on Ocean Ave; Carmel Beach lot at the foot of Ocean Ave", restroom:"Carmel Beach restrooms at the top of Ocean Ave", badge:"must", photo:"Carmel-by-the-Sea_-_Ocean_Avenue.jpg", type:"beach" },
+        { time:"8:30 PM", name:"Arrive Hampton Inn Monterey", desc:"Final destination for the night. Conf 94520764.", addr:"2401 Del Monte Avenue, Monterey, CA 93940", type:"stay" }
       ],
-      kids:"Mystery Spot: full restrooms + water (gravel paths, no strollers). Spanish Bay & Carmel Beach restrooms available."
+      kids:"Restrooms at Santa Cruz Boardwalk (multiple), Spanish Bay, and Carmel Beach. Pack a fleece/jacket for the Carmel Beach sunset — coastal evenings are chilly. Bring binoculars for the sea lions at Bird Rock."
     },
-    { n:3, dateISO:"2026-06-01", dateLabel:"Sun, Jun 1", theme:"Big Sur Coast",
-      depart:"8:30 AM", driving:"~4.5 hrs round-trip", stayId:"monterey",
+    { n:3, dateISO:"2026-06-01", dateLabel:"Mon, Jun 1", theme:"Big Sur Apex & Way-Back Discoveries",
+      depart:"9:00 AM", driving:"~5 hrs (Monterey → McWay Falls → Monterey loop)", stayId:"monterey",
+      routeMapUrl:"https://www.google.com/maps/dir/2401+Del+Monte+Ave,+Monterey,+CA+93940/886+Cannery+Row,+Monterey,+CA+93940/McWay+Falls,+California+93920/9101+Sycamore+Canyon+Rd,+Big+Sur,+CA+93920/46800+CA-1,+Big+Sur,+CA+93920/CA-1+%26+Bixby+Creek+Bridge,+California+93940/62+CA-1,+Carmel-By-The-Sea,+CA+93923/2401+Del+Monte+Ave,+Monterey,+CA+93940/@36.3872538,-122.1339406,10z/data=!3m1!4b1!4m49!4m48!1m5!1m1!1s0x808de459a1496e29:0x814af56bac4ec14f!2m2!1d-121.8602194!2d36.6057522!1m5!1m1!1s0x808de401d01aa6bf:0xc9f86491056b6116!2m2!1d-121.901173!2d36.617578!1m5!1m1!1s0x808d803496d56575:0x6668b96e4335c2f5!2m2!1d-121.6721628!2d36.1578259!1m5!1m1!1s0x808d9ab556cf7b79:0x808c0dd9d87d5fd6!2m2!1d-121.8121194!2d36.2382839!1m5!1m1!1s0x808d8fe2f9cddbc1:0x77b7fb6e9899593d!2m2!1d-121.8084582!2d36.2705616!1m5!1m1!1s0x808d94a0a6115939:0xee2d45ce748cc08!2m2!1d-121.9016671!2d36.3704669!1m5!1m1!1s0x808de88da44726db:0x832ee0aa51371c5f!2m2!1d-121.9378125!2d36.5152662!1m5!1m1!1s0x808de459a1496e29:0x814af56bac4ec14f!2m2!1d-121.8602194!2d36.6057522?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D",
       activities:[
-        { time:"9:00 AM", name:"Point Lobos State Natural Reserve", desc:"Sea otters, tide pools, easy 1-mi Cypress Grove loop.", addr:"62 CA-1, Carmel-By-The-Sea, CA 93923", duration:"1.5 hrs", parking:"$10/vehicle, arrive by 9 AM weekends", restroom:"Multiple restrooms on-site", badge:"must", photo:"Point_Lobos_State_Natural_Reserve.jpg", type:"hike" },
-        { time:"11:00 AM", name:"Garrapata State Park (Calla Lily Valley)", desc:"Park gates 18–19 on Hwy 1, valley of white calla lilies, sea arches.", duration:"30 min", parking:"Free roadside parking, no facilities", noRestroom:true, badge:"gem", type:"beach" },
-        { time:"12:00 PM", name:"Bixby Creek Bridge + Hurricane Point", desc:"Best view from Hurricane Point south pull-off.", addr:"Bixby Creek Bridge, Big Sur, CA 93920", duration:"30 min", noRestroom:true, badge:"must", photo:"Bixby_Bridge_Big_Sur_California_United_States_Landscape_Photography_(106473129).jpeg", type:"activity" },
-        { time:"12:45 PM", name:"Point Sur State Historic Park", desc:"1889 lighthouse, tour-only access — drive-by only.", duration:"15 min drive-by", badge:"skip", type:"activity" },
-        { time:"1:30 PM", name:"Lunch: Nepenthe", desc:"Cliff-side terrace, 800 ft above Pacific.", addr:"48510 CA-1, Big Sur, CA 93920", duration:"1.5 hrs", tickets:"Call ahead, wait expected", restroom:"Restrooms at restaurant", badge:"must", type:"food" },
-        { time:"3:30 PM", name:"Pfeiffer Beach (Purple Sand + Keyhole Arch)", desc:"Unmarked turn 0.5 mi south of Big Sur Station, then 2 mi down narrow Sycamore Canyon Rd.", duration:"45 min", parking:"$15/vehicle, lot is small", restroom:"Big Sur Station restrooms before turn-off", badge:"gem", photo:"Pfeiffer_Beach_-_Big_Sur,_California.jpg", type:"beach" },
-        { time:"5:00 PM", name:"McWay Falls", desc:"80-ft waterfall on a beach, 0.5 mi paved overlook.", addr:"Julia Pfeiffer Burns State Park, 52801 CA-1, Big Sur, CA 93920", duration:"30 min", parking:"$10/vehicle (covers all CA State Parks for the day)", restroom:"Trailhead restrooms", badge:"must", photo:"McWay_Falls_Julia_Pfeiffer_Burns_State_Park.jpg", type:"hike" }
+        { time:"9:00 AM", name:"Depart Hampton Inn Monterey", desc:"Head straight to Cannery Row for the aquarium opening.", addr:"2401 Del Monte Avenue, Monterey, CA 93940", type:"drive" },
+        { time:"9:15 AM", name:"Monterey Bay Aquarium", desc:"World-Class Marine Life (9:15 AM – 11:30 AM). Head straight here in the morning to see the playful sea otters and enjoy the interactive children's splash touch-tanks.", addr:"886 Cannery Row, Monterey, CA 93940", duration:"2 hr 15 min", parking:"Heritage Harbor garage / Cannery Row lots (~$3/hr)", tickets:"montereybayaquarium.org — buy timed tickets ahead", restroom:"Multiple restrooms inside the aquarium", badge:"must", type:"activity" },
+        { time:"12:45 PM", name:"McWay Falls (The Deepest Point South)", desc:"Iconic Waterfall Photo Stop (12:45 PM – 1:15 PM). Drive straight down to the furthest point of your trip. Take the flat, stroller-friendly 30-minute path to take pictures of the majestic waterfall pouring onto the untouched sand cove.", addr:"Julia Pfeiffer Burns State Park, 52801 CA-1, Big Sur, CA 93920", duration:"30 min", parking:"$10/vehicle (covers all CA State Parks for the day)", restroom:"Trailhead restrooms", badge:"must", photo:"McWay_Falls_Julia_Pfeiffer_Burns_State_Park.jpg", type:"hike" },
+        { time:"1:30 PM", name:"Pfeiffer Beach (On the Way Back North)", desc:"Hidden Gem Purple Sand Beach (1:30 PM – 2:40 PM). Turning back north, pull off to explore this hidden treasure. Kids can look for vibrant patches of purple sand and watch waves crash through Keyhole Arch.", addr:"9101 Sycamore Canyon Rd, Big Sur, CA 93920", duration:"1 hr 10 min", parking:"$15/vehicle, small lot. Unmarked turn ~0.5 mi south of Big Sur Station, then 2 mi down narrow Sycamore Canyon Rd.", restroom:"Big Sur Station restrooms before the turn-off", badge:"gem", photo:"Pfeiffer_Beach_-_Big_Sur,_California.jpg", type:"beach" },
+        { time:"3:00 PM", name:"Big Sur River Inn (On the Way Back North)", desc:"Late Lunch & Forest Relaxation (3:00 PM – 4:30 PM). The ultimate family pit-stop. Sit in the heavy wood chairs placed directly inside the shallow, clear river while the kids splash safely under giant redwoods.", addr:"46800 CA-1, Big Sur, CA 93920", duration:"1 hr 30 min", parking:"On-site lot at the inn", restroom:"Full restrooms at the restaurant", badge:"must", type:"food" },
+        { time:"4:50 PM", name:"Bixby Creek Bridge (On the Way Back North)", desc:"Iconic Bridge Photo Stop (4:50 PM – 5:10 PM). Pull into the northern cliffside turnout to snap your definitive family portrait with this legendary highway architectural arch.", addr:"Bixby Creek Bridge, Big Sur, CA 93920", duration:"20 min", parking:"Free roadside pullout on the north side of the bridge", noRestroom:true, badge:"must", photo:"Bixby_Bridge_Big_Sur_California_United_States_Landscape_Photography_(106473129).jpeg", type:"activity" },
+        { time:"5:30 PM", name:"Point Lobos State Natural Reserve", desc:"Scenic Headlands Nature Walk (5:30 PM – 6:45 PM). Wind down the day walking the completely flat 0.8-mile Bird Island Trail loop. Peer down into the turquoise waters of China Cove to spot harbor seals and wildlife.", addr:"62 CA-1, Carmel-By-The-Sea, CA 93923", duration:"1 hr 15 min", parking:"$10/vehicle", restroom:"Multiple restrooms on-site", badge:"must", photo:"Point_Lobos_State_Natural_Reserve.jpg", type:"hike" },
+        { time:"7:00 PM", name:"Return to Hampton Inn Monterey", desc:"Final return point for the night. Conf 94520764.", addr:"2401 Del Monte Avenue, Monterey, CA 93940", type:"stay" }
       ],
-      kids:"Restrooms: Point Lobos (multiple), Nepenthe, McWay Falls trailhead. NO restrooms between Garrapata and Nepenthe. Bring extra water — Nepenthe + Big Sur Station are only refills."
+      kids:"Restrooms at the Aquarium (multiple), McWay Falls trailhead, Big Sur River Inn, and Point Lobos. Bring water + snacks — limited services between Big Sur River Inn and Bixby Bridge. Drive slowly on the narrow Pfeiffer access road."
     },
-    { n:4, dateISO:"2026-06-02", dateLabel:"Mon, Jun 2", theme:"Transit & Reunion",
-      depart:"8:00 AM", driving:"~6 hrs (Monterey → Tracy → Oakhurst)", stayId:"oakhurst",
+    { n:4, dateISO:"2026-06-02", dateLabel:"Tue, Jun 2", theme:"Redwood Steam Train Voyage & Onward to Oakhurst",
+      depart:"9:00 AM", driving:"~6 hrs total (Monterey → Felton → Tracy → Oakhurst)", stayId:"oakhurst",
+      routeMapUrl:"https://www.google.com/maps/dir/2401+Del+Monte+Ave,+Monterey,+CA+93940/5401+Graham+Hill+Rd,+Felton,+CA+95018/3163+Neil+Jerome+Dr,+Tracy,+CA+95377/@37.1715794,-122.4276019,9z/data=!3m1!4b1!4m19!4m18!1m5!1m1!1s0x808de459a1496e29:0x814af56bac4ec14f!2m2!1d-121.8602194!2d36.6057522!1m5!1m1!1s0x808e46b9cbd0e9a5:0x1a337ffd5f8bcf26!2m2!1d-122.0641707!2d37.0470199!1m5!1m1!1s0x8090231720c43c31:0xd62320b565d3bed3!2m2!1d-121.4730485!2d37.7015071?entry=ttu&g_ep=EgoyMDI2MDUyNy4wIKXMDSoASAFQAw%3D%3D",
       activities:[
-        { time:"11:30 AM", name:"Arrive at Friend's house (Tracy)", desc:"Lunch with friends.", addr:"3163 Neil Jerome Dr, Tracy, CA 95377", duration:"2 hrs", drive:"2h 15min from Monterey", restroom:"Friend's house", badge:"must", type:"activity" },
-        { time:"1:30 PM", name:"New Indian Supermarket (road snacks)", desc:"Biggest Indian grocery in Tracy. Samosas, sweets, chaat, fruit, chai mixes for the Yosemite days.", addr:"3250 N Tracy Blvd, Tracy, CA 95376", duration:"30 min", parking:"Open 9 AM–9:30 PM daily, ample free parking", restroom:"In-store restrooms", badge:"must", type:"food" },
-        { time:"2:30 PM", name:"Drive to Oakhurst", desc:"Tracy → Oakhurst: 2h 45min via I-5 S + CA-152 E + CA-99 S + CA-41 N. Restroom stop in Madera or Chowchilla suggested.", duration:"2h 45min", restroom:"Madera or Chowchilla gas stations en route", badge:"must", type:"drive" },
-        { time:"6:00 PM", name:"Check in: Hampton Inn Oakhurst", desc:"Settle, decompress.", addr:"40740 Highway 41, Oakhurst, CA 93644", type:"stay" },
-        { time:"7:00 PM", name:"Dinner: Tandoori Express", desc:"4.3⭐ (470+ reviews). Family-run Punjabi. Owners Omi & Vanshu personally cook. Order Aloo Paratha (off-menu), Butter Chicken, Dal Tadka.", addr:"40278 Rd 425A, Oakhurst, CA 93644", duration:"1.5 hrs", parking:"5 min from hotel", badge:"must", type:"food" }
+        { time:"9:00 AM", name:"Depart Hampton Inn Monterey", desc:"Head north on Hwy 1 → CA-17 N toward the Santa Cruz mountains.", addr:"2401 Del Monte Avenue, Monterey, CA 93940", type:"drive" },
+        { time:"10:00 AM", name:"Roaring Camp Railroads + Henry Cowell Redwoods", desc:"Historic Steam Train & Living Tree Trail (10:00 AM – 1:00 PM). Drive inland straight to the mountains. Hop aboard an authentic 19th-century steam train to ride up through the redwoods. Afterward, take the flat, 0.8-mile trail loop next door at Henry Cowell State Park so the kids can physically crawl inside a giant hollow living redwood tree.", addr:"5401 Graham Hill Rd, Felton, CA 95018", duration:"3 hrs", tickets:"roaringcamp.com — book the Redwood Forest Steam Train ahead", parking:"Free on-site lot with ticket purchase", restroom:"On-site restrooms at depot + Henry Cowell trailhead", badge:"must", type:"activity" },
+        { time:"3:00 PM", name:"Arrive at Friend's House (Tracy)", desc:"Head up CA-17 North out of the mountains, merge onto I-680 North, and take I-580 East across the pass directly to Tracy. A highly relaxed 1.5-to-2-hour drive to close out the coastal leg of the trip.", addr:"3163 Neil Jerome Dr, Tracy, CA 95377", duration:"2 hrs (visit)", drive:"~1.5–2 hrs Felton → Tracy", restroom:"At friend's house", badge:"must", type:"activity" },
+        { time:"5:00 PM", name:"New Indian Supermarket (road snacks)", desc:"Biggest Indian grocery in Tracy. Samosas, sweets, chaat, fruit, chai mixes for the Yosemite days.", addr:"3250 N Tracy Blvd, Tracy, CA 95376", duration:"30 min", parking:"Open 9 AM – 9:30 PM daily, ample free parking", restroom:"In-store restrooms", badge:"must", type:"food" },
+        { time:"5:45 PM", name:"Drive to Oakhurst", desc:"Tracy → Oakhurst: 2h 45min via I-5 S + CA-152 E + CA-99 S + CA-41 N. Restroom stop in Madera or Chowchilla suggested.", duration:"2h 45min", restroom:"Madera or Chowchilla gas stations en route", badge:"must", type:"drive" },
+        { time:"8:30 PM", name:"Check in: Hampton Inn Oakhurst", desc:"Settle, decompress. Conf 90574140.", addr:"40740 Highway 41, Oakhurst, CA 93644", type:"stay" },
+        { time:"9:00 PM", name:"Dinner: Tandoori Express", desc:"4.3⭐ Punjabi, family-run. Closes ~9 PM — CALL AHEAD for pickup. Order Aloo Paratha (off-menu), Butter Chicken, Dal Tadka.", addr:"40278 Rd 425A, Oakhurst, CA 93644", duration:"1 hr", parking:"5 min from hotel", badge:"must", type:"food" }
       ],
-      kids:"Restrooms at friend's house, New Indian Supermarket, Madera/Chowchilla gas stations. Stock up on snacks at Indian grocery — no Indian food in Yosemite. Long day, plan a 15-min stretch break mid-drive."
+      kids:"Restrooms at Roaring Camp depot, Henry Cowell trailhead, friend's house, New Indian Supermarket, and Madera/Chowchilla gas stations. Stock up on snacks at the Indian grocery — no Indian food in Yosemite. Long day, build in a 15-min stretch break mid-drive."
     },
-    { n:5, dateISO:"2026-06-03", dateLabel:"Tue, Jun 3", theme:"Yosemite High Views",
+    { n:5, dateISO:"2026-06-03", dateLabel:"Wed, Jun 3", theme:"Yosemite High Views",
       depart:"7:30 AM", driving:"~3.5 hrs total", stayId:"oakhurst",
       warn:"Glacier Point Rd is a 16-mile windy mountain road. Bring Dramamine / motion sickness bands for the 4-year-olds. Drive slow, stop at pullouts.",
       activities:[
@@ -658,7 +680,7 @@ const TRIP = {
       ],
       kids:"Restrooms at South Entrance station, Glacier Point parking, Sentinel Dome trailhead. Water refills at South Entrance + Glacier Point. Kids need fleece + hat at 7,200 ft even in June."
     },
-    { n:6, dateISO:"2026-06-04", dateLabel:"Wed, Jun 4", theme:"Valley, Sequoias & Falls",
+    { n:6, dateISO:"2026-06-04", dateLabel:"Thu, Jun 4", theme:"Valley, Sequoias & Falls",
       depart:"7:00 AM", driving:"~3.5 hrs total", stayId:"oakhurst",
       warn:"Yosemite Valley parking fills by 9 AM in summer. Aim for arrival ≤8:30 AM. Use the FREE Valley shuttle once parked.",
       activities:[
@@ -676,7 +698,7 @@ const TRIP = {
       ],
       kids:"Restrooms at Mariposa Grove Welcome Plaza, Curry Village, Lower Yosemite Falls trailhead, Bridalveil parking, Tunnel View. Water refills at Curry Village, Yosemite Village, Glacier Point. Big day! Pack snacks, sunscreen, extra layers for Tunnel View at altitude."
     },
-    { n:7, dateISO:"2026-06-05", dateLabel:"Thu, Jun 5", theme:"Tioga Pass Drive",
+    { n:7, dateISO:"2026-06-05", dateLabel:"Fri, Jun 5", theme:"Tioga Pass Drive",
       depart:"7:00 AM", driving:"~7 hrs total — LONGEST DAY", stayId:"tahoe",
       warn:"LONG DRIVING DAY. Tioga Rd has NO food, water, gas, or services between Crane Flat and Lee Vining (135 mi). Fill gas in Oakhurst. Bring lots of water + snacks. Vault toilets only at Tioga stops.",
       activities:[
@@ -693,7 +715,7 @@ const TRIP = {
       ],
       kids:"Vault-only restrooms at Crane Flat, Olmsted Point, Tuolumne Meadows, Tioga Pass entrance. Full facilities at Whoa Nellie Deli + Lee Vining Mobil. Bridgeport gas + restrooms midway. Bring 1 gallon water per person — Tioga has zero water sources."
     },
-    { n:8, dateISO:"2026-06-06", dateLabel:"Fri, Jun 6", theme:"Lake Tahoe",
+    { n:8, dateISO:"2026-06-06", dateLabel:"Sat, Jun 6", theme:"Lake Tahoe",
       depart:"8:30 AM", driving:"~2 hrs around the lake", stayId:"tahoe",
       activities:[
         { time:"9:30 AM", name:"Heavenly Gondola", desc:"2.4-mi gondola to 9,123 ft observation deck. 360° lake + Carson Valley views. Kids 5+ love it.", addr:"4080 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", duration:"2 hrs", drive:"45 min from cabin", parking:"Heavenly Village garage at 1 Bellamy Ct, $1.50/hr, $20 daily max", tickets:"~$79/adult, ~$45/child at skiheavenly.com (buy online to skip line)", restroom:"Heavenly Village restrooms", badge:"must", photo:"Heavenly_Mountain_Resort_gondola.jpg", type:"activity" },
@@ -706,7 +728,7 @@ const TRIP = {
       ],
       kids:"Full restrooms at Heavenly Village, Emerald Bay Inspiration Point, Sand Harbor (also showers). Bonsai Rock has NO restrooms. Sand Harbor has water fountains — bring extra for Bonsai Rock. Water is COLD (~60°F in June). High-altitude sun is intense — sunscreen."
     },
-    { n:9, dateISO:"2026-06-07", dateLabel:"Sat, Jun 7", theme:"Return to the Bay",
+    { n:9, dateISO:"2026-06-07", dateLabel:"Sun, Jun 7", theme:"Return to the Bay",
       depart:"10:00 AM", driving:"~4 hrs total (Tahoma → SF)", stayId:"sfo-north",
       activities:[
         { time:"10:00 AM", name:"Check out of Tahoma cabin", desc:"Final breakfast, pack up.", duration:"1 hr", restroom:"At cabin — go before Eagle Rock", type:"stay" },
@@ -718,7 +740,7 @@ const TRIP = {
       ],
       kids:"Restrooms at cabin (go before Eagle Rock — none on trail), Auburn/Davis stop, Battery Spencer (vault only). Long drive day — bring snacks, books, downloaded shows."
     },
-    { n:10, dateISO:"2026-06-08", dateLabel:"Sun, Jun 8", theme:"Muir Woods & Bridges",
+    { n:10, dateISO:"2026-06-08", dateLabel:"Mon, Jun 8", theme:"Muir Woods & Bridges",
       depart:"7:30 AM", driving:"~3 hrs around city", stayId:"sfo-north",
       warn:"MUIR WOODS REQUIRES ADVANCE PARKING RESERVATION. Book at gomuirwoods.com — $10/vehicle + $15/adult entry, kids 15 & under FREE. Reservations open 90 days out. BOOK NOW.",
       activities:[
@@ -732,7 +754,7 @@ const TRIP = {
       ],
       kids:"Restrooms at Muir Woods (multiple), Golden Gate Welcome Center, Lands End Lookout, Twin Peaks (upper lot). NO cell at Muir Woods — download offline maps before. Layers: Muir Woods ~55°F even in June, bridges windy."
     },
-    { n:11, dateISO:"2026-06-09", dateLabel:"Mon, Jun 9", theme:"City Landmarks",
+    { n:11, dateISO:"2026-06-09", dateLabel:"Tue, Jun 9", theme:"City Landmarks",
       depart:"8:00 AM", driving:"~2 hrs total + rental return", stayId:"embassy",
       activities:[
         { time:"9:00 AM", name:"Cable Car Ride (Powell-Hyde line)", desc:"Classic SF experience. Hold on tight!", addr:"Powell-Hyde Cable Car Turnaround, 2099 Hyde St, SF", duration:"1 hr", drive:"25 min", parking:"Park at Pier 39 garage and ride cable car as a loop. Don't park near Lombard.", tickets:"$8/ride or $26 day pass", badge:"must", photo:"San_Francisco_Cable_Car_Hyde_Street.jpg", type:"activity" },
@@ -747,7 +769,7 @@ const TRIP = {
       ],
       kids:"Restrooms at Pier 39 (multiple), Lombard St (Hyde St cafes), Amber India, Embassy Suites. Cable car LOUD when bells ring — smaller kids may need parent's lap. Sea lions are loud and smelly — kids find both hilarious."
     },
-    { n:12, dateISO:"2026-06-10", dateLabel:"Tue, Jun 10", theme:"Departure",
+    { n:12, dateISO:"2026-06-10", dateLabel:"Wed, Jun 10", theme:"Departure",
       depart:"6:30 AM", driving:"15 min shuttle", stayId:null,
       activities:[
         { time:"6:30 AM", name:"Hotel Shuttle to SFO Airport", desc:"Embassy Suites runs continuous SFO shuttle. 90 min before Delta domestic.", duration:"15 min", badge:"must", type:"car" },
@@ -1188,6 +1210,7 @@ function renderDayContent(){
       <div class="stat">${icon("i-clock")}<div class="stat-text"><span class="stat-label">Depart</span><span class="stat-val">${esc(d.depart)}</span></div></div>
       <div class="stat">${icon("i-route")}<div class="stat-text"><span class="stat-label">Driving</span><span class="stat-val">${esc(d.driving)}</span></div></div>
     </div>
+    ${d.routeMapUrl ? `<a class="route-map-btn" target="_blank" rel="noopener" href="${esc(d.routeMapUrl)}">${icon("i-route")}<div class="route-map-text"><span class="route-map-label">Full Route in Google Maps</span><span class="route-map-sub">All ${d.activities.filter(a=>a.addr).length} stops pinned in order</span></div>${icon("i-external")}</a>` : ""}
     ${d.warn ? `<div class="warn">${icon("i-alert")}<div>${esc(d.warn)}</div></div>` : ""}
   `;
 
@@ -1281,8 +1304,8 @@ function renderLogistics(){
       <div class="logistics-head">
         <div class="logistics-icon">${icon("i-car")}</div>
         <div>
-          <h3 class="logistics-title">Rental · ${esc(TRIP.car.company)}</h3>
-          <div class="logistics-sub">${esc(TRIP.car.vehicle)}</div>
+          <h3 class="logistics-title">Rental Option 1 · ${esc(TRIP.car.company)}</h3>
+          <div class="logistics-sub">${esc(TRIP.car.vehicle)} · Primary</div>
         </div>
       </div>
       <div class="car-grid">
@@ -1303,6 +1326,35 @@ function renderLogistics(){
           <div class="car-cell-val">${esc(TRIP.car.dropoff)}</div>
         </div>
       </div>
+    </article>
+
+    <article class="logistics-card">
+      <div class="logistics-head">
+        <div class="logistics-icon">${icon("i-car")}</div>
+        <div>
+          <h3 class="logistics-title">Rental Option 2 · ${esc(TRIP.carBackup.company)}</h3>
+          <div class="logistics-sub">${esc(TRIP.carBackup.vehicle)} · Backup</div>
+        </div>
+      </div>
+      <div class="car-grid">
+        <button class="car-cell copy-btn" data-copy="${esc(TRIP.carBackup.conf)}" data-label="Enterprise Conf # copied">
+          <div class="car-cell-label">Enterprise Conf</div>
+          <div class="car-cell-val">${esc(TRIP.carBackup.conf)}</div>
+        </button>
+        <div class="car-cell">
+          <div class="car-cell-label">Vehicle</div>
+          <div class="car-cell-val">12-Seater Van</div>
+        </div>
+        <div class="car-cell">
+          <div class="car-cell-label">Pickup</div>
+          <div class="car-cell-val">${esc(TRIP.carBackup.pickup)}</div>
+        </div>
+        <div class="car-cell">
+          <div class="car-cell-label">Dropoff</div>
+          <div class="car-cell-val">${esc(TRIP.carBackup.dropoff)}</div>
+        </div>
+      </div>
+      ${TRIP.carBackup.note ? `<div class="car-note">${icon("i-info","icon icon-sm")} ${esc(TRIP.carBackup.note)}</div>` : ""}
     </article>
   `;
 }
