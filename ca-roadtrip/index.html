@@ -333,6 +333,57 @@
   .dining-addr{display:flex;gap:6px;align-items:flex-start;font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;line-height:1.4}
   .dining-addr .icon{color:var(--ink-mute);flex-shrink:0;margin-top:2px}
 
+  /* ---------- NOTES SCREEN ---------- */
+  .notes-intro{background:linear-gradient(135deg,var(--primary-soft),#FDE68A);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:18px;font-size:13px;color:var(--ink-soft);line-height:1.5;display:flex;gap:10px;align-items:flex-start}
+  .notes-intro .icon{color:var(--primary-deep);flex-shrink:0;margin-top:1px}
+  .note-stats{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding:0 2px}
+  .note-stats-label{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:700}
+  .note-stats-count{font-size:13px;color:var(--ink);font-weight:600}
+  .note-add{display:flex;gap:8px;margin-bottom:18px}
+  .note-input{flex:1;padding:12px 14px;border:1.5px solid var(--line-strong);border-radius:var(--radius);background:var(--paper);font-family:inherit;font-size:14px;color:var(--ink);min-height:46px;transition:border-color .15s ease}
+  .note-input:focus{outline:none;border-color:var(--primary)}
+  .note-add-btn{padding:0 18px;background:var(--primary);color:#fff;border-radius:var(--radius);font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px;letter-spacing:0.02em;transition:background .15s ease}
+  .note-add-btn:hover{background:var(--primary-deep)}
+  .note-add-btn:active{transform:scale(0.97)}
+  .note-list{display:flex;flex-direction:column;gap:8px}
+  .note-item{display:flex;align-items:flex-start;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px;box-shadow:var(--shadow-card);transition:background .12s ease}
+  .note-item:hover{background:var(--sunken)}
+  .note-check{flex:0 0 22px;width:22px;height:22px;border-radius:7px;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;background:transparent;transition:all .18s ease;margin-top:1px;flex-shrink:0}
+  .note-check .icon{width:14px;height:14px;stroke-width:3;opacity:0;transform:scale(0.6)}
+  .note-item.done .note-check{background:var(--kid);border-color:var(--kid)}
+  .note-item.done .note-check .icon{opacity:1;transform:scale(1)}
+  .note-text{flex:1;min-width:0;font-size:14px;line-height:1.5;color:var(--ink);word-break:break-word;cursor:pointer}
+  .note-item.done .note-text{color:var(--ink-mute);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+  .note-meta{font-size:11px;color:var(--ink-mute);margin-top:4px;letter-spacing:0.03em}
+  .note-delete{flex-shrink:0;width:32px;height:32px;border-radius:8px;color:var(--ink-mute);display:flex;align-items:center;justify-content:center;transition:all .15s ease}
+  .note-delete:hover{background:#FEE2E2;color:var(--danger)}
+  .note-delete .icon{width:16px;height:16px}
+  .notes-empty{padding:32px 16px;text-align:center;color:var(--ink-mute);font-size:14px;background:var(--paper);border:1px dashed var(--line-strong);border-radius:var(--radius-lg)}
+  .notes-empty .icon{color:var(--ink-mute);margin-bottom:8px;width:36px;height:36px}
+  .notes-section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:10px;margin:8px 0 12px;letter-spacing:-0.01em}
+  .notes-section-title .icon{color:var(--primary);width:20px;height:20px}
+
+  /* ---------- DAY CHECKLIST ---------- */
+  .day-chk-block{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow-card)}
+  .day-chk-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:linear-gradient(135deg,var(--sunken),var(--paper));border-bottom:1px solid var(--line)}
+  .day-chk-eyebrow{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:2px}
+  .day-chk-theme{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--ink);line-height:1.25;letter-spacing:-0.005em}
+  .day-chk-count{background:var(--primary-soft);color:var(--primary-deep);font-size:12px;font-weight:700;padding:5px 10px;border-radius:8px;letter-spacing:0.02em;white-space:nowrap;flex-shrink:0}
+  .day-chk-count.complete{background:var(--kid-bg);color:var(--kid)}
+  .day-chk-list{padding:4px 0}
+  .day-chk-item{display:flex;align-items:center;gap:12px;padding:11px 16px;width:100%;text-align:left;cursor:pointer;border-top:1px solid var(--line);transition:background .12s ease;min-height:48px}
+  .day-chk-item:first-of-type{border-top:none}
+  .day-chk-item:hover{background:var(--sunken)}
+  .day-chk-item:active{background:var(--line)}
+  .day-chk-box{flex:0 0 20px;width:20px;height:20px;border-radius:6px;border:2px solid var(--line-strong);display:flex;align-items:center;justify-content:center;color:#fff;background:transparent;transition:all .18s ease;flex-shrink:0}
+  .day-chk-box .icon{width:12px;height:12px;stroke-width:3;opacity:0;transform:scale(0.6)}
+  .day-chk-item.done .day-chk-box{background:var(--kid);border-color:var(--kid)}
+  .day-chk-item.done .day-chk-box .icon{opacity:1;transform:scale(1)}
+  .day-chk-text{display:flex;flex-direction:column;flex:1;min-width:0;gap:1px}
+  .day-chk-time{font-size:10.5px;color:var(--ink-mute);letter-spacing:0.06em;text-transform:uppercase;font-weight:700}
+  .day-chk-name{font-size:13.5px;color:var(--ink);line-height:1.35;font-weight:500}
+  .day-chk-item.done .day-chk-name{color:var(--ink-mute);text-decoration:line-through;text-decoration-color:var(--line-strong)}
+
   /* ---------- EATS ---------- */
   .search-wrap{position:sticky;top:calc(56px + var(--safe-top));z-index:40;background:var(--bg);padding:8px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
   .search-input-wrap{position:relative;display:flex;align-items:center}
@@ -476,6 +527,7 @@
     <section class="screen" id="screen-stays" data-screen="stays"></section>
     <section class="screen" id="screen-logistics" data-screen="logistics"></section>
     <section class="screen" id="screen-eats" data-screen="eats"></section>
+    <section class="screen" id="screen-notes" data-screen="notes"></section>
   </main>
 
   <nav class="nav" id="nav" aria-label="Primary">
@@ -493,6 +545,9 @@
     </button>
     <button class="nav-btn" data-target="eats" aria-label="Eats">
       <svg class="icon" aria-hidden="true"><use href="#i-utensils"/></svg><span>Eats</span>
+    </button>
+    <button class="nav-btn" data-target="notes" aria-label="Notes">
+      <svg class="icon" aria-hidden="true"><use href="#i-clipboard"/></svg><span>Notes</span>
     </button>
   </nav>
 </div>
@@ -674,8 +729,23 @@ const TRIP = {
       segment:"Tioga Pass, Convict Lake Detour & Lake Tahoe West Shore",
       options:[
         { cat:"Legendary Mountain Pass Lunch", name:"Whoa Nellie Deli", addr:"22 Vista Point Dr, Lee Vining, CA 93541", rating:"4.5", phone:"+1 760-647-6411", hours:"Mon–Sun: 7:00 AM – 9:00 PM", proximity:"Located inside the Mobil Station right at the intersection of Tioga Pass (Hwy 120) and US-395.", notes:"A legendary, world-famous culinary landmark. Looks like a gas station but serves upscale gourmet meals with outdoor seating overlooking Mono Lake. Offers excellent vegetarian selection, including large veggie pizzas, southwest burritos, and fresh salads." },
-        { cat:"South Asian & Himalayan Dinner Destination", name:"Shangrila Himalayan Kitchen", addr:"1142 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.4", phone:"+1 530-600-4599", hours:"Mon–Sun: 11:30 AM – 2:30 PM, 5:00 PM – 9:30 PM", proximity:"Located on the South Shore of Tahoe as you transition toward your Tahoma cabin.", notes:"Exceptional Indian and Nepalese restaurant. Highly recommended to call ahead for pickup to bypass their notoriously slow dine-in service. Features incredible vegetarian choices, including fresh garlic-free naan options, vegetable pakoras, local dal, and high-rated lentil-based dishes." },
+        { cat:"South Asian & Himalayan Dinner Destination", name:"Shangrila Himalayan Kitchen", addr:"1142 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.4", phone:"+1 530-600-4599", hours:"Mon–Sun: 11:30 AM – 2:30 PM, 5:00 PM – 9:30 PM", proximity:"Passed along the South Shore as you route from Convict Lake to your Tahoma cabin.", notes:"Incredible vegetarian selections including vegetable pakoras, lentil tarka dal, paneer options, and hot naan. DINE-IN SERVICE CAN BE SLOW WITH KIDS; highly recommended to call ahead for takeout while driving up US-395 so you can pick it up instantly." },
         { cat:"Eastern Sierra Quick-Service Backup", name:"Taco Bell (Mammoth Lakes Loop)", addr:"1567 Meridian Blvd, Mammoth Lakes, CA 93546", rating:"3.8", phone:"+1 760-934-2977", hours:"Mon–Sun: 10:00 AM – 10:00 PM", proximity:"Located right next to your Convict Lake detour turnaround point.", notes:"Perfect fast milestone to grab bean burritos or cheese quesadillas for the kids to eat in their car seats before initiating the long 3.5-hour drive north to your cabin." }
+      ]
+    },
+    "2026-06-06": {
+      segment:"Lake Tahoe Counter-Clockwise Loop · Heavenly Village Pit Stops",
+      options:[
+        { cat:"Indian Cuisine Counter (Take Out)", name:"Curry & Grill", addr:"2297 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.2", phone:"+1 530-318-8520", hours:"Mon–Sun: 11:00 AM – 9:00 PM", proximity:"Less than 5 minutes down the street from the Heavenly Gondola base.", notes:"A quick, straightforward counter inside a liquor store property. Excellent for grabbing fast vegetarian samosas, chana masala, or paneer wraps to keep the lunch schedule moving quickly." },
+        { cat:"Traditional Indian Snacks & Casual Dining", name:"Nikki's Chaat Café", addr:"3469 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"3.8", phone:"+1 530-541-3354", hours:"Mon–Tue & Thu–Sun: 12:00 PM – 4:00 PM, 5:00 PM – 9:00 PM (Closed Wednesdays)", proximity:"Directly on your clockwise path wrapping around the south tip of the lake.", notes:"Great stop for specialized street food, chaat varieties, samosas, and regional vegetarian appetizers that children enjoy. Casual and welcoming environment." },
+        { cat:"Reliable Quick-Service", name:"Chipotle Mexican Grill (Heavenly Village)", addr:"4000 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.1", phone:"+1 530-544-0100", hours:"Mon–Sun: 10:45 AM – 10:00 PM", proximity:"Right next to the Heavenly Gondola village plaza.", notes:"Perfect fast milestone for the kids. Pick up a vegetarian bean burrito or a lifestyle bowl modified with sofritas, fajita vegetables, rice, and fresh guacamole." }
+      ]
+    },
+    "2026-06-07": {
+      segment:"West Shore Tahoe → Fremont → SFO North",
+      options:[
+        { cat:"Fremont Dinner Stop · Gujarati Thali (TBD)", name:"Fremont Gujarati Thali — Awaiting Part 2 Details", addr:"Fremont, CA (address pending)", rating:"—", phone:null, hours:"Send the restaurant name + address and I'll pin it here", proximity:"En route Tahoma → Fremont → SFO. Aim for a 4:30 PM seating to clear before the SF sunset run.", notes:"Placeholder for the planned Fremont Gujarati thali stop. Suggest verifying hours by phone before leaving the cabin since most Gujarati thali halls close their lunch service around 3 PM and reopen for dinner around 6 PM." },
+        { cat:"Quick-Service Backup (en route)", name:"Chipotle Mexican Grill (South Lake Tahoe)", addr:"4000 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.1", phone:"+1 530-544-0100", hours:"Mon–Sun: 10:45 AM – 10:00 PM", proximity:"On the way out of Tahoe if the kids need food before the long I-80 drive.", notes:"Easy grab-and-go vegetarian burritos or sofritas bowls. Skip if you're powering straight through to the Fremont dinner stop." }
       ]
     }
   },
@@ -783,6 +853,9 @@ const TRIP = {
     { n:7, dateISO:"2026-06-05", dateLabel:"Fri, Jun 5", theme:"High Sierra Tioga Pass Highway & Convict Lake Detour",
       depart:"6:30 AM", driving:"~8 hrs total — LONGEST DAY (Oakhurst → Tioga → Convict Lake → Tahoma)", stayId:"tahoe",
       warn:"LONG DRIVING DAY. Tioga Rd (CA-120) has NO food, water, gas, or services between Crane Flat and Lee Vining (135 mi). Fill gas in Oakhurst. Bring lots of water + snacks. Vault toilets only at Tioga stops.",
+      routeMaps:[
+        { label:"Full Route · Oakhurst → Tioga → Convict Lake → Tahoma", url:"https://maps.google.com/maps/dir/40740+Highway+41,+Oakhurst,+CA+93644/Olmsted+Point,+Yosemite+National+Park,+CA/Tenaya+Lake,+Yosemite+National+Park,+CA/Tuolumne+Meadows,+Yosemite+National+Park,+CA/Whoa+Nellie+Deli,+Lee+Vining,+CA/Convict+Lake,+California/6270+Flicker+Ave,+Tahoma,+CA+96142" }
+      ],
       activities:[
         { time:"6:30 AM", name:"Depart Oakhurst — fill gas first", desc:"Crane Flat in-park gas is the LAST gas until Lee Vining. Highways: CA-41 + CA-120 (Tioga Road) + US-395 North/South + CA-89.", addr:"40740 Highway 41, Oakhurst, CA 93644", type:"drive" },
         { time:"8:00 AM", name:"Tuolumne Grove Sequoias", desc:"A quick, quiet morning stop at the base of Tioga Road to stretch your legs around a second beautiful grove of giant trees.", addr:"Tuolumne Grove Trailhead, Tioga Rd, Yosemite NP, CA 95389", duration:"1 hr", parking:"Free trailhead lot", restroom:"Vault toilets at trailhead", badge:"must", type:"hike" },
@@ -795,30 +868,40 @@ const TRIP = {
       ],
       kids:"Vault-only restrooms at Tuolumne Grove, Olmsted Point, Tuolumne Meadows. Full facilities at Whoa Nellie Deli + Lee Vining Mobil + Convict Lake. Bridgeport gas + restrooms midway on the north drive. Bring 1 gallon water per person — Tioga has zero water sources between Crane Flat and Lee Vining."
     },
-    { n:8, dateISO:"2026-06-06", dateLabel:"Sat, Jun 6", theme:"Lake Tahoe",
-      depart:"8:30 AM", driving:"~2 hrs around the lake", stayId:"tahoe",
-      activities:[
-        { time:"9:30 AM", name:"Heavenly Gondola", desc:"2.4-mi gondola to 9,123 ft observation deck. 360° lake + Carson Valley views. Kids 5+ love it.", addr:"4080 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", duration:"2 hrs", drive:"45 min from cabin", parking:"Heavenly Village garage at 1 Bellamy Ct, $1.50/hr, $20 daily max", tickets:"~$79/adult, ~$45/child at skiheavenly.com (buy online to skip line)", restroom:"Heavenly Village restrooms", badge:"must", photo:"Heavenly_Mountain_Resort_gondola.jpg", type:"activity" },
-        { time:"12:00 PM", name:"Lunch: Curry & Grill", desc:"4.2⭐ Indian. Lunch buffet often $8.99. Backup: Chipotle next door.", addr:"3601 Lake Tahoe Blvd, South Lake Tahoe", duration:"1 hr", badge:"kid", type:"food" },
-        { time:"1:30 PM", name:"Emerald Bay State Park Lookout", desc:"Most photographed view in Tahoe. Vikingsholm Castle visible 1,000 ft below.", addr:"Inspiration Point, Emerald Bay, CA", duration:"30 min (photo) or 2.5 hrs (with hike)", parking:"$10 fee, lot fills 10 AM–4 PM", restroom:"Inspiration Point restrooms", badge:"must", photo:"Emerald_Bay_Lake_Tahoe.jpg", type:"beach" },
-        { time:"2:30 PM", name:"Sand Harbor State Park", desc:"BEST FAMILY BEACH on the lake. Sandy beach, giant granite boulders to scramble + jump from, kayak rentals, shallow swimming.", addr:"2005 NV-28, Incline Village, NV 89451", duration:"2.5 hrs", parking:"$15 out-of-state vehicle ($12 NV). Fills by 11 AM weekends.", restroom:"Full restrooms + showers", badge:"must", photo:"Sand_Harbor_State_Park_Lake_Tahoe.jpg", type:"beach" },
-        { time:"5:00 PM", name:"Bonsai Rock + Whale Rock", desc:"1 mi south of Sand Harbor on NV-28. Iconic granite boulder with 4 small trees on top. Short scramble down to beach. ROCK JUMPING for the 10-year-old (parents check depth first). 4-year-olds wade.", addr:"NV-28, ~1 mi south of Sand Harbor, Crystal Bay, NV", duration:"1 hr", parking:"Small unofficial roadside pullouts — park carefully. Steep 5-min scramble down.", noRestroom:true, badge:"gem", photo:"Bonsai_Rock_Lake_Tahoe.jpg", type:"beach" },
-        { time:"6:30 PM", name:"Cave Rock (drive-by)", desc:"Sacred Washoe tribal site, tunnel through the rock on US-50.", addr:"Cave Rock, US-50, Glenbrook, NV", duration:"10 min", parking:"$5 NV state lot", badge:"skip", photo:"Cave_Rock_Lake_Tahoe.jpg", type:"activity" },
-        { time:"7:30 PM", name:"Dinner: Nikki's Chaat Cafe", desc:"4.0⭐ chaat, dosas, samosas. Quick + casual.", addr:"3469 Lake Tahoe Blvd, South Lake Tahoe", duration:"1 hr", badge:"kid", type:"food" }
+    { n:8, dateISO:"2026-06-06", dateLabel:"Sat, Jun 6", theme:"Lake Tahoe Counter-Clockwise Screenshot Loop",
+      depart:"8:30 AM", driving:"~3.5 hrs total around the lake", stayId:"tahoe",
+      routeMaps:[
+        { label:"Full Route · Tahoma → North → East → South → Emerald Bay → Tahoma", url:"https://maps.google.com/maps/dir/6270+Flicker+Ave,+Tahoma,+CA+96142/Historic+Stateline+Fire+Lookout,+Kings+Beach,+CA/Sand+Harbor,+Washoe+County,+NV/Bonsai+Rock,+Nevada/Logan+Shoals+Vista+Point,+Lake+Shore+Blvd,+Zephyr+Cove,+NV/4080+Lake+Tahoe+Blvd,+South+Lake+Tahoe,+CA+96150/Glen+Alpine+Falls,+Glen+Alpine+Rd,+South+Lake+Tahoe,+CA/Cascade+Falls+Trail,+California+96150/Emerald+Bay+State+Park+Lookout,+CA-89,+Tahoe+Pines,+CA/6270+Flicker+Ave,+Tahoma,+CA+96142" }
       ],
-      kids:"Full restrooms at Heavenly Village, Emerald Bay Inspiration Point, Sand Harbor (also showers). Bonsai Rock has NO restrooms. Sand Harbor has water fountains — bring extra for Bonsai Rock. Water is COLD (~60°F in June). High-altitude sun is intense — sunscreen."
+      activities:[
+        { time:"8:30 AM", name:"Depart Tahoma Cabin Base", desc:"Roll out clockwise heading north up CA-89 toward Kings Beach.", addr:"6270 Flicker Ave, Tahoma, CA 96142", type:"drive" },
+        { time:"9:15 AM", name:"Historic Stateline Fire Lookout", desc:"Hidden Gem & Paved Family Walk (9:15 AM – 10:15 AM). A very gentle, fully paved uphill path along the border line. Safe for small children and yields a stunning northern view across the entire lake.", addr:"Historic Stateline Fire Lookout, Kings Beach, CA 96143", duration:"1 hr", parking:"Small free lot at Reservoir Dr trailhead", restroom:"Limited — go before at Kings Beach State Rec Area", badge:"gem", type:"hike" },
+        { time:"10:30 AM", name:"Sand Harbor State Park", desc:"Best Family Beach & Boulders (10:30 AM – 12:30 PM). Vast sand areas and massive smooth granite shore boulders. Kids can climb and dry scramble without having to jump into the cold water.", addr:"Sand Harbor State Park, 2005 NV-28, Washoe County, NV 89452", duration:"2 hrs", parking:"$15 out-of-state vehicle ($12 NV). Fills by 11 AM weekends.", restroom:"Full restrooms + showers", badge:"must", photo:"Sand_Harbor_State_Park_Lake_Tahoe.jpg", type:"beach" },
+        { time:"12:35 PM", name:"Bonsai Rock", desc:"Scenic Landmark Photo Stop (12:35 PM – 1:00 PM). Quick roadside platform stop to see the famous miniature tree-capped boulder structure out in the water.", addr:"Bonsai Rock, NV-28, Carson City, NV 89704", duration:"25 min", parking:"Small unofficial roadside pullouts on NV-28 — park carefully", noRestroom:true, badge:"gem", photo:"Bonsai_Rock_Lake_Tahoe.jpg", type:"beach" },
+        { time:"1:15 PM", name:"Logan Shoals Vista Point", desc:"Hidden Gem Overlook (1:15 PM – 1:30 PM). Drive-by stone viewpoint jutting directly over the eastern cliff water lines. Flat and fully stroller-safe.", addr:"Logan Shoals Vista Point, Lake Shore Blvd, Zephyr Cove, NV 89448", duration:"15 min", parking:"Free roadside lot", noRestroom:true, badge:"gem", type:"activity" },
+        { time:"1:50 PM", name:"Heavenly Mountain Scenic Gondola", desc:"High Peak Views & Lunch Milestone (1:50 PM – 3:30 PM). Enclosed cable car ride to 9,123 feet. Perfect timing for a quick lunch at Chipotle or nearby Indian chaat counters inside the village plaza.", addr:"Heavenly Gondola, 4080 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", duration:"1 hr 40 min", parking:"Heavenly Village garage at 1 Bellamy Ct, $1.50/hr, $20 daily max", tickets:"~$79/adult, ~$45/child at skiheavenly.com (buy online to skip line)", restroom:"Heavenly Village restrooms", badge:"must", photo:"Heavenly_Mountain_Resort_gondola.jpg", type:"activity" },
+        { time:"3:55 PM", name:"Glen Alpine Falls", desc:"Roadside Waterfall Stop (3:55 PM – 4:25 PM). A roaring multi-tiered waterfall positioned directly next to the asphalt driving lane. Excellent stop to view rushing snowmelt without an actual trail walk.", addr:"1580 Glen Alpine Rd, South Lake Tahoe, CA 96150", duration:"30 min", parking:"Free roadside pullouts along Glen Alpine Rd", noRestroom:true, badge:"gem", type:"hike" },
+        { time:"4:45 PM", name:"Cascade Falls Trail", desc:"Signature Waterfall Hiking Trail (4:45 PM – 6:00 PM). A flat 1.4-mile mountain ridge trek leading to a roaring 200-foot waterfall view looking down over Cascade Lake and Tahoe simultaneously.", addr:"Cascade Falls Trail, Bayview Trailhead, South Lake Tahoe, CA 96150", duration:"1 hr 15 min", parking:"Bayview Trailhead lot — fills by noon; arrives easier in late afternoon", restroom:"Vault toilets at trailhead", badge:"must", type:"hike" },
+        { time:"6:05 PM", name:"Emerald Bay State Park Lookout", desc:"Iconic Postcard Photo Stop (6:05 PM – 6:30 PM). Enjoy the deep late afternoon shadows stretching over Fannette Island from the main parking ledge before driving 15 minutes north back to the cabin.", addr:"Emerald Bay State Park Lookout, CA-89, Tahoe Pines, CA 96142", duration:"25 min", parking:"$10 fee, lot fills 10 AM – 4 PM (easier this late)", restroom:"Inspiration Point restrooms", badge:"must", photo:"Emerald_Bay_Lake_Tahoe.jpg", type:"beach" },
+        { time:"6:45 PM", name:"Return to Tahoma Cabin", desc:"Final return point for the night. Conf HM32PP9SWF.", addr:"6270 Flicker Ave, Tahoma, CA 96142", type:"stay" }
+      ],
+      kids:"Full restrooms at Sand Harbor (also showers), Heavenly Village, Bayview Trailhead (vault), Inspiration Point. Bonsai Rock, Logan Shoals, and Glen Alpine have NO restrooms — go before at Sand Harbor. Water is COLD (~60°F in June). High-altitude sun is intense — sunscreen + hats. Counter-clockwise direction keeps Tahoe on your right all day for easy turnouts."
     },
-    { n:9, dateISO:"2026-06-07", dateLabel:"Sun, Jun 7", theme:"Return to the Bay",
-      depart:"10:00 AM", driving:"~4 hrs total (Tahoma → SF)", stayId:"sfo-north",
-      activities:[
-        { time:"10:00 AM", name:"Check out of Tahoma cabin", desc:"Final breakfast, pack up.", duration:"1 hr", restroom:"At cabin — go before Eagle Rock", type:"stay" },
-        { time:"11:00 AM", name:"Eagle Rock Trail (west shore)", desc:"Quick 20-min hike to a volcanic outcrop with panoramic Tahoe views. Easy for kids, <1 mi round-trip.", addr:"Eagle Rock Trailhead, Homewood, CA", duration:"1 hr", parking:"Free roadside pull-off on Hwy 89", noRestroom:true, badge:"gem", photo:"Eagle_Rock_Lake_Tahoe.jpg", type:"hike" },
-        { time:"12:30 PM", name:"Drive I-80 West to SF", desc:"~3 hrs. Stop in Auburn or Davis for lunch (In-N-Out, Chipotle).", duration:"3 hrs", restroom:"Auburn or Davis stop", badge:"must", type:"drive" },
-        { time:"4:30 PM", name:"Check in: Hilton Garden Inn SFO N", desc:"Settle, kids nap. Conf 3451357510", addr:"670 Gateway Blvd, South San Francisco, CA 94080", type:"stay" },
-        { time:"7:00 PM", name:"Battery Spencer Viewpoint (sunset)", desc:"BEST Golden Gate Bridge photo spot in SF. Bridge fills your camera frame at golden hour. Bring jacket — windy.", addr:"Battery Spencer, Conzelman Rd, Sausalito, CA 94965", duration:"1 hr", drive:"45 min from hotel", parking:"Small free lot, fills before sunset — arrive 30 min early", restroom:"Vault toilets on site", badge:"must", photo:"Golden_Gate_Bridge_from_Battery_Spencer.jpg", type:"activity" },
-        { time:"9:00 PM", name:"Late dinner", desc:"Order delivery to the room (Roti Indian or Chipotle delivery).", type:"food" }
+    { n:9, dateISO:"2026-06-07", dateLabel:"Sun, Jun 7", theme:"West Shore Mansion Grounds & Volcanic Lookout Return",
+      depart:"9:30 AM", driving:"~5 hrs total (Tahoma → Fremont → SF)", stayId:"sfo-north",
+      routeMaps:[
+        { label:"Part 1 · Tahoma → Eagle Rock → SFO Hotel → Battery Spencer", url:"https://maps.google.com/maps/dir/6270+Flicker+Ave,+Tahoma,+CA+96142/Eagle+Rock+Trailhead,+Tahoma,+CA/Hilton+Garden+Inn+San+Francisco+Airport+North,+Gateway+Boulevard,+South+San+Francisco,+CA/Battery+Spencer,+Conzelman+Road,+Sausalito,+CA" }
       ],
-      kids:"Restrooms at cabin (go before Eagle Rock — none on trail), Auburn/Davis stop, Battery Spencer (vault only). Long drive day — bring snacks, books, downloaded shows."
+      activities:[
+        { time:"9:30 AM", name:"Check out & Depart Tahoma Cabin", desc:"Final breakfast, pack up. Roll out south on CA-89 along the West Shore.", addr:"6270 Flicker Ave, Tahoma, CA 96142", restroom:"At cabin — go before park stops", type:"drive" },
+        { time:"9:40 AM", name:"Ed Z'berg Sugar Pine Point State Park", desc:"Hidden Gem Historic Park & Lakeside Trails (9:40 AM – 10:40 AM). Located 3 minutes from your cabin. Walk the completely flat forested path down to the lake shore to view the historic Ehrman Mansion estate and see the old maritime train tracks rolling into the transparent water.", addr:"7360 W Lake Blvd, Tahoma, CA 96142", duration:"1 hr", parking:"$10/vehicle day-use lot", restroom:"Park restrooms at visitor area", badge:"gem", type:"hike" },
+        { time:"10:50 AM", name:"Eagle Rock Trailhead", desc:"Quick Family Hike & Final Vista (10:50 AM – 11:50 AM). A quick 20-minute uphill path to the top of a volcanic rock shelf for a staggering panoramic vista over the water before driving home to the Bay Area.", addr:"3370 W Lake Blvd, Homewood, CA 96141", duration:"1 hr", parking:"Free roadside pull-off on Hwy 89", noRestroom:true, badge:"gem", photo:"Eagle_Rock_Lake_Tahoe.jpg", type:"hike" },
+        { time:"12:00 PM", name:"Drive Tahoma → Bay Area (I-80 W)", desc:"~3.5 hrs via CA-89 + I-80 W. Optional restroom stop in Auburn or Davis.", duration:"3 hr 30 min", restroom:"Auburn or Davis stop", badge:"must", type:"drive" },
+        { time:"4:30 PM", name:"Fremont Dinner Stop · Gujarati Thali (TBD)", desc:"Stop in Fremont for an early Gujarati thali dinner before heading into the city. Send Part 2 details and I'll lock in the exact restaurant + address here.", duration:"1 hr 30 min", badge:"opt", type:"food" },
+        { time:"6:30 PM", name:"Check in: Hilton Garden Inn SFO N", desc:"Settle, kids decompress before sunset run. Conf 3451357510.", addr:"670 Gateway Blvd, South San Francisco, CA 94080", type:"stay" },
+        { time:"7:45 PM", name:"Battery Spencer Viewpoint (sunset)", desc:"BEST Golden Gate Bridge photo spot in SF. Bridge fills your camera frame at golden hour. Sunset ~8:25 PM. Bring jacket — windy.", addr:"Battery Spencer, Conzelman Rd, Sausalito, CA 94965", duration:"1 hr 15 min", drive:"45 min from hotel", parking:"Small free lot, fills before sunset — arrive 30 min early", restroom:"Vault toilets on site", badge:"must", photo:"Golden_Gate_Bridge_from_Battery_Spencer.jpg", type:"activity" }
+      ],
+      kids:"Restrooms at cabin, Sugar Pine Point visitor area, Auburn/Davis stop, Battery Spencer (vault only). Eagle Rock has NO restrooms — go before. Long drive day — bring snacks, books, downloaded shows. Fremont dinner gives the kids a stretch + warm food before the SF evening."
     },
     { n:10, dateISO:"2026-06-08", dateLabel:"Mon, Jun 8", theme:"Muir Woods & Bridges",
       depart:"7:30 AM", driving:"~3 hrs around city", stayId:"sfo-north",
@@ -1677,11 +1760,163 @@ function renderGlobalSearchResults(q){
 }
 
 /* ===============================================================
+   NOTES & SUMMARY
+=============================================================== */
+const LESSONS_KEY = "ca-lessons-v1";
+const SEED_LESSONS = [
+  { text:"Take the Blue Line AirTrain from SFO terminals to the Rental Car Center — big lesson learned for next time!", done:false }
+];
+
+function loadLessons(){
+  try{
+    const raw = localStorage.getItem(LESSONS_KEY);
+    if(!raw) return SEED_LESSONS.slice();
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : SEED_LESSONS.slice();
+  } catch(e){ return SEED_LESSONS.slice(); }
+}
+function saveLessons(lessons){
+  localStorage.setItem(LESSONS_KEY, JSON.stringify(lessons));
+}
+
+function renderNotes(){
+  const root = $("#screen-notes");
+
+  const render = () => {
+    const lessons = loadLessons();
+
+    // Visit progress from TRIP.days
+    let totalActs = 0, doneActs = 0;
+    TRIP.days.forEach(d => {
+      d.activities.forEach((a, i) => {
+        totalActs++;
+        if(localStorage.getItem("ca-visit-"+d.n+"-"+i) === "1") doneActs++;
+      });
+    });
+
+    root.innerHTML = `
+      <div class="section-eyebrow">Field Notes</div>
+      <h2 class="section-title">Notes & Summary</h2>
+      <p class="section-sub">Day-by-day quick checklist + personal lessons learned. Tap any item to mark it visited.</p>
+
+      <div class="notes-intro">
+        ${icon("i-info","icon")}
+        <div>Jot personal notes and check off every Point of Interest as you visit it. All checkmarks save automatically on this device.</div>
+      </div>
+
+      <h3 class="notes-section-title">${icon("i-clipboard","icon")} Lessons Learned & Personal Notes</h3>
+      <div class="note-add">
+        <input class="note-input" id="note-input" type="text" placeholder="Add a lesson learned or note…" autocomplete="off">
+        <button class="note-add-btn" id="note-add-btn">${icon("i-arrow-right","icon icon-sm")} Add</button>
+      </div>
+      <div class="note-stats">
+        <span class="note-stats-label">Personal Notes</span>
+        <span class="note-stats-count">${lessons.filter(n=>n.done).length} / ${lessons.length} done</span>
+      </div>
+      <div class="note-list" id="note-list">
+        ${lessons.length ? lessons.map((n, i) => `
+          <div class="note-item ${n.done?'done':''}" data-i="${i}">
+            <button class="note-check" aria-label="Toggle done" aria-pressed="${n.done}">${icon("i-check","icon icon-sm")}</button>
+            <div class="note-text">${esc(n.text)}</div>
+            <button class="note-delete" aria-label="Delete note">${icon("i-x","icon icon-sm")}</button>
+          </div>
+        `).join("") : `<div class="notes-empty">${icon("i-clipboard","icon icon-xl")}<div>No notes yet — add one above.</div></div>`}
+      </div>
+
+      <h3 class="notes-section-title" style="margin-top:32px">${icon("i-calendar","icon")} Trip Checklist · Day by Day</h3>
+      <div class="note-stats">
+        <span class="note-stats-label">Stops Visited (Overall)</span>
+        <span class="note-stats-count">${doneActs} / ${totalActs}</span>
+      </div>
+      <div class="day-checklist" id="day-checklist">
+        ${TRIP.days.map(d => {
+          const acts = d.activities;
+          const done = acts.filter((_, i) => localStorage.getItem("ca-visit-"+d.n+"-"+i) === "1").length;
+          const complete = done === acts.length && acts.length > 0;
+          return `
+            <div class="day-chk-block">
+              <div class="day-chk-head">
+                <div>
+                  <div class="day-chk-eyebrow">Day ${d.n} · ${esc(d.dateLabel)}</div>
+                  <div class="day-chk-theme">${esc(d.theme)}</div>
+                </div>
+                <span class="day-chk-count ${complete?'complete':''}">${done} / ${acts.length}</span>
+              </div>
+              <div class="day-chk-list">
+                ${acts.map((a, i) => `
+                  <button class="day-chk-item ${localStorage.getItem("ca-visit-"+d.n+"-"+i) === "1" ? 'done':''}" data-day="${d.n}" data-act="${i}">
+                    <div class="day-chk-box">${icon("i-check","icon icon-sm")}</div>
+                    <div class="day-chk-text">
+                      <span class="day-chk-time">${esc(a.time||'')}</span>
+                      <span class="day-chk-name">${esc(a.name)}</span>
+                    </div>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+
+    // Wire personal-note checkbox + delete + add
+    $$(".note-item", root).forEach(el => {
+      const i = parseInt(el.dataset.i, 10);
+      const toggle = () => {
+        const ls = loadLessons();
+        ls[i].done = !ls[i].done;
+        saveLessons(ls);
+        render();
+      };
+      $(".note-check", el).addEventListener("click", toggle);
+      $(".note-text", el).addEventListener("click", toggle);
+      $(".note-delete", el).addEventListener("click", (e) => {
+        e.stopPropagation();
+        const ls = loadLessons();
+        ls.splice(i, 1);
+        saveLessons(ls);
+        render();
+      });
+    });
+
+    // Wire day-checklist toggle
+    $$(".day-chk-item", root).forEach(el => {
+      el.addEventListener("click", () => {
+        const key = "ca-visit-"+el.dataset.day+"-"+el.dataset.act;
+        if(localStorage.getItem(key) === "1") localStorage.removeItem(key);
+        else localStorage.setItem(key, "1");
+        render();
+      });
+    });
+
+    // Wire note add
+    const input = $("#note-input", root);
+    const addBtn = $("#note-add-btn", root);
+    const submit = () => {
+      const v = input.value.trim();
+      if(!v) return;
+      const ls = loadLessons();
+      ls.unshift({ text:v, done:false });
+      saveLessons(ls);
+      input.value = "";
+      render();
+    };
+    addBtn.addEventListener("click", submit);
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") submit();
+    });
+  };
+
+  render();
+}
+
+/* ===============================================================
    NAVIGATION
 =============================================================== */
 function switchScreen(target){
   $$(".screen").forEach(s => s.classList.toggle("active", s.dataset.screen === target));
   $$(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.target === target));
+  if(target === "notes") renderNotes();
   window.scrollTo({ top:0, behavior:"smooth" });
 }
 
@@ -1725,6 +1960,7 @@ renderDays();
 renderStays();
 renderLogistics();
 renderEats();
+renderNotes();
 </script>
 </body>
 </html>
