@@ -308,6 +308,31 @@
   .car-note{display:flex;align-items:flex-start;gap:6px;margin-top:10px;font-size:12px;color:var(--ink-mute);background:var(--sunken);padding:8px 10px;border-radius:8px;line-height:1.4}
   .car-note .icon{color:var(--ink-mute);flex-shrink:0;margin-top:1px}
 
+  /* ---------- DINING SECTION ---------- */
+  .dining-section{margin-top:22px;padding-top:18px;border-top:2px solid var(--line)}
+  .dining-head{margin-bottom:14px}
+  .dining-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:10px;line-height:1.2;letter-spacing:-0.01em}
+  .dining-title .icon{color:var(--primary);width:22px;height:22px}
+  .dining-segment{font-size:12px;color:var(--ink-mute);margin-top:4px;letter-spacing:0.02em;font-style:italic}
+  .dining-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-card);overflow:hidden}
+  .dining-cat{display:inline-block;background:var(--primary-soft);color:var(--primary-deep);font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:4px 9px;border-radius:6px;margin-bottom:10px;line-height:1.4}
+  .dining-name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px}
+  .dining-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.25;letter-spacing:-0.005em;flex:1;min-width:0}
+  .dining-rating{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--accent);background:var(--gem-bg);padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap}
+  .dining-rating .icon{color:var(--accent)}
+  .dining-prox{display:flex;gap:6px;align-items:flex-start;font-size:13px;color:var(--ink-soft);margin-bottom:8px;line-height:1.4}
+  .dining-prox .icon{color:var(--ink-mute);flex-shrink:0;margin-top:2px}
+  .dining-row{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;line-height:1.45;display:flex;gap:6px;align-items:flex-start}
+  .dining-row .icon{color:var(--ink-mute);flex-shrink:0;margin-top:1px}
+  .dining-row strong{color:var(--ink);font-size:10.5px;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;margin-right:4px}
+  .dining-notes{font-size:13px;color:var(--ink-soft);line-height:1.55;margin:8px 0 10px;padding:10px 12px;background:var(--sunken);border-radius:8px;border-left:3px solid var(--primary)}
+  .dining-actions{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .dining-action{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--teal);background:var(--teal-soft);padding:6px 11px;border-radius:8px;font-weight:600;text-decoration:none;border:1px solid transparent;transition:background .12s ease}
+  .dining-action:hover{background:var(--teal);color:#fff}
+  .dining-action .icon{color:currentColor}
+  .dining-addr{display:flex;gap:6px;align-items:flex-start;font-size:12.5px;color:var(--ink-soft);margin-bottom:8px;line-height:1.4}
+  .dining-addr .icon{color:var(--ink-mute);flex-shrink:0;margin-top:2px}
+
   /* ---------- EATS ---------- */
   .search-wrap{position:sticky;top:calc(56px + var(--safe-top));z-index:40;background:var(--bg);padding:8px 0 12px;margin:0 -16px;padding-left:16px;padding-right:16px}
   .search-input-wrap{position:relative;display:flex;align-items:center}
@@ -426,6 +451,8 @@
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r=".5" fill="currentColor"/></symbol>
     <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
     <symbol id="i-fuel" viewBox="0 0 24 24"><path d="M3 22V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v18"/><path d="M2 22h16"/><path d="M7 6h5"/><path d="M16 12h2a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0V8l-4-4"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-clock-3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6h4"/></symbol>
   </defs>
 </svg>
 
@@ -610,6 +637,48 @@ const TRIP = {
     { day:11, area:"SF Yerba Buena", name:"Amber India", cuisine:"Indian (Upscale)", addr:"25 Yerba Buena Ln, SF, CA 94103", rating:"4.4", reviews:"1700+", notes:"Bib Gourmand. Book ahead.", veg:true, indian:true, gem:false, star:true },
     { day:11, area:"SF West Portal", name:"Roti Indian Bistro", cuisine:"Indian", addr:"53 W Portal Ave, SF, CA 94127", rating:"4.3", reviews:"500+", notes:"Backup.", veg:true, indian:true, gem:false }
   ],
+  diningByDate: {
+    "2026-05-31": {
+      segment:"Burlingame to Monterey via Santa Cruz",
+      options:[
+        { cat:"Pure Vegetarian (Kid-Friendly Favorite)", name:"Dharma's Restaurant", addr:"4250 Capitola Rd, Capitola, CA 95010", rating:"4.4", phone:"+1 831-462-1717", hours:"Mon–Sun: 11:00 AM – 8:00 PM", proximity:"Located right next to Santa Cruz along your main highway flow.", notes:"100% vegetarian and vegan restaurant. Offers an expansive, kid-friendly menu featuring vegetarian burgers, pasta, tacos, and flavorful Asian/Indian style bowls. Highly recommended for a relaxed family meal." },
+        { cat:"High-Rated Indian Cuisine", name:"India Gourmet", addr:"725 Front St Space 107, Santa Cruz, CA 95060", rating:"4.8", phone:null, hours:"Mon–Thu: 11:00 AM – 9:00 PM · Fri–Sat: 11:00 AM – 10:00 PM · Sun: 11:00 AM – 9:00 PM", proximity:"Situated inside Abbott Square Market, less than 5 minutes from the Boardwalk.", notes:"Exceptional reviews. Features traditional North and South Indian street food items, including fresh chaat and specialized vegetarian platters that match family spice preferences." },
+        { cat:"Reliable Quick-Service", name:"Chipotle Mexican Grill (Monterey Destination)", addr:"560 Munras Ave, Monterey, CA 93940", rating:"3.7", phone:"+1 831-718-9369", hours:"Mon–Sun: 10:45 AM – 10:00 PM", proximity:"Minutes from your night destination, the Hampton Inn Monterey.", notes:"Perfect fast backup for the kids after a long driving day. Easy customization for vegetarian burritos or rice bowls with beans, fajita veggies, and guacamole." }
+      ]
+    },
+    "2026-06-01": {
+      segment:"Big Sur Coastal Loop & Monterey Return",
+      options:[
+        { cat:"Scenic Peak Lunch (Walk-In Only)", name:"Nepenthe", addr:"48510 Highway One, Big Sur, CA 93920", rating:"4.5", phone:"+1 831-667-2345", hours:"Mon–Sun: 11:30 AM – 10:00 PM", proximity:"Directly on Highway 1 cliffs in the heart of Big Sur.", notes:"Arrive right at 11:30 AM opening to secure a spot on the outdoor redwood deck. Famous for its views. Features excellent vegetarian options, including their signature house-made veggie burger, fresh cheeses, and specialty salads." },
+        { cat:"High-Rated Indian Dinner", name:"Namaste India Bistro", addr:"538 Lighthouse Ave, Monterey, CA 93940", rating:"4.2", phone:"+1 831-641-0130", hours:"Mon–Sun: 11:00 AM – 9:00 PM", proximity:"Located right along the main avenue in downtown Monterey, perfect for a post-trip dinner.", notes:"Reviewers frequently praise their extensive vegetarian selection, highlighting customized spice levels, paneer specialties, traditional dal dishes, and warm tandoori breads." },
+        { cat:"Vegetarian-Friendly Indian Dinner", name:"Ambrosia India Bistro - Monterey", addr:"565 Abrego St, Monterey, CA 93940", rating:"3.9", phone:"+1 831-641-0610", hours:"Mon–Thu: 11:30 AM – 2:45 PM, 5:00 – 9:00 PM · Fri–Sat: 11:30 AM – 2:45 PM, 4:00 – 9:30 PM", proximity:"Very close to your hotel base camp.", notes:"Features a dedicated, wide array of vegetarian and vegan entries. Reviewers mention a welcoming atmosphere for families with young children." }
+      ]
+    },
+    "2026-06-03": {
+      segment:"Glacier Point Road, Yosemite Valley Floor & Moonbow Run",
+      options:[
+        { cat:"In-Park Family Dinner (Stays Open Late)", name:"Basecamp Eatery (Yosemite Valley Lodge)", addr:"9006 Yosemite Lodge Dr, Yosemite National Park, CA 95389", rating:"3.8", phone:"+1 209-372-1274", hours:"Mon–Sun: 6:30 AM – 9:00 PM", proximity:"Located directly on the valley floor, right at the base of Lower Yosemite Fall.", notes:"Perfect hub to feed the family after your Glacier Point sunset loop. Food-court style setup with kid-friendly customizable options, including vegetarian pasta, flatbread pizzas, and quick grab-and-go salads." },
+        { cat:"Sit-Down Mountain Dining", name:"The Mountain Room", addr:"9006 Yosemite Lodge Dr, Yosemite National Park, CA 95389", rating:"4.0", phone:"+1 209-372-1488", hours:"Mon–Sun: 5:00 PM – 9:00 PM", proximity:"Directly inside the Yosemite Valley Lodge property.", notes:"Features massive glass windows looking out toward the roaring waterfalls. Offers a higher-end sit-down setting with dedicated vegetarian entrees like roasted vegetable blocks and local grains." },
+        { cat:"Oakhurst Base Backup", name:"Tandoori Express", addr:"40282 Highway 41, Oakhurst, CA 93644", rating:"4.1", phone:"+1 559-642-2300", hours:"Mon–Sun: 11:00 AM – 9:00 PM", proximity:"Down the street from your Oakhurst hotel base camp.", notes:"Great North Indian food option. Highly recommended to call ahead for takeout orders before 8:30 PM so it is ready for the family to eat immediately upon arriving at the hotel." }
+      ]
+    },
+    "2026-06-04": {
+      segment:"Mariposa Grove & Yosemite Valley Floor Waterfall Flow",
+      options:[
+        { cat:"Kid-Perfect In-Park Lunch", name:"Curry Village Pizza Deck", addr:"9010 Curry Village Dr, Yosemite National Park, CA 95389", rating:"4.2", phone:null, hours:"Mon–Sun: 11:30 AM – 9:00 PM", proximity:"Located directly at the Mist Trail trailhead parking area.", notes:"An absolute favorite for families. Large outdoor deck surrounded by giant granite cliffs. Serves fast, hot, custom pizzas. You can order multiple pure vegetarian pies topped with peppers, onions, olives, and jalapenos with no garlic crust modifications." },
+        { cat:"Quick-Service Mexican", name:"Taco Bell (Oakhurst Gateway)", addr:"40194 Highway 41, Oakhurst, CA 93644", rating:"3.6", phone:"+1 559-641-6555", hours:"Mon–Sun: 7:00 AM – 11:00 PM", proximity:"Right on the main strip in Oakhurst.", notes:"An easy, familiar backup for the kids. Highly customizable for vegetarians by selecting the 'Make It Veggie' option on the digital kiosks, swapping beef for black or pinto beans on any item." },
+        { cat:"Fast Mexican Casual", name:"Chipotle Mexican Grill (Fresno Route Loop)", addr:"246 W Shaw Ave, Clovis, CA 93612", rating:"3.9", phone:"+1 559-322-1088", hours:"Mon–Sun: 10:45 AM – 10:00 PM", proximity:"Accessible along the valley highway paths if driving toward the outer regional hubs.", notes:"Standard high-rated Chipotle setup for easy vegetarian burritos, sofritas, or plain bean bowls for toddlers." }
+      ]
+    },
+    "2026-06-05": {
+      segment:"Tioga Pass, Convict Lake Detour & Lake Tahoe West Shore",
+      options:[
+        { cat:"Legendary Mountain Pass Lunch", name:"Whoa Nellie Deli", addr:"22 Vista Point Dr, Lee Vining, CA 93541", rating:"4.5", phone:"+1 760-647-6411", hours:"Mon–Sun: 7:00 AM – 9:00 PM", proximity:"Located inside the Mobil Station right at the intersection of Tioga Pass (Hwy 120) and US-395.", notes:"A legendary, world-famous culinary landmark. Looks like a gas station but serves upscale gourmet meals with outdoor seating overlooking Mono Lake. Offers excellent vegetarian selection, including large veggie pizzas, southwest burritos, and fresh salads." },
+        { cat:"South Asian & Himalayan Dinner Destination", name:"Shangrila Himalayan Kitchen", addr:"1142 Lake Tahoe Blvd, South Lake Tahoe, CA 96150", rating:"4.4", phone:"+1 530-600-4599", hours:"Mon–Sun: 11:30 AM – 2:30 PM, 5:00 PM – 9:30 PM", proximity:"Located on the South Shore of Tahoe as you transition toward your Tahoma cabin.", notes:"Exceptional Indian and Nepalese restaurant. Highly recommended to call ahead for pickup to bypass their notoriously slow dine-in service. Features incredible vegetarian choices, including fresh garlic-free naan options, vegetable pakoras, local dal, and high-rated lentil-based dishes." },
+        { cat:"Eastern Sierra Quick-Service Backup", name:"Taco Bell (Mammoth Lakes Loop)", addr:"1567 Meridian Blvd, Mammoth Lakes, CA 93546", rating:"3.8", phone:"+1 760-934-2977", hours:"Mon–Sun: 10:00 AM – 10:00 PM", proximity:"Located right next to your Convict Lake detour turnaround point.", notes:"Perfect fast milestone to grab bean burritos or cheese quesadillas for the kids to eat in their car seats before initiating the long 3.5-hour drive north to your cabin." }
+      ]
+    }
+  },
   preTripChecklist: [
     "Book Muir Woods parking at gomuirwoods.com (90 days out)",
     "Buy Mystery Spot tickets at mysteryspot.com",
@@ -1233,12 +1302,41 @@ function renderDayContent(){
     ? d.activities.map(activityHTML).join("")
     : timelineHTML(d);
 
+  const dining = TRIP.diningByDate && TRIP.diningByDate[d.dateISO];
+  const diningHTML = dining ? `
+    <div class="dining-section">
+      <div class="dining-head">
+        <h3 class="dining-title">${icon("i-utensils")} Dining Options for Today</h3>
+        <div class="dining-segment">${esc(dining.segment)}</div>
+      </div>
+      ${dining.options.map(opt => `
+        <article class="dining-card">
+          <div class="dining-cat">${esc(opt.cat)}</div>
+          <div class="dining-name-row">
+            <h4 class="dining-name">${esc(opt.name)}</h4>
+            ${opt.rating ? `<span class="dining-rating">${icon("i-star","icon icon-sm")} ${esc(opt.rating)}</span>` : ""}
+          </div>
+          ${opt.proximity ? `<div class="dining-prox">${icon("i-map-pin","icon icon-sm")}<span>${esc(opt.proximity)}</span></div>` : ""}
+          ${opt.hours ? `<div class="dining-row">${icon("i-clock-3","icon icon-sm")}<span><strong>Hours</strong>${esc(opt.hours)}</span></div>` : ""}
+          ${opt.notes ? `<div class="dining-notes">${esc(opt.notes)}</div>` : ""}
+          ${opt.phone ? `<div class="dining-actions"><a class="dining-action" href="tel:${esc(opt.phone.replace(/[^+\d]/g,''))}">${icon("i-phone","icon icon-sm")} ${esc(opt.phone)}</a></div>` : ""}
+          <div class="dining-addr">${icon("i-map-pin","icon icon-sm")}<span>${esc(opt.addr)}</span></div>
+          <div class="addr-actions">
+            <button class="addr-btn copy-btn" data-copy="${esc(opt.addr)}">${icon("i-copy")} Copy</button>
+            <a class="addr-btn primary" target="_blank" rel="noopener" href="${mapsLink(opt.addr)}">${icon("i-external")} Maps</a>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  ` : "";
+
   const footer = `
     ${d.kids ? `<div class="info-block">${icon("i-info")}<div><strong>Kid Logistics</strong>${esc(d.kids)}</div></div>` : ""}
     <div class="day-summary">
       ${stay ? `<div class="day-summary-card"><div class="day-summary-label">${icon("i-bed","icon icon-sm")} Tonight</div><div class="day-summary-val">${esc(stay.name)}</div></div>` : ""}
       ${eats.length ? `<div class="day-summary-card"><div class="day-summary-label">${icon("i-utensils","icon icon-sm")} Eats</div><div class="day-summary-val">${eats.map(e=>esc(e.name)).join(" · ")}</div></div>` : ""}
     </div>
+    ${diningHTML}
   `;
 
   root.innerHTML = header + body + footer;
@@ -1491,6 +1589,16 @@ function renderGlobalSearchResults(q){
     const hay = [e.name, e.area, e.cuisine, e.notes, e.addr, "day "+e.day].join(" ").toLowerCase();
     return hay.includes(query);
   });
+  const dining = [];
+  if(TRIP.diningByDate){
+    Object.entries(TRIP.diningByDate).forEach(([dateISO, info]) => {
+      const day = TRIP.days.find(d => d.dateISO === dateISO);
+      info.options.forEach(opt => {
+        const hay = [opt.name, opt.cat, opt.addr, opt.notes, opt.proximity, opt.hours, info.segment, dateISO, day?.dateLabel, "day "+(day?.n||"")].filter(Boolean).join(" ").toLowerCase();
+        if(hay.includes(query)) dining.push({ ...opt, dateISO, dayN:day?.n, dayLabel:day?.dateLabel, segment:info.segment });
+      });
+    });
+  }
   const stays = TRIP.stays.filter(s => {
     const hay = [s.name, s.addr, s.type].join(" ").toLowerCase();
     return hay.includes(query);
@@ -1505,6 +1613,19 @@ function renderGlobalSearchResults(q){
         <div class="search-result-body">
           <div class="search-result-title">${esc(a.name)}</div>
           <div class="search-result-sub">Day ${a.dayN} · ${esc(a.dayLabel)} · ${esc(a.time)}</div>
+        </div>
+        ${icon("i-chevron-right")}
+      </button>
+    `).join("");
+  }
+  if(dining.length){
+    html += `<div class="search-group-head">Dining (Daily Picks) · ${dining.length}</div>`;
+    html += dining.map(o => `
+      <button class="search-result" data-go="day" data-day="${o.dayN}">
+        <div class="search-result-mark">${icon("i-utensils")}</div>
+        <div class="search-result-body">
+          <div class="search-result-title">${esc(o.name)}</div>
+          <div class="search-result-sub">Day ${o.dayN||""} · ${esc(o.dayLabel||"")} · ${esc(o.cat)} · ${esc(o.rating)}⭐</div>
         </div>
         ${icon("i-chevron-right")}
       </button>
