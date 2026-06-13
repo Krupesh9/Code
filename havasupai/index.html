@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0F172A">
+<title>Havasupai Falls · Trip Plan (POC)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F0FDFA;
+    --paper:#FFFFFF;
+    --sunken:#ECFEFF;
+    --ink:#0F172A;
+    --ink-soft:#334155;
+    --ink-mute:#64748B;
+    --line:#CFFAFE;
+    --line-strong:#A5F3FC;
+    --primary:#0E7490;
+    --primary-deep:#155E75;
+    --primary-soft:#CFFAFE;
+    --accent:#0891B2;
+    --warn-bg:#FEF3C7;
+    --warn-fg:#854D0E;
+    --warn-border:#FDE68A;
+    --kid:#15803D;
+    --radius:12px;
+    --radius-lg:16px;
+    --radius-xl:20px;
+    --shadow-card:0 1px 2px rgba(15,23,42,0.04), 0 4px 12px rgba(15,23,42,0.04);
+    --shadow-lift:0 4px 16px rgba(15,23,42,0.08), 0 12px 32px rgba(15,23,42,0.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;font-size:16px;line-height:1.5}
+  body{min-height:100dvh;overflow-x:hidden}
+  .app{max-width:560px;margin:0 auto;padding:0 16px 40px}
+  h1,h2,h3{font-family:'Playfair Display',Georgia,serif;font-weight:600;letter-spacing:-0.015em;line-height:1.18}
+  a{color:var(--primary);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Hero */
+  .hero{margin:20px 0 16px;background:linear-gradient(155deg,#155E75 0%,#0F172A 60%,#0B1220 100%);color:#fff;border-radius:var(--radius-xl);padding:28px 22px;position:relative;overflow:hidden;box-shadow:var(--shadow-lift)}
+  .hero::before{content:"";position:absolute;top:-50px;right:-40px;width:180px;height:180px;background:radial-gradient(circle,#22D3EE 0%,transparent 70%);opacity:0.35}
+  .hero::after{content:"";position:absolute;bottom:-40px;left:-30px;width:140px;height:140px;background:radial-gradient(circle,#0891B2 0%,transparent 70%);opacity:0.25}
+  .hero-eyebrow{position:relative;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;opacity:.85;font-weight:600;margin-bottom:6px}
+  .hero h1{position:relative;font-size:34px;color:#fff;line-height:1.1}
+  .hero-sub{position:relative;font-size:14px;opacity:.85;margin-top:10px;line-height:1.55}
+  .hero-meta{position:relative;display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .hero-chip{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500}
+
+  /* Section */
+  .section{margin-top:22px}
+  .section-eyebrow{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-mute);font-weight:600;margin-bottom:4px}
+  .section h2{font-size:24px;margin-bottom:12px}
+
+  /* Card */
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;box-shadow:var(--shadow-card)}
+  .card h3{font-size:17px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--ink-soft);line-height:1.55}
+
+  /* Day */
+  .day{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px;margin-bottom:10px;box-shadow:var(--shadow-card)}
+  .day-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .day-num{background:var(--primary);color:#fff;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
+  .day-date{font-size:12px;color:var(--ink-mute);font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
+  .day h3{font-size:18px;margin-bottom:6px}
+  .day p{font-size:14px;color:var(--ink-soft);line-height:1.55}
+
+  /* List */
+  ul.tidy{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-top:8px}
+  ul.tidy li{font-size:14px;color:var(--ink-soft);padding-left:18px;position:relative;line-height:1.5}
+  ul.tidy li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;border-radius:50%;background:var(--primary)}
+  @media (max-width:480px){ul.tidy{grid-template-columns:1fr}}
+
+  /* Facts grid */
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .fact{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px}
+  .fact-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-mute);font-weight:700;margin-bottom:4px}
+  .fact-val{font-size:14px;font-weight:600;color:var(--ink);line-height:1.3}
+
+  /* Warn */
+  .warn{display:flex;gap:10px;background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius);padding:12px 14px;margin-top:12px;font-size:13px;line-height:1.5;color:var(--warn-fg)}
+  .warn strong{font-weight:700}
+
+  /* Footer */
+  footer{margin-top:28px;text-align:center;font-size:12px;color:var(--ink-mute)}
+  footer a{color:var(--primary)}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="hero">
+    <div class="hero-eyebrow">Patel Family · Trip Plan (POC)</div>
+    <h1>Havasupai Falls</h1>
+    <p class="hero-sub">Turquoise waterfalls deep in the Grand Canyon. A 4-day backpacking trip on Havasupai tribal land — permits required.</p>
+    <div class="hero-meta">
+      <span class="hero-chip">📍 Supai, Arizona</span>
+      <span class="hero-chip">🥾 20 mi round-trip</span>
+      <span class="hero-chip">🗓️ Dates TBD</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="section-eyebrow">At a glance</div>
+    <h2>The Basics</h2>
+    <div class="facts">
+      <div class="fact"><div class="fact-label">Trailhead</div><div class="fact-val">Hualapai Hilltop</div></div>
+      <div class="fact"><div class="fact-label">Distance</div><div class="fact-val">10 mi each way</div></div>
+      <div class="fact"><div class="fact-label">Elevation</div><div class="fact-val">~2,400 ft drop</div></div>
+      <div class="fact"><div class="fact-label">Best season</div><div class="fact-val">Mar–May, Sep–Oct</div></div>
+      <div class="fact"><div class="fact-label">Permit cost</div><div class="fact-val">~$455 / person</div></div>
+      <div class="fact"><div class="fact-label">Nights</div><div class="fact-val">3 (mandatory)</div></div>
+    </div>
+    <div class="warn">
+      <span>⚠️</span>
+      <div><strong>Permits sell out fast.</strong> Reservations open Feb 1 each year at <a href="https://www.havasupaireservations.com" target="_blank" rel="noopener">havasupaireservations.com</a>. No day hikes allowed.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-eyebrow">Itinerary</div>
+    <h2>4 Days, 3 Nights</h2>
+
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">Day 1</span>
+        <span class="day-date">Hike In</span>
+      </div>
+      <h3>Hualapai Hilltop → Campground</h3>
+      <p>Start before sunrise (5–6am) to beat the heat. 8 mi descent through the canyon to Supai Village, then 2 mi more to the campground between Havasu and Mooney Falls. Set up camp, cool off in Havasu Falls.</p>
+    </div>
+
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">Day 2</span>
+        <span class="day-date">Beaver Falls</span>
+      </div>
+      <h3>Mooney + Beaver Falls Day Hike</h3>
+      <p>Climb down the chains/ladders past Mooney Falls (200 ft, the tallest), then 3 mi downstream to Beaver Falls — multi-tiered turquoise pools perfect for swimming. ~8 mi round-trip from camp.</p>
+    </div>
+
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">Day 3</span>
+        <span class="day-date">Explore + Rest</span>
+      </div>
+      <h3>Navajo + Fifty Foot Falls</h3>
+      <p>Easy day. Visit Navajo Falls and Fifty Foot Falls (upstream of camp). Swim, relax, journal. Confirm Day 4 plan — pack lightly for the climb out.</p>
+    </div>
+
+    <div class="day">
+      <div class="day-head">
+        <span class="day-num">Day 4</span>
+        <span class="day-date">Hike Out</span>
+      </div>
+      <h3>Campground → Hualapai Hilltop</h3>
+      <p>Leave camp by 4–5am. The last 1.5 mi is steep switchbacks back to the rim — save energy. Drive to Las Vegas or Flagstaff for a real bed and a real meal.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-eyebrow">What to pack</div>
+    <h2>Gear Checklist</h2>
+    <div class="card">
+      <h3>Essentials</h3>
+      <ul class="tidy">
+        <li>Backpack (50–65L)</li>
+        <li>Tent + sleeping pad</li>
+        <li>Sleeping bag (30°F)</li>
+        <li>Water filter / Sawyer</li>
+        <li>Hiking boots (broken in)</li>
+        <li>Trekking poles</li>
+        <li>Headlamp + batteries</li>
+        <li>Sun hat + sunscreen</li>
+        <li>Swimwear + quick-dry towel</li>
+        <li>Water shoes (for falls)</li>
+        <li>Permit printout + ID</li>
+        <li>Cash (no cards in village)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Food (4 days, no fires allowed)</h3>
+      <p>Plan ~2,500 cal/day. Dehydrated meals, oatmeal, trail mix, jerky, electrolyte tabs. Café in Supai Village sells fry bread + basics — cash only.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-eyebrow">Getting there</div>
+    <h2>Logistics</h2>
+    <div class="card">
+      <h3>Fly to Las Vegas (LAS)</h3>
+      <p>Closest major airport. ~4 hr drive to Hualapai Hilltop. Rent a car with high clearance — last 60 miles are remote, no gas stations near trailhead.</p>
+    </div>
+    <div class="card">
+      <h3>Night before: Peach Springs or Kingman, AZ</h3>
+      <p>Sleep close to the trailhead. Peach Springs is ~1 hr from Hualapai Hilltop. Hualapai Lodge is the closest option.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>Havasupai Falls Trip · POC · <a href="../index.html">← Back to Home</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
