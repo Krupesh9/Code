@@ -354,3 +354,11 @@ All models are modified: geometry consolidated and simplified, interior componen
 - CC BY-NC-SA 4.0: https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Keep these credits with redistributions. NC assets restrict commercial use; SA applies to adaptations of those models. Manufacturer trademarks and underlying vehicle design rights are not granted by a model’s Creative Commons license.
+
+
+## Additional photographed road surfaces
+
+- Concrete Pavement by Charlotte Baglioni, Poly Haven, CC0. Source: https://polyhaven.com/a/concrete_pavement . Local 1K color, OpenGL normal and roughness maps in `assets/surfaces/`.
+- Gravelly Sand by Dario Barresi, Poly Haven, CC0. Source: https://polyhaven.com/a/gravelly_sand . Local 1K color, OpenGL normal and roughness maps in `assets/surfaces/`.
+- Direct source-file URLs and author metadata are retained in `assets/surfaces/sources.json`. No external texture requests occur during play.
+- Existing Asphalt 02 maps now use the original downloaded 1K resolution. The sky now retains the original 1024 × 512 HDR pixels, with linear filtering.

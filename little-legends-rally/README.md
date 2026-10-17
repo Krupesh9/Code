@@ -9,7 +9,8 @@ A WebGL arcade racer with 52 car models/variants from 17 brands, 36 events acros
 - Hold **BRAKE** to slow down; release to accelerate.
 - Hold **NITRO** to boost. Release and reapply inside the blue charge zone for perfect nitro.
 - In the air, tap **BARREL ROLL** for a stunt. Loops use traction assistance.
-- Settings offers Sport/Assisted handling, Chase/Road cameras, graphics quality, tilt steering, music and effects.
+- Settings offers Sport/Assisted handling, Chase/Road cameras, graphics quality, tilt steering, and separate music/effects volume controls.
+- Drive through moving rings for bonus credits, points and nitro. Sliding gates, rotating sweepers, timed presses, swinging loads, slalom drums, and rolling rocks/snowballs appear progressively. Brake or change your line to pass hazards; warning paint and the HUD identify approaching hazards.
 - Keyboard alternatives: arrows steer, down/S brakes, Shift drifts, Space boosts, Escape pauses.
 
 ## Save progress
@@ -43,13 +44,13 @@ For a separate repository:
 5. Select **main** and **/(root)**, then **Save**.
 6. Wait for GitHub's Pages deployment to finish. Open `https://YOUR-USERNAME.github.io/nightshift/`.
 
-All car models, thumbnails, and surface textures use relative paths and work in a repository subfolder. Keep their spelling and capitalization unchanged. Three.js is pinned to 0.160.1 on jsDelivr, with an unpkg fallback. A network connection is needed on first load; blocked CDNs or disabled WebGL show a retry message. The page is not a fully offline app. Audio starts after a user gesture, and tilt permission depends on browser support and a secure context. High graphics can be demanding; Auto lowers the pixel budget and shadows, while Smooth explicitly reduces effects.
+All car models, thumbnails, and surface textures use relative paths and work in a repository subfolder. Keep their spelling and capitalization unchanged. Three.js is pinned to 0.160.1 on jsDelivr, with an unpkg fallback. A network connection is needed on first load; blocked CDNs or disabled WebGL show a retry message. The page is not a fully offline app. Audio starts after a user gesture, and tilt permission depends on browser support and a secure context. High graphics can be demanding; Auto starts at up to 2× display resolution, reduces secondary effects before resolution, and restores resolution when frame time improves. High allows up to 2.5× within an 8.5-megapixel budget; Smooth explicitly reduces effects.
 
 ## Assets and limitations
 
 See [ASSET-CREDITS.md](ASSET-CREDITS.md) for each model's source and terms. Several models have noncommercial licenses; this collection is for noncommercial use. Names identify depicted cars and do not imply manufacturer endorsement. Ratings are arcade-balanced, not manufacturer specifications. The models differ in detail and fidelity.
 
-This is a browser arcade game, not a commercial-engine simulation. The current steering, loop, drift, road, camera, and lighting changes are ready for user play-testing; automated/browser tests were skipped at the user's request. Frame rate and iPhone compatibility have not been verified for this revision.
+This is a browser arcade game, not a commercial-engine simulation. The current revision is ready for user driving and difficulty assessment. JavaScript syntax and a brief desktop/mobile browser render are checked; full race playthroughs and physical iPhone testing are not covered. Frame rate depends on device and graphics settings.
 
 ## Visual references
 
@@ -57,3 +58,18 @@ The requested Asphalt references are linked for comparison, not bundled as game 
 
 - [Apple's Asphalt Legends Unite preview and screenshots](https://apps.apple.com/us/story/id1735568051): lighting, reflections, garage presentation, and drifting.
 - [Asphalt 9 screenshot gallery](https://www.mobygames.com/game/112064/asphalt-9-legends/screenshots/): road environments, track obstacles, and race HUD examples.
+
+## Campaign variety
+
+| District | Surface and route | Main hazards |
+| --- | --- | --- |
+| Pacific Coast | Highway and concrete promenade; flowing bends | Slalom drums, moving gates, sweepers |
+| Neon Metro | Wet expressway, tunnels, city chicanes | Gates, overhead presses, sweepers |
+| Redrock Canyon | Photographed gravel; climbs and ridge turns | Rolling rocks, drums, sweepers |
+| Alpine Pass | Snowfall, cold asphalt and icy concrete; switchbacks | Snowballs, gates, slalom |
+| Rainforest Run | Gravel/asphalt, monsoon conditions and bridge crossings | Swinging loads, gates, rocks |
+| Storm Harbor | Concrete docks, covered roads and narrower lanes | Presses, sweepers, gates, swinging loads |
+
+Later events increase moving-hazard speed, reduce obstacle spacing and gate openings, narrow the road, and strengthen rivals. Thirty-six route recipes combine district-specific opening sections with different technical sections. Objectives rotate through clean runs, ring collections, stunts, drift duration, near misses and score. Objectives award extra credits; finishing top three still unlocks progression.
+
+The game saves on background/close and pauses an active race. Audio resumes after a tap; mobile browsers can require that gesture after an interruption. The garage animates while open, with a reduced-motion option. The app does not attempt to run animations or audio after it is closed.

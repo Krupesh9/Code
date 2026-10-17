@@ -1,0 +1,52 @@
+[
+  {
+    "id": "concrete_pavement",
+    "author": {
+      "Charlotte Baglioni": "All"
+    },
+    "source": "https://polyhaven.com/a/concrete_pavement",
+    "license": "CC0",
+    "maps": {
+      "diff": {
+        "file": "concrete_pavement-color.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/concrete_pavement/concrete_pavement_diff_1k.jpg",
+        "bytes": 926197
+      },
+      "nor_gl": {
+        "file": "concrete_pavement-normal.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/concrete_pavement/concrete_pavement_nor_gl_1k.jpg",
+        "bytes": 1184345
+      },
+      "rough": {
+        "file": "concrete_pavement-roughness.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/concrete_pavement/concrete_pavement_rough_1k.jpg",
+        "bytes": 475799
+      }
+    }
+  },
+  {
+    "id": "gravelly_sand",
+    "author": {
+      "Dario Barresi": "All"
+    },
+    "source": "https://polyhaven.com/a/gravelly_sand",
+    "license": "CC0",
+    "maps": {
+      "diff": {
+        "file": "gravelly_sand-color.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravelly_sand/gravelly_sand_diff_1k.jpg",
+        "bytes": 1062525
+      },
+      "nor_gl": {
+        "file": "gravelly_sand-normal.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravelly_sand/gravelly_sand_nor_gl_1k.jpg",
+        "bytes": 1387739
+      },
+      "rough": {
+        "file": "gravelly_sand-roughness.jpg",
+        "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/gravelly_sand/gravelly_sand_rough_1k.jpg",
+        "bytes": 419895
+      }
+    }
+  }
+]
