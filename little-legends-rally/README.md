@@ -1,6 +1,6 @@
 # Nightshift
 
-A WebGL arcade racer with 52 car models/variants from 17 brands, 36 events across six environments, a configurable garage, nitro, drifting, jumps, and loop courses. Built with Three.js; no build tool or backend is needed.
+A WebGL arcade racer with 52 car models/variants from 17 brands, 36 events across six environments, a configurable garage, nitro, drifting, thruster flight, jumps, and loop courses. The detailed Tesla Roadster 2020 is the free default car. Built with Three.js; no build tool or backend is needed.
 
 ## Play
 
@@ -8,14 +8,16 @@ A WebGL arcade racer with 52 car models/variants from 17 brands, 36 events acros
 - Hold **DRIFT** while steering to slide. Countersteer to catch the rear; release drift to regain grip.
 - Hold **BRAKE** to slow down; release to accelerate.
 - Hold **NITRO** to boost. Release and reapply inside the blue charge zone for perfect nitro.
-- In the air, tap **BARREL ROLL** for a stunt. Loops use traction assistance.
+- Tap **FLY** above nitro for a 3.2-second steerable thruster flight. The same button becomes **FLIP** in the air; tap once for a barrel roll and land for credits and nitro. Flight also works with other garage cars.
+- Flight has a separate meter: 6% recharge per second on the ground, 12% while drifting, and 20% from bonus rings. Low-clearance tunnels and loops block launches. Nitro remains available during flight.
+- In the air, the left **BARREL ROLL** button also triggers a stunt. Loops use traction assistance.
 - Settings offers Sport/Assisted handling, Chase/Road cameras, graphics quality, tilt steering, and separate music/effects volume controls.
 - Drive through moving rings for bonus credits, points and nitro. Sliding gates, rotating sweepers, timed presses, swinging loads, slalom drums, and rolling rocks/snowballs appear progressively. Brake or change your line to pass hazards; warning paint and the HUD identify approaching hazards.
-- Keyboard alternatives: arrows steer, down/S brakes, Shift drifts, Space boosts, Escape pauses.
+- Keyboard alternatives: arrows steer, down/S brakes, Shift drifts, Space boosts, F launches/flips, Escape pauses.
 
 ## Save progress
 
-Campaign unlocks, best results, currency, purchased cars, cosmetics, upgrades, and settings save automatically in the browser. Nightshift retains the original `apex-drive-v2` storage key and save-file format so the rename does not reset an existing garage. A previous complete save is retained as a recovery copy.
+Campaign unlocks, best results, currency, purchased cars, cosmetics, upgrades, and settings save automatically in the browser. Nightshift retains the original `apex-drive-v2` storage key and save-file format so the rename does not reset an existing garage. A previous complete save is retained as a recovery copy. This release grants and equips the Roadster once for existing saves without removing cars, credits, upgrades, custom builds, or campaign progress. Later car selections remain selected on future visits.
 
 Use **Settings → Export backup** before switching browsers, devices, or website addresses. Import it on the destination with **Settings → Import backup**. Localhost and GitHub Pages are separate browser storage origins; saves do not automatically sync between them. Clearing browser data or private browsing can remove browser saves. An unfinished race restarts; collected credits are retained.
 
@@ -48,7 +50,7 @@ All car models, thumbnails, and surface textures use relative paths and work in 
 
 ## Assets and limitations
 
-See [ASSET-CREDITS.md](ASSET-CREDITS.md) for each model's source and terms. Several models have noncommercial licenses; this collection is for noncommercial use. Names identify depicted cars and do not imply manufacturer endorsement. Ratings are arcade-balanced, not manufacturer specifications. The models differ in detail and fidelity.
+See [ASSET-CREDITS.md](ASSET-CREDITS.md) for each model's source and terms. Several models have noncommercial licenses; this collection is for noncommercial use. Names identify depicted cars and do not imply manufacturer endorsement. Ratings are arcade-balanced, not manufacturer specifications. Thruster flight and barrel rolls are fictional arcade abilities; the included Roadster model depicts the 2020 design, not an exact replica of a later event prototype. The models differ in detail and fidelity.
 
 This is a browser arcade game, not a commercial-engine simulation. The current revision is ready for user driving and difficulty assessment. JavaScript syntax and a brief desktop/mobile browser render are checked; full race playthroughs and physical iPhone testing are not covered. Frame rate depends on device and graphics settings.
 

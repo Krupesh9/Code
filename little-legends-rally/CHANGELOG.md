@@ -1,5 +1,13 @@
 # Changes
 
+## 2026-10-17 — Roadster and thruster flight
+
+- Made the detailed Tesla Roadster 2020 a free default starter; existing saves receive it once while retaining their cars, builds, currency, upgrades and campaign. Subsequent car choices persist.
+- Added a dedicated FLY/FLIP touch button above nitro, independent charge meter, steerable 3.2-second flight, visible underbody thrusters, aerial barrel rolls, and landing rewards. Keyboard F provides the same action.
+- Flight recharges on the ground, faster while drifting, with additional charge from rings. Launch clearance excludes tunnels and loops; recovery cancels flight safely.
+- Repositioned the minimap above the right-thumb action stack and raised the chase camera during thruster flight.
+- Focused checks passed for save migration, later car selection, lift/flip/landing rewards, loop launch blocking, and 390×844 control placement. Physical iPhone driving remains for user testing.
+
 ## 2026-10-17 — Districts and moving hazards
 
 - Added moving bonus rings, sliding gates, rotating sweepers, timed presses, swinging loads, slalom drums, and rolling hazards, with collision and reward rules.
